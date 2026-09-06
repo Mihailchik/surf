@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f9">
 <title>Phuket · surf</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b7fc7'/%3E%3Cpath d='M6 40c6 0 6-7 12-7s6 7 12 7 6-7 12-7 6 7 12 7' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M6 50c6 0 6-6 12-6s6 6 12 6 6-6 12-6 6 6 12 6' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' opacity='.55'/%3E%3Ccircle cx='45' cy='19' r='7' fill='%23ffd94a'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b7fc7'/%3E%3Cpath d='M6 40c6 0 6-7 12-7s6 7 12 7 6-7 12-7 6 7 12 7' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M6 50c6 0 6-6 12-6s6 6 12 6 6-6 12-6 6 6 12 6' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' opacity='.55'/%3E%3Ccircle cx='45' cy='19' r='7' fill='%23ffd94a'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Phuket%20surf%22%2C%22short_name%22%3A%22Surf%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f2f5f9%22%2C%22theme_color%22%3A%22%230b7fc7%22%2C%22start_url%22%3A%22.%22%7D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Surf">
+<meta name="description" content="Waves, wind, tide and live cams for Phuket west coast beaches">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* Светлая тема — основная. Тёмная включается кнопкой и живёт в localStorage. */
@@ -97,7 +103,6 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .nocam{display:flex;align-items:center;gap:7px;background:var(--card2);color:var(--dim2);
   font-size:11.5px;padding:8px 13px;border-bottom:1px solid var(--line)}
 .nocam b{color:var(--dim);font-size:12px;font-weight:650}
-.proxy{border-bottom:1px solid var(--line)}
 
 .mets{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
 .met{background:var(--card);padding:8px 4px;text-align:center}
@@ -238,55 +243,51 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 --------------------------------------------------------------- */
 const SPOTS=[
  {id:'naiharn',nm:{en:'Nai Harn',ru:'Най Харн',th:'หาดในหาน'},lat:7.7756,lon:98.3035,facing:250,swellMin:0.9,swellMax:2.6,
-  shelter:.45,tide:'mid',pin:1,cam:null,proxy:'kata',camNote:'ближайшая — Ката, 4.7 км',
-  note:'бухта, прикрыта мысами. оживает на большом свелле, когда Кату разносит'},
+  shelter:.45,tide:'mid',pin:1,cam:null},
  {id:'kata',nm:{en:'Kata',ru:'Ката',th:'หาดกะตะ'},lat:7.8206,lon:98.2967,facing:270,swellMin:0.4,swellMax:2.2,
-  shelter:.2,tide:'mid',pin:1,cam:{type:'rtsp',id:'2F8DfBS5',by:'SSS Dive & Surf'},
-  note:'рабочая лошадка, держит почти любой свелл. на отливе мельчает'},
+  shelter:.2,tide:'mid',pin:1,cam:{type:'rtsp',id:'2F8DfBS5',by:'SSS Dive & Surf'}},
  {id:'patong',nm:{en:'Patong',ru:'Патонг',th:'หาดป่าตอง'},lat:7.8950,lon:98.2830,facing:265,swellMin:0.6,swellMax:2.0,
   // поток Патонга закрыт CSP (frame-ancestors только phuket101.net),
   // поэтому берём кадр — он обновляется сам и никуда не уводит
-  shelter:.4,tide:'mid',pin:1,cam:{type:'img',id:'1613136596',by:'Patong Tower, 15F'},
-  note:'широкая бухта, мягче остальных. хорошо для лонга и новичков'},
+  shelter:.4,tide:'mid',pin:1,cam:{type:'img',id:'1613136596',by:'Patong Tower, 15F'}},
  {id:'karon',nm:{en:'Karon',ru:'Карон',th:'หาดกะรน'},lat:7.8480,lon:98.2930,facing:270,swellMin:0.5,swellMax:2.4,
-  shelter:.15,tide:'high',pin:1,cam:{type:'ipcam',id:'69241c73d3f52',by:'Marina Phuket Resort'},
-  note:'мощный шор-брейк, на отливе бьёт в песок. лучше на приливе'},
+  shelter:.15,tide:'high',pin:1,cam:{type:'ipcam',id:'69241c73d3f52',by:'Marina Phuket Resort'}},
  {id:'katanoi',nm:{en:'Kata Noi',ru:'Ката Ной',th:'หาดกะตะน้อย'},lat:7.8080,lon:98.2960,facing:270,swellMin:0.6,swellMax:2.0,
-  shelter:.3,tide:'high',cam:null,camNote:'публичных камер нет',
-  note:'короче и злее Каты, крутой шор-брейк'},
+  shelter:.3,tide:'high',cam:null},
  {id:'kalim',nm:{en:'Kalim',ru:'Калим',th:'หาดกะหลิม'},lat:7.9130,lon:98.2790,facing:270,swellMin:1.3,swellMax:3.5,
-  shelter:.1,tide:'mid',cam:null,camNote:'публичных камер нет',
-  note:'риф, левая. молчит до 1.3 м, зато на большом свелле — лучший на острове'},
+  shelter:.1,tide:'mid',cam:null},
  {id:'kamala',nm:{en:'Kamala',ru:'Камала',th:'หาดกมลา'},lat:7.9540,lon:98.2790,facing:272,swellMin:0.6,swellMax:2.2,
-  shelter:.25,tide:'any',cam:null,camNote:'публичных камер нет',
-  note:'ровный бич-брейк, спокойнее Сурина'},
+  shelter:.25,tide:'any',cam:null},
  {id:'surin',nm:{en:'Surin',ru:'Сурин',th:'หาดสุรินทร์'},lat:7.9770,lon:98.2780,facing:270,swellMin:0.8,swellMax:2.6,
-  shelter:.1,tide:'mid',cam:null,camNote:'публичных камер нет',
-  note:'мощно и резко, шор-брейк. не для первого раза'},
+  shelter:.1,tide:'mid',cam:null},
  {id:'bangtao',nm:{en:'Bang Tao',ru:'Банг Тао',th:'หาดบางเทา'},lat:8.0000,lon:98.2930,facing:275,swellMin:0.5,swellMax:2.2,
-  shelter:.2,tide:'any',cam:null,camNote:'публичных камер нет',
-  note:'длинный пустой бич-брейк. ловит ветер сильнее всех'},
+  shelter:.2,tide:'any',cam:null},
  {id:'layan',nm:{en:'Layan',ru:'Лайан',th:'หาดลายัน'},lat:8.0330,lon:98.2890,facing:272,swellMin:0.5,swellMax:1.8,
-  shelter:.35,tide:'any',cam:null,camNote:'публичных камер нет',
-  note:'мелкий угол бухты, спокойно и мягко'},
+  shelter:.35,tide:'any',cam:null},
  {id:'naithon',nm:{en:'Nai Thon',ru:'Найтон',th:'หาดในทอน'},lat:8.0800,lon:98.2600,facing:270,swellMin:0.5,swellMax:2.0,
-  shelter:.3,tide:'mid',cam:null,camNote:'публичных камер нет',
-  note:'тихо и малолюдно, ехать далеко'},
+  shelter:.3,tide:'mid',cam:null},
  {id:'naiyang',nm:{en:'Nai Yang',ru:'Най Янг',th:'หาดในยาง'},lat:8.0930,lon:98.2960,facing:270,swellMin:0.4,swellMax:1.5,
-  shelter:.55,tide:'high',cam:null,camNote:'есть камера в лодже, но смотрит в сад — бесполезна',
-  note:'риф гасит волну, самое пологое место. школы катаются тут'}
+  shelter:.55,tide:'high',cam:null}
 ];
 
 const WAVE_MODELS=['gwam','meteofrance_wave','ecmwf_wam025'];
 const WIND_MODELS=['icon_seamless','gfs_seamless','ecmwf_ifs025','meteofrance_seamless','jma_seamless'];
 let TAB='now', DATA=null, WEATHER=null;
 
+/* localStorage может бросать исключение (приватный режим, отключённые
+   куки) — тогда страница просто работает без запоминания настроек. */
+const LS={
+  get(k){ try{ return localStorage.getItem(k) }catch{ return null } },
+  set(k,v){ try{ localStorage.setItem(k,v) }catch{} },
+  del(k){ try{ localStorage.removeItem(k) }catch{} }
+};
+
 /* ── Языки ─────────────────────────────────────────────────────
    Английский по умолчанию, выбор запоминается в localStorage.
    t('key') берёт строку текущего языка, при пропуске падает на en. */
 const I18N={
  en:{
-  title:'Phuket · surf', now:'Now', d3:'3 days', d7:'Week',
+  title:'Phuket · surf', now:'Now', d3:'3 days', d7:'10 days',
   go:'GO', ok:'WORTH IT', weak:'WEAK', no:'SKIP',
   darkNow:'dark now · ', bestIs:'best is {0}', windowAt:'window {0} {1}',
   today:'today', tomorrow:'tomorrow', peak:'peak', outOf:'of 10',
@@ -336,7 +337,7 @@ const I18N={
   srcSG:'Stormglass (NOAA, AIFS, Met Office)'
  },
  ru:{
-  title:'Пхукет · серф', now:'Сейчас', d3:'3 дня', d7:'Неделя',
+  title:'Пхукет · серф', now:'Сейчас', d3:'3 дня', d7:'10 дней',
   go:'ЕХАТЬ', ok:'МОЖНО', weak:'СЛАБО', no:'НЕ СТОИТ',
   darkNow:'сейчас темно · ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
   today:'сегодня', tomorrow:'завтра', peak:'пик', outOf:'из 10',
@@ -386,7 +387,7 @@ const I18N={
   srcSG:'Stormglass (NOAA, AIFS, Met Office)'
  },
  th:{
-  title:'ภูเก็ต · เซิร์ฟ', now:'ตอนนี้', d3:'3 วัน', d7:'สัปดาห์',
+  title:'ภูเก็ต · เซิร์ฟ', now:'ตอนนี้', d3:'3 วัน', d7:'10 วัน',
   go:'ไปเลย', ok:'พอไหว', weak:'คลื่นเล็ก', no:'ไม่ควรไป',
   darkNow:'ตอนนี้มืดแล้ว · ', bestIs:'ดีที่สุดคือ {0}', windowAt:'ช่วงเวลา {0} {1}',
   today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', outOf:'จาก 10',
@@ -438,7 +439,7 @@ const I18N={
 };
 const LOCALE={en:'en-GB',ru:'ru-RU',th:'th-TH'};
 const nameOf=sp=>sp.nm[LANG]||sp.nm.en;
-let LANG=localStorage.getItem('lang');
+let LANG=LS.get('lang');
 if(!I18N[LANG]) LANG=(navigator.language||'en').slice(0,2);
 if(!I18N[LANG]) LANG='en';
 function t(k,...a){
@@ -455,7 +456,7 @@ const WMO={0:['☀','ясно'],1:['🌤','почти ясно'],2:['⛅','пе�
   95:['⛈','гроза'],96:['⛈','гроза'],99:['⛈','гроза']};
 
 /* тема: светлая по умолчанию */
-const th=localStorage.getItem('theme')||'light';
+const th=LS.get('theme')||'light';
 if(th==='dark') document.documentElement.dataset.theme='dark';
 const tglBtn=document.getElementById('tgl');
 const paint=()=>{const d=document.documentElement.dataset.theme==='dark';
@@ -464,7 +465,7 @@ const paint=()=>{const d=document.documentElement.dataset.theme==='dark';
 paint();
 tglBtn.onclick=()=>{const d=document.documentElement.dataset.theme==='dark';
   if(d) delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme='dark';
-  localStorage.setItem('theme',d?'light':'dark'); paint()};
+  LS.set('theme',d?'light':'dark'); paint()};
 
 const avg=a=>{a=a.filter(x=>x!=null&&!isNaN(x));return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
 /* Медиана, а не среднее: одна модель-выброс (ECMWF даёт 7 м/с там,
@@ -565,7 +566,7 @@ async function loadWW3(){
   const t0=iso(new Date()), t1=iso(new Date(Date.now()+6*864e5));
   const idx=`%5B(${t0}):1:(${t1})%5D%5B(0.0)%5D%5B(7.9)%5D%5B(98.3)%5D`;
   const url='https://pae-paha.pacioos.hawaii.edu/erddap/griddap/ww3_global.json?'+
-    ['Thgt','Tper','Tdir','whgt'].map(v=>v+idx).join(',');
+    ['Thgt','Tper','Tdir'].map(v=>v+idx).join(',');
   const j=await jget(url);
   const cols=j.table.columnNames, out={};
   const ci=n=>cols.indexOf(n);
@@ -573,7 +574,7 @@ async function loadWW3(){
     // ERDDAP отдаёт UTC — переводим в местный час Пхукета
     const k=new Date(r[ci('time')]).toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'})
       .slice(0,13).replace(' ','T');
-    out[k]={h:r[ci('Thgt')], p:r[ci('Tper')], d:r[ci('Tdir')], wh:r[ci('whgt')]};
+    out[k]={h:r[ci('Thgt')], p:r[ci('Tper')], d:r[ci('Tdir')]};
   }
   return out;
 }
@@ -584,12 +585,12 @@ async function loadWW3(){
    тянем раз в 6 часов (4 запроса в сутки) и держим в localStorage.
    Ключ живёт в браузере, а не в коде — файл можно публиковать.     */
 const SG_TTL=6*3600*1000;
-const sgKey=()=>localStorage.getItem('sg_key')||'';
+const sgKey=()=>LS.get('sg_key')||'';
 async function loadStormglass(){
   const key=sgKey();
   if(!key){ STATUS.sg={ok:false,label:t('srcSG'),err:t('keyMissing')}; return null }
   try{
-    const cached=JSON.parse(localStorage.getItem('sg_cache')||'null');
+    const cached=JSON.parse(LS.get('sg_cache')||'null');
     if(cached && Date.now()-cached.at<SG_TTL){
       STATUS.sg={ok:true,label:t('srcSG'),
         note:t('fromCache',new Date(cached.at).toLocaleTimeString(LOCALE[LANG],{hour:'2-digit',minute:'2-digit'}))};
@@ -606,7 +607,7 @@ async function loadStormglass(){
       const k=new Date(h.time).toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,13).replace(' ','T');
       by[k]=h;
     }
-    localStorage.setItem('sg_cache',JSON.stringify({at:Date.now(),data:by}));
+    LS.set('sg_cache',JSON.stringify({at:Date.now(),data:by}));
     STATUS.sg={ok:true,label:t('srcSG'),
       note:t('refreshed',j.meta?.requestCount??'?',j.meta?.dailyQuota??10)};
     return by;
@@ -614,7 +615,7 @@ async function loadStormglass(){
     STATUS.sg={ok:false,label:t('srcSG'),
       err:e.name==='AbortError'?t('timeout'):e.message};
     // если свежий запрос не удался, лучше показать вчерашний кэш, чем ничего
-    const c=JSON.parse(localStorage.getItem('sg_cache')||'null');
+    const c=JSON.parse(LS.get('sg_cache')||'null');
     return c?c.data:null;
   }
 }
@@ -626,7 +627,7 @@ async function safe(key,label,fn){
 async function load(){
   const pts=[...new Set(SPOTS.map(s=>s.lat.toFixed(2)+','+s.lon.toFixed(2)))];
   const lats=pts.map(p=>p.split(',')[0]).join(','), lons=pts.map(p=>p.split(',')[1]).join(',');
-  const base='latitude='+lats+'&longitude='+lons+'&timezone=Asia%2FBangkok&forecast_days=7';
+  const base='latitude='+lats+'&longitude='+lons+'&timezone=Asia%2FBangkok&forecast_days=10';
   const [m,w,tSea,g,mn,ww3,sg]=await Promise.all([
     safe('wave',t('srcWave'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
@@ -708,8 +709,6 @@ async function load(){
         sgTide, sgWater,
         wind:median(wS), wdir:circMean(wRaw.map(x=>x.d)),
         gust:median(wRaw.map(x=>x.g)),
-        agree:1-clamp(spread(sH)*0.6+spread(wS)*0.4,0,1),
-        nSwell:sH.filter(x=>x!=null).length, nWind:wS.filter(x=>x!=null).length,
         // сырые значения каждой модели — чтобы итог можно было проверить руками
         ww3:w3,
         raw:{wave:sRaw, wind:wRaw}});
@@ -860,8 +859,8 @@ function card(sp,rows,pinned){
       `<details class="more"><summary>${t('more')}</summary>
          ${hourStrip(rows,i0)}${why(sp,r)}${sources(r)}
        </details>`;
-  }else body=dayRows(rows,TAB==='d3'?3:7);
-  const best=bestDaylight(rows,i0,TAB==='d3'?72:TAB==='d7'?168:24);
+  }else body=dayRows(rows,TAB==='d3'?3:10);
+  const best=bestDaylight(rows,i0,TAB==='d3'?72:TAB==='d7'?240:24);
   const sub=TAB==='now'
     ? `${t('wave')} <b>${fmt(r.swell,1)} ${t('uM')}</b> · ${t('period')} <b>${fmt(r.period,1)} ${t('uS')}</b> · ${t('wind')} <b>${
         dirRu(r.wdir??0)} ${fmt(r.wind,0)}</b> · ${t('water')} <b>${fmt(r.sst,0)}°</b>`
@@ -1009,10 +1008,10 @@ function render(){
   document.querySelectorAll('#sgsave').forEach(b=>b.onclick=()=>{
     const v=b.parentElement.querySelector('input').value.trim();
     if(!v||v.startsWith('•')) return;
-    localStorage.setItem('sg_key',v); localStorage.removeItem('sg_cache'); boot();
+    LS.set('sg_key',v); LS.del('sg_cache'); boot();
   });
   document.querySelectorAll('#sgdel').forEach(b=>b.onclick=()=>{
-    localStorage.removeItem('sg_key'); localStorage.removeItem('sg_cache'); boot();
+    LS.del('sg_key'); LS.del('sg_cache'); boot();
   });
 
   document.getElementById('upd').innerHTML=statusPill()+' '+t('updAt',
@@ -1039,7 +1038,7 @@ function applyLang(){
 }
 applyLang();
 document.getElementById('lang').onchange=e=>{
-  LANG=e.target.value; localStorage.setItem('lang',LANG);
+  LANG=e.target.value; LS.set('lang',LANG);
   applyLang(); render();
 };
 
@@ -1048,7 +1047,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   b.classList.add('on'); TAB=b.dataset.t; render(); window.scrollTo({top:0,behavior:'smooth'});
 });
 boot();
-setInterval(boot,600000);
+setInterval(boot,1800000);
 // кадровые камеры освежаем чаще, чем перерисовываем всю страницу
 setInterval(()=>document.querySelectorAll('.camimg').forEach(img=>{
   img.src=`https://imgproxy.windy.com/_/preview/plain/current/${img.dataset.cam}/original.jpg?v=${Date.now()}`;
