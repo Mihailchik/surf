@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f9">
 <title>Phuket · surf</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b7fc7'/%3E%3Cpath d='M6 40c6 0 6-7 12-7s6 7 12 7 6-7 12-7 6 7 12 7' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M6 50c6 0 6-6 12-6s6 6 12 6 6-6 12-6 6 6 12 6' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' opacity='.55'/%3E%3Ccircle cx='45' cy='19' r='7' fill='%23ffd94a'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b7fc7'/%3E%3Cpath d='M6 40c6 0 6-7 12-7s6 7 12 7 6-7 12-7 6 7 12 7' stroke='white' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M6 50c6 0 6-6 12-6s6 6 12 6 6-6 12-6 6 6 12 6' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' opacity='.55'/%3E%3Ccircle cx='45' cy='19' r='7' fill='%23ffd94a'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7fc7'/%3E%3Cpath d='M3 19q4.5-5 9 0t9 0 8-3' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7fc7'/%3E%3Cpath d='M3 19q4.5-5 9 0t9 0 8-3' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Phuket%20surf%22%2C%22short_name%22%3A%22Surf%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f2f5f9%22%2C%22theme_color%22%3A%22%230b7fc7%22%2C%22start_url%22%3A%22.%22%7D">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Surf">
@@ -33,13 +33,17 @@ body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-
 
 header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);
   backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:9px 0 0}
-.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px}
-.logo{font-size:16px;font-weight:750;letter-spacing:-.3px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 12px}
+.logo{font-size:15px;font-weight:750;letter-spacing:-.3px;white-space:nowrap;flex:0 0 auto}
 .logo span{color:var(--acc)}
-.hr2{display:flex;align-items:center;gap:9px}
-.upd{font-size:11px;color:var(--dim2);font-variant-numeric:tabular-nums}
-.lang{font:inherit;font-size:11px;font-weight:650;padding:3px 4px;border-radius:7px;
-  border:1px solid var(--line);background:var(--card);color:var(--dim);cursor:pointer}
+.hr2{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.upd{font-size:10px;color:var(--dim2);font-variant-numeric:tabular-nums;white-space:nowrap;
+  display:flex;align-items:center;gap:3px}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--card)}
+.lang button{font:inherit;font-size:10px;font-weight:700;letter-spacing:.2px;padding:4px 6px;
+  border:0;background:none;color:var(--dim2);cursor:pointer;line-height:1.1}
+.lang button+button{border-left:1px solid var(--line)}
+.lang button.on{background:var(--acc);color:#fff}
 .tgl{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;
   width:28px;height:26px;font-size:13px;cursor:pointer;line-height:1;padding:0}
 /* верхний бар: дата, погода, ветер, солнце */
@@ -201,6 +205,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .src{margin:20px 0 0;padding:12px 13px;border-radius:12px;background:var(--card2);
   border:1px solid var(--line);font-size:11px;color:var(--dim2);line-height:1.6}
 .src b{color:var(--dim)}
+.hits{display:flex;justify-content:center;padding:14px 0 4px;opacity:.65}
+.hits img{height:18px}
 .err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
   color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
 .skel{height:70px;border-radius:14px;background:linear-gradient(90deg,var(--card),var(--card2),var(--card));
@@ -215,7 +221,9 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
     <div class="logo" id="logo"></div>
     <div class="hr2">
       <div class="upd" id="upd">…</div>
-      <select class="lang" id="lang"><option value="en">EN</option><option value="ru">RU</option><option value="th">TH</option></select>
+      <div class="lang" id="lang">
+        <button data-l="en">EN</button><button data-l="ru">RU</button><button data-l="th">TH</button>
+      </div>
       <button class="tgl" id="tgl">☾</button>
     </div>
   </div>
@@ -233,6 +241,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
   <div class="src" id="src"></div>
+  <div class="hits"><img alt="" loading="lazy"
+    src="https://hits.sh/mihailchik.github.io/sitesurf.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
 </div>
 
 <script>
@@ -309,7 +319,7 @@ const I18N={
   keyOk:'save', keyReplace:'replace', keyRemove:'remove',
   keyNote:'The key is stored in this browser only, never in the code. One request per 6 hours — 4 of 10 daily.',
   keyMissing:'no key set', fromCache:'cached, {0}', refreshed:'refreshed, {0}/{1} today',
-  srcCount:'sources {0}', srcSome:'sources {0}/{1}', updAt:'upd. {0}',
+  srcCount:'sources {0}', srcSome:'sources {0}/{1}', updAt:'{0}',
   noData:'no data · ', timeout:'timeout',
   wxUnavailable:'weather unavailable — source did not respond',
   feels:'feels', uv:'UV', gustShort:'↗{0} m/s',
@@ -359,7 +369,7 @@ const I18N={
   keyOk:'ок', keyReplace:'заменить', keyRemove:'убрать',
   keyNote:'Ключ хранится только в этом браузере, в код не попадает. Запрос раз в 6 часов — 4 из 10 суточных.',
   keyMissing:'ключ не задан', fromCache:'из кэша, {0}', refreshed:'обновлён, {0}/{1} за сутки',
-  srcCount:'источников {0}', srcSome:'источники {0}/{1}', updAt:'обн. {0}',
+  srcCount:'источников {0}', srcSome:'источники {0}/{1}', updAt:'{0}',
   noData:'нет данных · ', timeout:'таймаут',
   wxUnavailable:'погода недоступна — источник не ответил',
   feels:'ощущ', uv:'УФ', gustShort:'↗{0} м/с',
@@ -409,7 +419,7 @@ const I18N={
   keyOk:'บันทึก', keyReplace:'เปลี่ยน', keyRemove:'ลบ',
   keyNote:'คีย์เก็บไว้ในเบราว์เซอร์นี้เท่านั้น ไม่อยู่ในโค้ด ขอข้อมูลทุก 6 ชั่วโมง — 4 จาก 10 ครั้งต่อวัน',
   keyMissing:'ยังไม่ได้ใส่คีย์', fromCache:'จากแคช {0}', refreshed:'อัปเดตแล้ว {0}/{1} วันนี้',
-  srcCount:'แหล่งข้อมูล {0}', srcSome:'แหล่งข้อมูล {0}/{1}', updAt:'อัปเดต {0}',
+  srcCount:'แหล่งข้อมูล {0}', srcSome:'แหล่งข้อมูล {0}/{1}', updAt:'{0}',
   noData:'ไม่มีข้อมูล · ', timeout:'หมดเวลา',
   wxUnavailable:'ไม่มีข้อมูลอากาศ — แหล่งข้อมูลไม่ตอบสนอง',
   feels:'รู้สึก', uv:'UV', gustShort:'↗{0} m/s',
@@ -1034,13 +1044,12 @@ function applyLang(){
   document.title=t('title');
   const map={now:'now',d3:'d3',d7:'d7'};
   document.querySelectorAll('.tab').forEach(b=>b.textContent=t(map[b.dataset.t]));
-  const sel=document.getElementById('lang'); if(sel) sel.value=LANG;
+  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
 applyLang();
-document.getElementById('lang').onchange=e=>{
-  LANG=e.target.value; LS.set('lang',LANG);
-  applyLang(); render();
-};
+document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>{
+  LANG=b.dataset.l; LS.set('lang',LANG); applyLang(); render();
+});
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
