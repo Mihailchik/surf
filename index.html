@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f6f9">
+<title>Пхукет · серф</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* Светлая тема — основная. Тёмная включается кнопкой и живёт в localStorage. */
+:root{
+  --bg:#f2f5f9; --card:#fff; --card2:#f7f9fc; --line:#e3e9f0;
+  --tx:#0f1b2d; --dim:#5b6b80; --dim2:#93a2b5;
+  --go:#00996b; --ok:#5f9e12; --mid:#d98207; --bad:#d9432c; --no:#9aa8b8;
+  --acc:#0b7fc7; --shadow:0 1px 2px rgba(15,27,45,.05),0 2px 10px rgba(15,27,45,.05);
+}
+:root[data-theme="dark"]{
+  --bg:#0a0e14; --card:#121822; --card2:#0e141d; --line:#1e2836;
+  --tx:#e8eef6; --dim:#7d8da3; --dim2:#56657a;
+  --go:#2ee6a8; --ok:#8fd94a; --mid:#f5c542; --bad:#e8734a; --no:#4a5568;
+  --acc:#38b6ff; --shadow:none;
+}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--tx)}
+body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;
+  padding:0 0 50px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:0 12px}
+
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:9px 0 0}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px}
+.logo{font-size:16px;font-weight:750;letter-spacing:-.3px}
+.logo span{color:var(--acc)}
+.hr2{display:flex;align-items:center;gap:9px}
+.upd{font-size:11px;color:var(--dim2);font-variant-numeric:tabular-nums}
+.tgl{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;
+  width:28px;height:26px;font-size:13px;cursor:pointer;line-height:1;padding:0}
+/* верхний бар: дата, погода, ветер, солнце */
+.wxbar{display:flex;align-items:center;gap:0;padding:7px 12px 0;overflow-x:auto;
+  scrollbar-width:none;font-variant-numeric:tabular-nums}
+.wxbar::-webkit-scrollbar{display:none}
+.wx{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--dim);white-space:nowrap;
+  padding:0 9px;border-right:1px solid var(--line)}
+.wx:first-child{padding-left:0}
+.wx:last-child{border-right:0;padding-right:0}
+.wx b{color:var(--tx);font-weight:650}
+.wx .ico{font-size:14px;line-height:1}
+.tabs{display:flex;margin-top:7px;padding:0 12px}
+.tab{flex:1;padding:9px 4px;text-align:center;font-size:13px;font-weight:600;color:var(--dim);
+  background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit}
+.tab.on{color:var(--tx);border-bottom-color:var(--acc)}
+
+/* ── сводка: всё по трём главным пляжам без скролла ── */
+.sum{margin:11px 0 4px;border-radius:14px;background:var(--card);border:1px solid var(--line);
+  overflow:hidden;box-shadow:var(--shadow)}
+.sumtop{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:1px solid var(--line)}
+.vbig{font-size:23px;font-weight:800;letter-spacing:-.5px;line-height:1;white-space:nowrap}
+.vtx{font-size:12.5px;color:var(--dim);line-height:1.35}
+.vtx b{color:var(--tx);font-weight:650}
+.srow{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid var(--line);
+  cursor:pointer;font-variant-numeric:tabular-nums}
+.srow:last-child{border-bottom:0}
+.sbadge{flex:0 0 30px;height:30px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;font-weight:800;font-size:14px}
+.sname{flex:0 0 72px;font-size:13.5px;font-weight:650;letter-spacing:-.2px}
+.sdat{flex:1;font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.speak{flex:0 0 auto;font-size:11.5px;color:var(--dim);text-align:right}
+.speak b{display:block;color:var(--tx);font-size:12.5px;font-weight:700}
+
+.card{margin:10px 0;border-radius:14px;background:var(--card);border:1px solid var(--line);
+  overflow:hidden;box-shadow:var(--shadow)}
+.chead{display:flex;align-items:center;gap:10px;padding:10px 13px;cursor:pointer}
+.score{flex:0 0 40px;height:40px;border-radius:11px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-weight:800;line-height:1}
+.score b{font-size:16px}
+.score i{font-size:8px;font-style:normal;opacity:.8;margin-top:1px}
+.cname{flex:1;min-width:0}
+.cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px}
+.cname p{margin:2px 0 0;font-size:12px;color:var(--dim);line-height:1.35}
+.cname p b{color:var(--tx);font-weight:650}
+.chev{color:var(--dim2);font-size:13px;transition:transform .2s}
+.card.open .chev{transform:rotate(90deg)}
+.cbody{display:none;border-top:1px solid var(--line)}
+.card.open .cbody,.card.pin .cbody{display:block}
+
+.cam{position:relative;background:#000;aspect-ratio:16/9;width:100%}
+.cam iframe{width:100%;height:100%;border:0;display:block}
+.cam img{width:100%;height:100%;object-fit:cover;display:block}
+.camtag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);
+  font-size:10px;padding:3px 7px;border-radius:6px;color:#fff;display:flex;align-items:center;
+  gap:5px;pointer-events:none;z-index:2}
+.dot{width:6px;height:6px;border-radius:50%;background:#ff4444;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.nocam{display:flex;align-items:center;gap:7px;background:var(--card2);color:var(--dim2);
+  font-size:11.5px;padding:8px 13px;border-bottom:1px solid var(--line)}
+.nocam b{color:var(--dim);font-size:12px;font-weight:650}
+.proxy{border-bottom:1px solid var(--line)}
+
+.mets{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+.met{background:var(--card);padding:8px 4px;text-align:center}
+.met span{display:block;font-size:9px;color:var(--dim2);text-transform:uppercase;letter-spacing:.5px}
+.met b{display:block;font-size:15px;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
+.met i{font-style:normal;font-size:10px;color:var(--dim);font-weight:400}
+
+.tim{border-top:1px solid var(--line);padding:8px 13px 9px}
+.trow{display:flex;align-items:baseline;gap:9px;font-size:12.5px;padding:2.5px 0}
+.trow>span{flex:0 0 46px;font-size:10px;color:var(--dim2);text-transform:uppercase;letter-spacing:.6px}
+.trow>div{flex:1;color:var(--dim);font-variant-numeric:tabular-nums}
+.trow b{color:var(--tx);font-weight:700}
+.trow i{font-style:normal;font-size:10px;color:var(--dim2);margin-left:6px}
+.why{padding:9px 13px;font-size:12.5px;color:var(--dim);line-height:1.5;border-top:1px solid var(--line)}
+.why b{color:var(--tx);font-weight:650}
+.conf{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 7px;border-radius:5px;
+  background:var(--card2);border:1px solid var(--line);margin-top:6px}
+
+/* таблица «все источники» */
+.srcbox{border-top:1px solid var(--line);font-size:12px}
+.srcbox summary{padding:9px 13px;color:var(--acc);cursor:pointer;font-size:12px;
+  font-weight:600;list-style:none}
+.srcbox summary::-webkit-details-marker{display:none}
+.srcbox summary::before{content:'▸ ';display:inline-block;transition:transform .2s}
+.srcbox[open] summary::before{content:'▾ '}
+.stab{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-bottom:2px}
+.stab th{font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim2);
+  font-weight:600;text-align:right;padding:5px 13px 4px}
+.stab th:first-child{text-align:left}
+.stab td{padding:4px 13px;text-align:right;color:var(--dim);border-top:1px solid var(--line)}
+.stab td:first-child{text-align:left;color:var(--tx);font-size:11.5px}
+.stab .avgrow td{font-weight:700;color:var(--tx);background:var(--card2)}
+.snote{padding:7px 13px 10px;font-size:11px;color:var(--dim2);line-height:1.5}
+.snote b{color:var(--dim)}
+.stab .rngrow td{color:var(--dim2);font-size:11px;border-top:0;padding-top:0}
+.stat{border-top:1px solid var(--line);padding:8px 13px 10px}
+.stline{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--dim);padding:2.5px 0}
+.stline b{margin-left:auto;font-weight:600;font-size:11px}
+.sdot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.sgkey{display:flex;gap:6px;margin-top:8px}
+.sgkey input{flex:1;min-width:0;font:inherit;font-size:11.5px;padding:6px 8px;border-radius:7px;
+  border:1px solid var(--line);background:var(--bg);color:var(--tx)}
+.sgkey button{font:inherit;font-size:11.5px;font-weight:600;padding:6px 10px;border-radius:7px;
+  border:1px solid var(--line);background:var(--card);color:var(--acc);cursor:pointer}
+.sgkey button.del{color:var(--bad)}
+.pill{display:inline-block;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:5px;
+  letter-spacing:.2px;vertical-align:middle;margin-right:4px}
+.pill.ok{background:color-mix(in srgb,var(--go) 15%,transparent);color:var(--go)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+/* график по часам: подписи строк слева не уезжают, данные скроллятся */
+.grid{display:flex;border-top:1px solid var(--line);padding:9px 0 4px}
+.glab{flex:0 0 52px;padding-left:13px;background:var(--card);z-index:2}
+.glab div{font-size:9.5px;color:var(--dim2);text-transform:uppercase;letter-spacing:.4px;
+  height:20px;display:flex;align-items:center;white-space:nowrap}
+.glab div:nth-child(2){height:36px}
+.gscroll{flex:1;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.gscroll::-webkit-scrollbar{display:none}
+.grow{display:flex}
+.hc{flex:0 0 38px;height:20px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums;position:relative}
+.gbar .hc{height:36px;align-items:flex-end;padding-bottom:2px}
+.gbar .hc i{display:block;width:17px;border-radius:3px 3px 0 0;font-style:normal}
+.hc.gh{font-size:10.5px;color:var(--dim2)}
+.hc.gv{color:var(--tx);font-weight:600}
+.hc.gw{color:var(--dim);font-weight:400}
+.hc.now{background:color-mix(in srgb,var(--acc) 13%,transparent)}
+.hc.now.gh{color:var(--acc);font-weight:700}
+.hc u{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:7.5px;
+  text-decoration:none;color:var(--go);font-weight:700;letter-spacing:0}
+.glegend{padding:2px 13px 10px;font-size:10.5px;color:var(--dim2);line-height:1.4}
+/* спойлер «подробнее» */
+.more{border-top:1px solid var(--line)}
+.more summary{padding:9px 13px;color:var(--acc);cursor:pointer;font-size:12.5px;
+  font-weight:600;list-style:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:'▸ '}
+.more[open] summary::before{content:'▾ '}
+.more .srcbox,.more .why,.more .grid{border-top:1px solid var(--line)}
+
+.days{border-top:1px solid var(--line)}
+.day{display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--line);font-size:12.5px}
+.day:last-child{border-bottom:0}
+.day .dn{flex:0 0 54px;color:var(--dim);font-size:11.5px}
+.day .dn b{display:block;color:var(--tx);font-size:12.5px;font-weight:650;text-transform:capitalize}
+.dbar{flex:1;height:22px;border-radius:6px;background:var(--card2);position:relative;overflow:hidden}
+.dbar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;font-style:normal;opacity:.85}
+.dbar em{position:absolute;left:7px;top:0;bottom:0;display:flex;align-items:center;font-style:normal;
+  font-size:10.5px;font-weight:650;color:#fff;font-variant-numeric:tabular-nums;
+  text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.dsc{flex:0 0 26px;text-align:right;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
+
+.sect{margin:18px 0 7px;font-size:11px;font-weight:700;color:var(--dim2);
+  text-transform:uppercase;letter-spacing:1.2px;padding:0 2px}
+.src{margin:20px 0 0;padding:12px 13px;border-radius:12px;background:var(--card2);
+  border:1px solid var(--line);font-size:11px;color:var(--dim2);line-height:1.6}
+.src b{color:var(--dim)}
+.err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
+  color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
+.skel{height:70px;border-radius:14px;background:linear-gradient(90deg,var(--card),var(--card2),var(--card));
+  background-size:200% 100%;animation:sh 1.3s infinite;margin:10px 0}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div class="logo">Пхукет<span>·</span>серф</div>
+    <div class="hr2">
+      <div class="upd" id="upd">загрузка…</div>
+      <button class="tgl" id="tgl" title="тема">☾</button>
+    </div>
+  </div>
+  <div class="wxbar" id="wxbar"></div>
+  <div class="tabs">
+    <button class="tab on" data-t="now">Сейчас</button>
+    <button class="tab" data-t="d3">3 дня</button>
+    <button class="tab" data-t="d7">Неделя</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="summary"></div>
+  <div id="main"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  <div class="sect" id="restlbl">Остальные пляжи</div>
+  <div id="rest"></div>
+  <div class="src" id="src"></div>
+</div>
+
+<script>
+/* ---------------------------------------------------------------
+   СПОТЫ. facing = откуда приходит волна (нормаль берега), градусы.
+   swellMin/Max — рабочий диапазон свелла. shelter — насколько бухта
+   прикрыта мысами. tide — на каком приливе спот лучше.
+--------------------------------------------------------------- */
+const SPOTS=[
+ {id:'naiharn',name:'Най Харн',lat:7.7756,lon:98.3035,facing:250,swellMin:0.9,swellMax:2.6,
+  shelter:.45,tide:'mid',pin:1,cam:null,proxy:'kata',camNote:'ближайшая — Ката, 4.7 км',
+  note:'бухта, прикрыта мысами. оживает на большом свелле, когда Кату разносит'},
+ {id:'kata',name:'Ката',lat:7.8206,lon:98.2967,facing:270,swellMin:0.4,swellMax:2.2,
+  shelter:.2,tide:'mid',pin:1,cam:{type:'rtsp',id:'2F8DfBS5',by:'SSS Dive & Surf'},
+  note:'рабочая лошадка, держит почти любой свелл. на отливе мельчает'},
+ {id:'patong',name:'Патонг',lat:7.8950,lon:98.2830,facing:265,swellMin:0.6,swellMax:2.0,
+  // поток Патонга закрыт CSP (frame-ancestors только phuket101.net),
+  // поэтому берём кадр — он обновляется сам и никуда не уводит
+  shelter:.4,tide:'mid',pin:1,cam:{type:'img',id:'1613136596',by:'Patong Tower, 15 этаж'},
+  note:'широкая бухта, мягче остальных. хорошо для лонга и новичков'},
+ {id:'karon',name:'Карон',lat:7.8480,lon:98.2930,facing:270,swellMin:0.5,swellMax:2.4,
+  shelter:.15,tide:'high',pin:1,cam:{type:'ipcam',id:'69241c73d3f52',by:'Marina Phuket Resort'},
+  note:'мощный шор-брейк, на отливе бьёт в песок. лучше на приливе'},
+ {id:'katanoi',name:'Ката Ной',lat:7.8080,lon:98.2960,facing:270,swellMin:0.6,swellMax:2.0,
+  shelter:.3,tide:'high',cam:null,camNote:'публичных камер нет',
+  note:'короче и злее Каты, крутой шор-брейк'},
+ {id:'kalim',name:'Калим',lat:7.9130,lon:98.2790,facing:270,swellMin:1.3,swellMax:3.5,
+  shelter:.1,tide:'mid',cam:null,camNote:'публичных камер нет',
+  note:'риф, левая. молчит до 1.3 м, зато на большом свелле — лучший на острове'},
+ {id:'kamala',name:'Камала',lat:7.9540,lon:98.2790,facing:272,swellMin:0.6,swellMax:2.2,
+  shelter:.25,tide:'any',cam:null,camNote:'публичных камер нет',
+  note:'ровный бич-брейк, спокойнее Сурина'},
+ {id:'surin',name:'Сурин',lat:7.9770,lon:98.2780,facing:270,swellMin:0.8,swellMax:2.6,
+  shelter:.1,tide:'mid',cam:null,camNote:'публичных камер нет',
+  note:'мощно и резко, шор-брейк. не для первого раза'},
+ {id:'bangtao',name:'Банг Тао',lat:8.0000,lon:98.2930,facing:275,swellMin:0.5,swellMax:2.2,
+  shelter:.2,tide:'any',cam:null,camNote:'публичных камер нет',
+  note:'длинный пустой бич-брейк. ловит ветер сильнее всех'},
+ {id:'layan',name:'Лайан',lat:8.0330,lon:98.2890,facing:272,swellMin:0.5,swellMax:1.8,
+  shelter:.35,tide:'any',cam:null,camNote:'публичных камер нет',
+  note:'мелкий угол бухты, спокойно и мягко'},
+ {id:'naithon',name:'Найтон',lat:8.0800,lon:98.2600,facing:270,swellMin:0.5,swellMax:2.0,
+  shelter:.3,tide:'mid',cam:null,camNote:'публичных камер нет',
+  note:'тихо и малолюдно, ехать далеко'},
+ {id:'naiyang',name:'Най Янг',lat:8.0930,lon:98.2960,facing:270,swellMin:0.4,swellMax:1.5,
+  shelter:.55,tide:'high',cam:null,camNote:'есть камера в лодже, но смотрит в сад — бесполезна',
+  note:'риф гасит волну, самое пологое место. школы катаются тут'}
+];
+
+const WAVE_MODELS=['gwam','meteofrance_wave','ecmwf_wam025'];
+const WIND_MODELS=['icon_seamless','gfs_seamless','ecmwf_ifs025','meteofrance_seamless','jma_seamless'];
+let TAB='now', DATA=null, WEATHER=null;
+
+/* WMO weather code → короткая подпись и значок */
+const WMO={0:['☀','ясно'],1:['🌤','почти ясно'],2:['⛅','переменная'],3:['☁','пасмурно'],
+  45:['🌫','туман'],48:['🌫','туман'],51:['🌦','морось'],53:['🌦','морось'],55:['🌦','морось'],
+  61:['🌧','дождь'],63:['🌧','дождь'],65:['🌧','ливень'],66:['🌧','дождь'],67:['🌧','ливень'],
+  80:['🌦','ливни'],81:['🌧','ливни'],82:['⛈','сильный ливень'],
+  95:['⛈','гроза'],96:['⛈','гроза'],99:['⛈','гроза']};
+
+/* тема: светлая по умолчанию */
+const th=localStorage.getItem('theme')||'light';
+if(th==='dark') document.documentElement.dataset.theme='dark';
+const tglBtn=document.getElementById('tgl');
+const paint=()=>{const d=document.documentElement.dataset.theme==='dark';
+  tglBtn.textContent=d?'☀':'☾';
+  document.querySelector('meta[name=theme-color]').content=d?'#0a0e14':'#f4f6f9'};
+paint();
+tglBtn.onclick=()=>{const d=document.documentElement.dataset.theme==='dark';
+  if(d) delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme='dark';
+  localStorage.setItem('theme',d?'light':'dark'); paint()};
+
+const avg=a=>{a=a.filter(x=>x!=null&&!isNaN(x));return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
+/* Медиана, а не среднее: одна модель-выброс (ECMWF даёт 7 м/с там,
+   где четыре других дают 3) не должна тянуть итог на себя. */
+const median=a=>{a=a.filter(x=>x!=null&&!isNaN(x)).sort((x,y)=>x-y);
+  if(!a.length) return null;
+  const m=a.length>>1; return a.length%2?a[m]:(a[m-1]+a[m])/2};
+const range=a=>{a=a.filter(x=>x!=null&&!isNaN(x));
+  return a.length?{lo:Math.min(...a),hi:Math.max(...a)}:null};
+/* Направление — круговая величина: 350° и 10° в среднем дают 0°, а не 180°.
+   Поэтому усредняем векторно, а не арифметически. */
+const circMean=arr=>{
+  const a=arr.filter(x=>x!=null&&!isNaN(x));
+  if(!a.length) return null;
+  let s=0,c=0; a.forEach(d=>{const r=d*Math.PI/180; s+=Math.sin(r); c+=Math.cos(r)});
+  return (Math.atan2(s/a.length,c/a.length)*180/Math.PI+360)%360;
+};
+const spread=a=>{a=a.filter(x=>x!=null&&!isNaN(x));if(a.length<2)return 0;
+  const m=avg(a);return m>0?(Math.max(...a)-Math.min(...a))/m:0};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const angDiff=(a,b)=>{let d=Math.abs(a-b)%360;return d>180?360-d:d};
+const dirRu=d=>['С','ССВ','СВ','ВСВ','В','ВЮВ','ЮВ','ЮЮВ','Ю','ЮЮЗ','ЮЗ','ЗЮЗ','З','ЗСЗ','СЗ','ССЗ'][Math.round(d/22.5)%16];
+const fmt=(v,d=1,dash='—')=>v==null||isNaN(v)?dash:v.toFixed(d);
+const scoreColor=s=>s>=7?'var(--go)':s>=5?'var(--ok)':s>=3?'var(--mid)':s>=1.5?'var(--bad)':'var(--no)';
+
+/* Пхукет: рассвет ~06:15, закат ~18:35 круглый год */
+const DAY_FROM=6, DAY_TO=18;
+const isDay=r=>{const h=+r.t.slice(11,13);return h>=DAY_FROM&&h<=DAY_TO};
+function bestDaylight(rows,from,limit){
+  const w=rows.slice(from,from+limit).filter(isDay);
+  return w.length?w.reduce((a,b)=>(b.score??0)>(a.score??0)?b:a):null;
+}
+/* Локальные экстремумы. Данные почасовые — вершину уточняем параболой
+   по трём точкам, иначе прилив всегда падал бы ровно на :00. */
+function extrema(rows,key,from,to){
+  const out=[];
+  for(let i=Math.max(from,1);i<Math.min(to,rows.length-1);i++){
+    const a=rows[i-1][key], b=rows[i][key], c=rows[i+1][key];
+    if(a==null||b==null||c==null) continue;
+    const hi=b>=a&&b>c, lo=b<=a&&b<c;
+    if(!hi&&!lo) continue;
+    const den=a-2*b+c, shift=den===0?0:clamp(0.5*(a-c)/den,-.5,.5);
+    const d=new Date(rows[i].t+':00'); d.setMinutes(d.getMinutes()+Math.round(shift*60));
+    out.push({type:hi?'high':'low', v:b, idx:i,
+      hhmm:String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')});
+  }
+  return out;
+}
+
+/* ---------- СКОРИНГ 0..10 ---------- */
+function scoreHour(sp,h){
+  const {swell:sw,period:per,sdir,wind:wsp,wdir,tide}=h;
+  if(sw==null) return null;
+  const eff=sw*(1-sp.shelter*0.55);            // сколько доходит через мысы
+  let size;
+  if(eff<sp.swellMin) size=clamp(eff/sp.swellMin,0,1)*4;
+  else if(eff>sp.swellMax) size=clamp(1-(eff-sp.swellMax)/1.2,0,1)*7+3;
+  else{const t=(eff-sp.swellMin)/(sp.swellMax-sp.swellMin); size=10-Math.abs(t-0.55)*5}
+  const period=per==null?5:clamp((per-3.5)/8,0,1)*10;
+  const dirS=clamp(1-(sdir==null?45:angDiff(sdir,sp.facing))/95,0,1)*10;
+  const wOff=angDiff(wdir==null?sp.facing:wdir,(sp.facing+180)%360);
+  let wind;
+  if(wsp==null||wsp<1.2) wind=8.5;
+  else if(wOff<55) wind=clamp(10-(wsp-3)*0.35,5,10);
+  else if(wOff<115) wind=clamp(7.5-wsp*0.55,1.5,7.5);
+  else wind=clamp(7-wsp*1.15,0,7);
+  let tideAdj=0;
+  if(tide!=null){
+    if(sp.tide==='high') tideAdj=(tide-0.55)*1.7;
+    else if(sp.tide==='low') tideAdj=(0.55-tide)*1.7;
+    else if(sp.tide==='mid') tideAdj=(0.5-Math.abs(tide-0.55))*1.6;
+  }
+  return clamp(size*0.34+period*0.20+dirS*0.16+wind*0.30+tideAdj,0,10);
+}
+
+async function jget(u,opt){
+  const c=new AbortController(), timer=setTimeout(()=>c.abort(),15000);
+  try{
+    const r=await fetch(u,{...opt,signal:c.signal});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  } finally{ clearTimeout(timer) }
+}
+/* Каждый источник грузится независимо: упавший не роняет остальные
+   и не ломает вёрстку — он просто помечается как недоступный. */
+const STATUS={};
+
+/* ── Stormglass ────────────────────────────────────────────────
+   Квота 10 запросов/сутки, а страница обновляется каждые 10 минут.
+   Спасает то, что один запрос отдаёт сразу 240 часов вперёд:
+   тянем раз в 6 часов (4 запроса в сутки) и держим в localStorage.
+   Ключ живёт в браузере, а не в коде — файл можно публиковать.     */
+const SG_TTL=6*3600*1000;
+const sgKey=()=>localStorage.getItem('sg_key')||'';
+async function loadStormglass(){
+  const key=sgKey();
+  if(!key){ STATUS.sg={ok:false,label:'Stormglass (NOAA, AIFS, Met Office)',err:'ключ не задан'}; return null }
+  try{
+    const cached=JSON.parse(localStorage.getItem('sg_cache')||'null');
+    if(cached && Date.now()-cached.at<SG_TTL){
+      STATUS.sg={ok:true,label:'Stormglass (NOAA, AIFS, Met Office)',
+        note:'из кэша, '+new Date(cached.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})};
+      return cached.data;
+    }
+    const P='waveHeight,swellHeight,swellPeriod,swellDirection,windSpeed,windDirection,'+
+            'gust,waterTemperature,seaLevel,precipitation';
+    const j=await jget(`https://api.stormglass.io/v2/weather/point?lat=7.85&lng=98.29&params=${P}`,
+      {headers:{Authorization:key}});
+    if(!j.hours) throw new Error(j.errors?JSON.stringify(j.errors).slice(0,60):'нет данных');
+    // раскладываем по местному часу Пхукета, время в ответе — UTC
+    const by={};
+    for(const h of j.hours){
+      const k=new Date(h.time).toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,13).replace(' ','T');
+      by[k]=h;
+    }
+    localStorage.setItem('sg_cache',JSON.stringify({at:Date.now(),data:by}));
+    STATUS.sg={ok:true,label:'Stormglass (NOAA, AIFS, Met Office)',
+      note:'обновлён, '+(j.meta?.requestCount??'?')+'/'+(j.meta?.dailyQuota??10)+' за сутки'};
+    return by;
+  }catch(e){
+    STATUS.sg={ok:false,label:'Stormglass (NOAA, AIFS, Met Office)',
+      err:e.name==='AbortError'?'таймаут':e.message};
+    // если свежий запрос не удался, лучше показать вчерашний кэш, чем ничего
+    const c=JSON.parse(localStorage.getItem('sg_cache')||'null');
+    return c?c.data:null;
+  }
+}
+async function safe(key,label,fn){
+  try{ const v=await fn(); STATUS[key]={ok:true,label}; return v }
+  catch(e){ STATUS[key]={ok:false,label,err:e.name==='AbortError'?'таймаут':e.message}; return null }
+}
+
+async function load(){
+  const pts=[...new Set(SPOTS.map(s=>s.lat.toFixed(2)+','+s.lon.toFixed(2)))];
+  const lats=pts.map(p=>p.split(',')[0]).join(','), lons=pts.map(p=>p.split(',')[1]).join(',');
+  const base='latitude='+lats+'&longitude='+lons+'&timezone=Asia%2FBangkok&forecast_days=7';
+  const [m,w,t,g,mn,sg]=await Promise.all([
+    safe('wave','Волна · Open-Meteo (3 модели)',()=>
+      jget('https://marine-api.open-meteo.com/v1/marine?'+base+
+        '&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height&models='+WAVE_MODELS.join(','))),
+    safe('wind','Ветер · Open-Meteo (5 моделей)',()=>
+      jget('https://api.open-meteo.com/v1/forecast?'+base+
+        '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms&models='+WIND_MODELS.join(','))),
+    // температура воды и уровень моря есть ТОЛЬКО в best_match — отдельным запросом
+    safe('sea','Прилив и вода · Open-Meteo',()=>
+      jget('https://marine-api.open-meteo.com/v1/marine?'+base+
+        '&hourly=sea_surface_temperature,sea_level_height_msl')),
+    // общая погода по острову для верхнего бара (одна точка, best_match)
+    safe('wx','Погода · Open-Meteo',()=>
+      jget('https://api.open-meteo.com/v1/forecast?latitude=7.89&longitude=98.30'+
+        '&timezone=Asia%2FBangkok&forecast_days=2&wind_speed_unit=ms'+
+        '&current=temperature_2m,apparent_temperature,weather_code,cloud_cover,'+
+        'wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,is_day'+
+        '&daily=sunrise,sunset,uv_index_max,temperature_2m_max,temperature_2m_min')),
+    // независимый провайдер: Норвежский метинститут, своя модель, не Open-Meteo
+    safe('metno','Ветер · MET Norway (независимый)',()=>
+      jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=7.87&lon=98.29')),
+    loadStormglass()
+  ]);
+  if(!m||!w) throw new Error('основные источники недоступны');
+  const M=[].concat(m), W=[].concat(w), T=t?[].concat(t):null;
+  WEATHER=g;
+
+  // met.no: раскладываем по локальному часу "YYYY-MM-DDTHH" для стыковки с Open-Meteo
+  const MET={};
+  if(mn) for(const p of mn.properties.timeseries){
+    const k=new Date(p.time).toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,13).replace(' ','T');
+    const d=p.data.instant.details;
+    MET[k]={s:d.wind_speed, d:d.wind_from_direction};
+  }
+  const idx={}; pts.forEach((p,i)=>idx[p]=i);
+  const out={};
+  for(const sp of SPOTS){
+    const i=idx[sp.lat.toFixed(2)+','+sp.lon.toFixed(2)];
+    const mh=M[i].hourly, wh=W[i].hourly, th=T?T[i].hourly:{}, rows=[];
+    for(let k=0;k<mh.time.length;k++){
+      const time=mh.time[k], hourKey=time.slice(0,13);
+      const met=MET[hourKey]||null;
+
+      const sgh=sg?sg[hourKey]:null;
+      // из Stormglass берём только те модели, которых нет в Open-Meteo
+      const SG_WAVE=['noaa'], SG_WIND=['noaa','ecmwf:aifs'];
+      const pick=(o,k2)=>o&&o[k2]!=null?o[k2]:null;
+
+      const sRaw=WAVE_MODELS.map(md=>({m:md,
+        h:mh['swell_wave_height_'+md]?.[k], p:mh['swell_wave_period_'+md]?.[k],
+        d:mh['swell_wave_direction_'+md]?.[k]}));
+      if(sgh) SG_WAVE.forEach(src=>{
+        const h=pick(sgh.swellHeight,src);
+        if(h!=null) sRaw.push({m:'sg:'+src, h, p:pick(sgh.swellPeriod,src), d:pick(sgh.swellDirection,src)});
+      });
+      const sH=sRaw.map(x=>x.h);
+
+      const wRaw=WIND_MODELS.map(md=>({m:md,
+        s:wh['wind_speed_10m_'+md]?.[k], d:wh['wind_direction_10m_'+md]?.[k],
+        g:wh['wind_gusts_10m_'+md]?.[k]}));
+      if(met) wRaw.push({m:'metno', s:met.s, d:met.d, g:null});
+      if(sgh) SG_WIND.forEach(src=>{
+        const s=pick(sgh.windSpeed,src);
+        if(s!=null) wRaw.push({m:'sg:'+src, s, d:pick(sgh.windDirection,src), g:pick(sgh.gust,src)});
+      });
+      const wS=wRaw.map(x=>x.s);
+      // независимая сверка прилива и воды от UK Met Office
+      const sgTide=sgh?pick(sgh.seaLevel,'meto'):null;
+      const sgWater=sgh?pick(sgh.waterTemperature,'meto'):null;
+
+      rows.push({t:time,
+        swell:median(sH), period:median(sRaw.map(x=>x.p)),
+        sdir:circMean(sRaw.map(x=>x.d)),
+        swellRange:range(sH), windRange:range(wS),
+        sst:th.sea_surface_temperature?.[k] ?? sgWater,
+        tideRaw:th.sea_level_height_msl?.[k] ?? sgTide,
+        sgTide, sgWater,
+        wind:median(wS), wdir:circMean(wRaw.map(x=>x.d)),
+        gust:median(wRaw.map(x=>x.g)),
+        agree:1-clamp(spread(sH)*0.6+spread(wS)*0.4,0,1),
+        nSwell:sH.filter(x=>x!=null).length, nWind:wS.filter(x=>x!=null).length,
+        // сырые значения каждой модели — чтобы итог можно было проверить руками
+        raw:{wave:sRaw, wind:wRaw}});
+    }
+    const tv=rows.map(r=>r.tideRaw).filter(x=>x!=null);
+    const tmin=tv.length?Math.min(...tv):0, tmax=tv.length?Math.max(...tv):0;
+    rows.forEach(r=>{r.tide=r.tideRaw==null?null:(tmax>tmin?(r.tideRaw-tmin)/(tmax-tmin):0.5);
+      r.score=scoreHour(sp,r)});
+    out[sp.id]=rows;
+  }
+  return out;
+}
+
+function nowIdx(rows){
+  // sv-SE даёт "2026-09-06 22:40", API — "2026-09-06T22:00": приводим к одному виду
+  const s=new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,13).replace(' ','T');
+  const i=rows.findIndex(r=>r.t.slice(0,13)===s);
+  return i<0?0:i;
+}
+
+function camBlock(sp){
+  // всё с первоисточника: играет само, кликом никуда не уводит
+  const view=(c,tag)=>{
+    if(c.type==='img') return `<div class="cam">
+      <img class="camimg" data-cam="${c.id}" alt="${tag}"
+        src="https://imgproxy.windy.com/_/preview/plain/current/${c.id}/original.jpg?v=${Date.now()}">
+      <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
+    const src=c.type==='ipcam'
+      ? `https://g3.ipcamlive.com/player/player.php?alias=${c.id}&autoplay=1&mute=1`
+      : `https://rtsp.me/embed/${c.id}/`;
+    return `<div class="cam">
+      <iframe src="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
+        allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
+  };
+  if(sp.cam) return view(sp.cam,'live · '+sp.cam.by);
+  // без камеры — просто честная плашка. Показывать тут чужой пляж бессмысленно:
+  // та же картинка уже есть в карточке того пляжа.
+  return `<div class="nocam"><b>камеры нет</b><span>${sp.camNote||''}</span></div>`;
+}
+
+function hourStrip(rows,i0){
+  const slice=rows.slice(i0,i0+18), d=slice.filter(isDay);
+  const best=d.length?Math.max(...d.map(r=>r.score??0)):-1;
+  const cells=slice.map(r=>{
+    const s=r.score??0, night=!isDay(r), h=Math.max(3,Math.round(s/10*30));
+    const isNow=rows.indexOf(r)===i0;
+    return {hh:r.t.slice(11,13), s, night, h, isNow,
+      top:(!night&&s===best&&s>4), sw:fmt(r.swell,1), wd:fmt(r.wind,0)};
+  });
+  const row=(cls,fn)=>cells.map(c=>`<div class="hc ${c.isNow?'now':''} ${cls}"
+    style="${c.night?'opacity:.35':''}">${fn(c)}</div>`).join('');
+  return `<div class="grid">
+    <div class="glab"><div>час</div><div>балл</div><div>волна</div><div>ветер</div></div>
+    <div class="gscroll"><div class="grow">${row('gh',c=>
+        `${c.hh}${c.top?'<u>лучшее</u>':''}`)}</div>
+      <div class="grow gbar">${row('',c=>
+        `<i style="height:${c.h}px;background:${c.night?'var(--no)':scoreColor(c.s)}"></i>`)}</div>
+      <div class="grow">${row('gv',c=>c.sw)}</div>
+      <div class="grow">${row('gv gw',c=>c.wd)}</div>
+    </div></div>
+  <div class="glegend">Столбик — оценка условий в этот час: выше и зеленее — лучше.
+    Волна в метрах, ветер в м/с. Серые часы — ночь.</div>`;
+}
+
+/* пики условий + приливы + текущая фаза */
+function peaksOf(rows,i0){
+  return extrema(rows,'score',i0,Math.min(rows.length,i0+30))
+    .filter(e=>e.type==='high'&&isDay(rows[e.idx])&&(rows[e.idx].score??0)>1.5).slice(0,3);
+}
+function timing(sp,rows,i0){
+  const today=rows[i0].t.slice(0,10);
+  const peaks=peaksOf(rows,i0).slice(0,2);
+  const tides=extrema(rows,'tideRaw',i0,Math.min(rows.length,i0+30)).slice(0,3);
+  const cur=rows[i0].score??0,
+        nxt=rows[Math.min(i0+2,rows.length-1)].score??0,
+        prv=rows[Math.max(i0-2,0)].score??0;
+  let phase,pcol;
+  if(!isDay(rows[i0])){phase=peaks[0]?`темно · ближайшее окно ${peaks[0].hhmm}`:'темно';pcol='var(--dim)'}
+  else if(cur>=prv&&cur>=nxt){phase='сейчас пик';pcol='var(--go)'}
+  else if(nxt>cur+0.25){phase='растёт';pcol='var(--ok)'}
+  else if(nxt<cur-0.25){phase='падает';pcol='var(--bad)'}
+  else{phase='без изменений';pcol='var(--dim)'}
+  const pk=peaks.length?peaks.map(p=>{
+      const d=rows[p.idx].t.slice(0,10)===today?'':'завтра ';
+      return `<b>${d}${p.hhmm}</b> <span style="color:${scoreColor(p.v)}">${p.v.toFixed(0)}/10</span>`;
+    }).join(' · '):'<span style="color:var(--dim2)">ровно весь день, пика нет</span>';
+  return `<div class="tim">
+    <div class="trow"><span>пик</span><div>${pk}</div></div>
+    <div class="trow"><span>прилив</span><div>${
+      tides.map(t=>`${t.type==='high'?'▲':'▼'} <b>${t.hhmm}</b>`).join(' · ')||'—'}
+      <i>▲ полная · ▼ малая</i></div></div>
+    <div class="trow"><span>сейчас</span><div style="color:${pcol};font-weight:650">${phase}</div></div>
+  </div>`;
+}
+
+function why(sp,r){
+  const b=[], eff=r.swell==null?null:r.swell*(1-sp.shelter*0.55);
+  if(eff!=null) b.push(eff<sp.swellMin?`свелла не хватает — <b>${fmt(eff,2)} м</b> при нужных ${sp.swellMin}`
+    :eff>sp.swellMax?`перебор — <b>${fmt(eff,1)} м</b>, будет закрывать`
+    :`свелл в рабочем окне — <b>${fmt(eff,1)} м</b>`);
+  if(r.period!=null) b.push(r.period<6?`период <b>${fmt(r.period,1)} с</b>, рубленая мелочь`
+    :r.period<9?`период <b>${fmt(r.period,1)} с</b>`:`длинный период <b>${fmt(r.period,1)} с</b>, ровные линии`);
+  if(r.wdir!=null&&r.wind!=null){
+    const off=angDiff(r.wdir,(sp.facing+180)%360);
+    b.push(off<55?`ветер offshore <b>${dirRu(r.wdir)} ${fmt(r.wind,0)} м/с</b> — держит стенку`
+      :off<115?`ветер боковой <b>${dirRu(r.wdir)} ${fmt(r.wind,0)} м/с</b>`
+      :`ветер в лоб <b>${dirRu(r.wdir)} ${fmt(r.wind,0)} м/с</b> — рвёт волну`);
+  }
+  // Насколько источники согласны — человеческим языком, без счётчиков моделей.
+  const sr=r.swellRange, wr=r.windRange;
+  const mult=x=>x&&x.lo>0.05?x.hi/x.lo:null;
+  const ms=mult(sr), mw=mult(wr);
+  const worst=Math.max(ms||1,mw||1);
+  let conf;
+  if(worst>=2.5) conf=['var(--bad)',
+    `источники расходятся в ${worst.toFixed(1)} раза — прогнозу тут верить нельзя, смотри камеру`];
+  else if(worst>=1.6) conf=['var(--mid)',`источники расходятся в ${worst.toFixed(1)} раза`];
+  else conf=['var(--go)','источники сходятся — прогнозу можно верить'];
+  const detail=[
+    sr?`волна ${fmt(sr.lo,2)}–${fmt(sr.hi,2)} м`:null,
+    wr?`ветер ${fmt(wr.lo,1)}–${fmt(wr.hi,1)} м/с`:null
+  ].filter(Boolean).join(' · ');
+  return `<div class="why">${b.join(' · ')}<br>
+    <span class="conf" style="color:${conf[0]}">◆ ${conf[1]}</span>
+    ${detail?`<div style="margin-top:5px;color:var(--dim2);font-size:11px">по источникам: ${detail}</div>`:''}
+  </div>`;
+}
+
+function dayRows(rows,n){
+  const by={};
+  rows.forEach(r=>{const d=r.t.slice(0,10);(by[d]=by[d]||[]).push(r)});
+  return '<div class="days">'+Object.keys(by).slice(0,n).map(d=>{
+    const rs=by[d].filter(isDay); if(!rs.length) return '';
+    const sc=Math.max(...rs.map(r=>r.score??0));
+    const bi=rs.reduce((a,b)=>(b.score??0)>(a.score??0)?b:a);
+    const dt=new Date(d+'T12:00:00');
+    return `<div class="day">
+      <div class="dn"><b>${dt.toLocaleDateString('ru-RU',{weekday:'short'})}</b>${
+        dt.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</div>
+      <div class="dbar"><i style="width:${Math.max(6,sc*10)}%;background:${scoreColor(sc)}"></i>
+        <em>${fmt(avg(rs.map(r=>r.swell)),1)} м · ${fmt(avg(rs.map(r=>r.wind)),0)} м/с · пик ${bi.t.slice(11,16)}</em></div>
+      <div class="dsc" style="color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
+    </div>`}).join('')+'</div>';
+}
+
+function card(sp,rows,pinned){
+  const i0=nowIdx(rows), r=rows[i0], s=r.score??0;
+  let body;
+  if(TAB==='now'){
+    // Наверху — только камера и короткий вывод. Вся кухня уходит под «подробнее».
+    body=camBlock(sp)+timing(sp,rows,i0)+
+      `<details class="more"><summary>подробнее</summary>
+         ${hourStrip(rows,i0)}${why(sp,r)}${sources(r)}
+       </details>`;
+  }else body=dayRows(rows,TAB==='d3'?3:7);
+  const best=bestDaylight(rows,i0,TAB==='d3'?72:TAB==='d7'?168:24);
+  const sub=TAB==='now'
+    ? `волна <b>${fmt(r.swell,1)} м</b> · период <b>${fmt(r.period,1)} с</b> · ветер <b>${
+        dirRu(r.wdir??0)} ${fmt(r.wind,0)}</b> · вода <b>${fmt(r.sst,0)}°</b>`
+    : best?`лучшее окно ${best.t.slice(5,10).split('-').reverse().join('.')} ${best.t.slice(11,16)} · ${best.score.toFixed(0)}/10`:'—';
+  return `<div class="card ${pinned?'pin':''}" data-id="${sp.id}" id="c-${sp.id}">
+    <div class="chead">
+      <div class="score" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
+        color:${scoreColor(s)}"><b>${s.toFixed(0)}</b><i>из 10</i></div>
+      <div class="cname"><h3>${sp.name}</h3><p>${sub}</p></div>
+      ${pinned?'':'<div class="chev">›</div>'}
+    </div>
+    <div class="cbody">${body}</div></div>`;
+}
+
+function wxbar(){
+  const bar=document.getElementById('wxbar');
+  if(!WEATHER||!WEATHER.current){
+    bar.innerHTML=`<div class="wx" style="color:var(--bad)">погода недоступна — источник не ответил</div>`;
+    return;
+  }
+  const c=WEATHER.current, d=WEATHER.daily;
+  const [ico,txt]=WMO[c.weather_code]||['·','—'];
+  const now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
+  const date=now.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('wxbar').innerHTML=`
+    <div class="wx"><b>${date[0].toUpperCase()+date.slice(1)}</b></div>
+    <div class="wx"><span class="ico">${ico}</span>${txt}</div>
+    <div class="wx"><b>${Math.round(c.temperature_2m)}°</b>
+      <span style="color:var(--dim2)">ощущ ${Math.round(c.apparent_temperature)}°</span></div>
+    <div class="wx">ветер <b>${dirRu(c.wind_direction_10m)} ${c.wind_speed_10m.toFixed(0)}</b>
+      <span style="color:var(--dim2)">порывы ${c.wind_gusts_10m.toFixed(0)} м/с</span></div>
+    ${c.precipitation>0?`<div class="wx" style="color:var(--acc)">дождь <b>${c.precipitation} мм</b></div>`:''}
+    <div class="wx">☀ <b>${d.sunrise[0].slice(11,16)}</b>–<b>${d.sunset[0].slice(11,16)}</b></div>
+    <div class="wx">УФ <b>${Math.round(d.uv_index_max[0])}</b></div>
+    <div class="wx"><span style="color:var(--dim2)">облачность</span> <b>${c.cloud_cover}%</b></div>`;
+}
+
+/* Явный список: какие источники ответили, какие нет и почему */
+function statusBlock(){
+  const rows=Object.values(STATUS).map(s=>
+    `<div class="stline"><span class="sdot" style="background:${s.ok?'var(--go)':'var(--bad)'}"></span>
+     ${s.label}<b style="color:${s.ok?'var(--dim)':'var(--bad)'}">${
+       s.ok?(s.note||'ок'):'нет данных · '+s.err}</b></div>`).join('');
+  const has=!!sgKey();
+  return `<div class="stat">${rows}
+    <div class="sgkey">
+      <input type="password" id="sgin" placeholder="ключ Stormglass — даёт NOAA, AIFS и Met Office"
+        value="${has?'••••••••':''}" autocomplete="off">
+      <button id="sgsave">${has?'заменить':'ок'}</button>
+      ${has?'<button id="sgdel" class="del">убрать</button>':''}
+    </div>
+    <div class="snote" style="padding:6px 0 0">Ключ хранится только в этом браузере, в код не попадает.
+      Запрос раз в 6 часов — 4 из 10 суточных.</div>
+  </div>`;
+}
+function statusPill(){
+  const all=Object.values(STATUS), bad=all.filter(s=>!s.ok);
+  if(!all.length) return '';
+  return bad.length
+    ? `<span class="pill bad" title="${bad.map(b=>b.label).join(', ')}">источники ${all.length-bad.length}/${all.length}</span>`
+    : `<span class="pill ok">источников ${all.length}</span>`;
+}
+
+/* Все модели по отдельности — чтобы итог можно было проверить руками */
+function sources(r){
+  const NAME={gwam:'DWD GWAM',meteofrance_wave:'MeteoFrance WAM',ecmwf_wam025:'ECMWF WAM',
+    icon_seamless:'ICON (DWD)',gfs_seamless:'GFS (NOAA)',ecmwf_ifs025:'ECMWF IFS',
+    meteofrance_seamless:'ARPEGE (MF)',jma_seamless:'JMA',metno:'MET Norway ⧉',
+    'sg:noaa':'NOAA ⧉ (Stormglass)','sg:ecmwf:aifs':'ECMWF AIFS ⧉ (Stormglass)'};
+  const wave=r.raw.wave.map(x=>`<tr><td>${NAME[x.m]}</td>
+      <td>${fmt(x.h,2)}</td><td>${fmt(x.p,1)}</td><td>${x.d==null?'—':Math.round(x.d)+'°'}</td></tr>`).join('');
+  const wind=r.raw.wind.map(x=>`<tr><td>${NAME[x.m]}</td>
+      <td>${fmt(x.s,1)}</td><td>${x.d==null?'—':dirRu(x.d)}</td><td>${fmt(x.g,1)}</td></tr>`).join('');
+  return `<details class="srcbox"><summary>показать все источники по отдельности</summary>
+    <table class="stab"><thead><tr><th>волна</th><th>свелл м</th><th>период с</th><th>напр.</th></tr></thead>
+      <tbody>${wave}
+      <tr class="avgrow"><td>медиана</td><td>${fmt(r.swell,2)}</td><td>${fmt(r.period,1)}</td>
+        <td>${r.sdir==null?'—':Math.round(r.sdir)+'°'}</td></tr>
+      ${r.swellRange?`<tr class="rngrow"><td>разброс</td>
+        <td colspan="3">${fmt(r.swellRange.lo,2)}–${fmt(r.swellRange.hi,2)} м</td></tr>`:''}
+      </tbody></table>
+    <table class="stab"><thead><tr><th>ветер</th><th>м/с</th><th>напр.</th><th>порывы</th></tr></thead>
+      <tbody>${wind}
+      <tr class="avgrow"><td>медиана</td><td>${fmt(r.wind,1)}</td>
+        <td>${r.wdir==null?'—':dirRu(r.wdir)}</td><td>${fmt(r.gust,1)}</td></tr>
+      ${r.windRange?`<tr class="rngrow"><td>разброс</td>
+        <td colspan="3">${fmt(r.windRange.lo,1)}–${fmt(r.windRange.hi,1)} м/с</td></tr>`:''}
+      </tbody></table>
+    <div class="snote">
+      Итог — <b>медиана</b>, а не среднее: одна модель-выброс не тянет результат на себя.
+      Направления усредняются векторно (иначе 350° и 10° дали бы 180°).<br>
+      ⧉ MET Norway — независимый провайдер, не Open-Meteo.
+      ECMWF WAM отдаёт только суммарную высоту, без разложения на свелл — отсюда прочерки.
+      Прилив и вода идут из одного источника, сравнивать не с чем.
+    </div>
+    ${statusBlock()}
+  </details>`;
+}
+
+function render(){
+  if(!DATA) return;
+  wxbar();
+  const pinned=SPOTS.filter(s=>s.pin), rest=SPOTS.filter(s=>!s.pin);
+  const ref=DATA[pinned[0].id], dark=!isDay(ref[nowIdx(ref)]);
+
+  const tops=pinned.map(sp=>{
+    const rows=DATA[sp.id], i=nowIdx(rows);
+    return {sp,rows,i,r:rows[i],pick:(dark?bestDaylight(rows,i,30):rows[i])||rows[i]};
+  }).sort((a,b)=>(b.pick.score??0)-(a.pick.score??0));
+
+  const t=tops[0], sc=t.pick.score??0;
+  const bi=bestDaylight(t.rows,t.i,30)||t.pick;
+  const word=sc>=7?'ЕХАТЬ':sc>=5?'МОЖНО':sc>=3?'СЛАБО':'НЕ СТОИТ';
+  const today=new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,10);
+  const when=bi.t.slice(0,10)===today?'сегодня':'завтра';
+
+  // сводка: три главных пляжа целиком, без скролла
+  const rowsHtml=tops.map(x=>{
+    const s=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0];
+    return `<div class="srow" data-go="${x.sp.id}">
+      <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
+        color:${scoreColor(s)}">${s.toFixed(0)}</div>
+      <div class="sname">${x.sp.name}</div>
+      <div class="sdat">${fmt(x.pick.swell,1)} м · ${fmt(x.pick.period,1)} с · ${
+        dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)} м/с</div>
+      <div class="speak">${pk?`<b>${pk.hhmm}</b>пик`:'<b>—</b>ровно'}</div>
+    </div>`}).join('');
+
+  document.getElementById('summary').innerHTML=`<div class="sum">
+    <div class="sumtop"><div class="vbig" style="color:${scoreColor(sc)}">${word}</div>
+      <div class="vtx">${dark?'сейчас темно · ':''}лучше всего <b>${t.sp.name}</b><br>
+      окно ${when} <b>${bi.t.slice(11,16)}</b> · ${fmt(bi.swell,1)} м · ${fmt(bi.wind,0)} м/с</div></div>
+    ${rowsHtml}</div>`;
+
+  document.getElementById('main').innerHTML=tops.map(x=>card(x.sp,x.rows,true)).join('');
+  document.getElementById('rest').innerHTML=rest.map(sp=>({sp,rows:DATA[sp.id]}))
+    .sort((a,b)=>(b.rows[nowIdx(b.rows)].score??0)-(a.rows[nowIdx(a.rows)].score??0))
+    .map(x=>card(x.sp,x.rows,false)).join('');
+
+  document.querySelectorAll('#rest .chead').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
+  document.querySelectorAll('.srow').forEach(el=>el.onclick=()=>
+    document.getElementById('c-'+el.dataset.go)?.scrollIntoView({behavior:'smooth',block:'start'}));
+
+  document.querySelectorAll('#sgsave').forEach(b=>b.onclick=()=>{
+    const v=b.parentElement.querySelector('input').value.trim();
+    if(!v||v.startsWith('•')) return;
+    localStorage.setItem('sg_key',v); localStorage.removeItem('sg_cache'); boot();
+  });
+  document.querySelectorAll('#sgdel').forEach(b=>b.onclick=()=>{
+    localStorage.removeItem('sg_key'); localStorage.removeItem('sg_cache'); boot();
+  });
+
+  document.getElementById('upd').innerHTML=statusPill()+' обн. '+
+    new Date().toLocaleTimeString('ru-RU',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('src').innerHTML=
+    `<b>Волна:</b> DWD GWAM · MeteoFrance WAM · ECMWF WAM — усреднение, расхождение видно в карточке.<br>
+     <b>Ветер:</b> ICON · GFS · ECMWF · MeteoFrance · JMA.<br>
+     <b>Прилив и вода:</b> Open-Meteo Marine (сверено с tide-forecast.com — время совпадает).<br>
+     <b>Камеры:</b> Ката — SSS Dive & Surf · Патонг — Phuket101 · Карон — Marina Phuket Resort.<br>
+     Сетка волновой модели ~9 км: соседние пляжи берут один узел, разницу даёт профиль спота.
+     Обновление каждые 10 мин. Волновой прогноз — максимум 7 дней.`;
+}
+
+async function boot(){
+  try{DATA=await load(); render()}
+  catch(e){
+    document.getElementById('main').innerHTML=
+      `<div class="err">Не загрузились данные: ${e.message}<br>Повтор через минуту.</div>`;
+    setTimeout(boot,60000);
+  }
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); TAB=b.dataset.t; render(); window.scrollTo({top:0,behavior:'smooth'});
+});
+boot();
+setInterval(boot,600000);
+// кадровые камеры освежаем чаще, чем перерисовываем всю страницу
+setInterval(()=>document.querySelectorAll('.camimg').forEach(img=>{
+  img.src=`https://imgproxy.windy.com/_/preview/plain/current/${img.dataset.cam}/original.jpg?v=${Date.now()}`;
+}),45000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)boot()});
+</script>
+</body>
+</html>
