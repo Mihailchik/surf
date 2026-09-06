@@ -11,8 +11,8 @@
 
 | источник | что даёт | ключ |
 |---|---|---|
-| Open-Meteo Marine | свелл, период, направление — 3 модели (DWD GWAM, MeteoFrance WAM, ECMWF WAM) | не нужен |
-| Open-Meteo Forecast | ветер и порывы — 5 моделей (ICON, GFS, ECMWF, ARPEGE, JMA) | не нужен |
+| Open-Meteo Marine | свелл, период, направление, ветровая волна — 3 модели (DWD GWAM, MeteoFrance WAM, ECMWF WAM) | не нужен |
+| Open-Meteo Forecast | ветер, порывы и осадки — 5 моделей (ICON, GFS, ECMWF, ARPEGE, JMA) | не нужен |
 | Open-Meteo Marine | прилив и температура воды | не нужен |
 | Open-Meteo Forecast | общая погода, восход/закат, УФ | не нужен |
 | MET Norway | ветер, независимый провайдер | не нужен |

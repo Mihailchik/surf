@@ -179,6 +179,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .hc.gh{font-size:10.5px;color:var(--dim2)}
 .hc.gv{color:var(--tx);font-weight:600}
 .hc.gw{color:var(--dim);font-weight:400}
+.hc.grain{color:var(--acc);font-weight:600;font-size:10px}
 .hc.now{background:color-mix(in srgb,var(--acc) 13%,transparent)}
 .hc.now.gh{color:var(--acc);font-weight:700}
 .hc u{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:7.5px;
@@ -346,6 +347,7 @@ const I18N={
    51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'heavy rain',66:'rain',67:'heavy rain',
    80:'showers',81:'showers',82:'heavy showers',95:'thunderstorm',96:'thunderstorm',99:'thunderstorm'},
   uM:'m', uMs:'m/s', uS:'s', uMm:'mm',
+  hRain:'rain', chop:'of it <b>{0} m</b> is local wind chop',
   srcWave:'Waves · Open-Meteo (3 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
@@ -396,6 +398,7 @@ const I18N={
    51:'морось',53:'морось',55:'морось',61:'дождь',63:'дождь',65:'ливень',66:'дождь',67:'ливень',
    80:'ливни',81:'ливни',82:'сильный ливень',95:'гроза',96:'гроза',99:'гроза'},
   uM:'м', uMs:'м/с', uS:'с', uMm:'мм',
+  hRain:'дождь', chop:'из них <b>{0} м</b> — ветровое месиво',
   srcWave:'Волна · Open-Meteo (3 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
@@ -446,6 +449,7 @@ const I18N={
    51:'ฝนละออง',53:'ฝนละออง',55:'ฝนละออง',61:'ฝนตก',63:'ฝนตก',65:'ฝนตกหนัก',66:'ฝนตก',67:'ฝนตกหนัก',
    80:'ฝนซู่',81:'ฝนซู่',82:'ฝนซู่หนัก',95:'พายุฝนฟ้าคะนอง',96:'พายุฝนฟ้าคะนอง',99:'พายุฝนฟ้าคะนอง'},
   uM:'ม.', uMs:'m/s', uS:'วิ.', uMm:'มม.',
+  hRain:'ฝน', chop:'ในนั้น <b>{0} ม.</b> เป็นคลื่นลมท้องถิ่น',
   srcWave:'คลื่น · Open-Meteo (3 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -646,10 +650,10 @@ async function load(){
   const [m,w,tSea,g,mn,ww3,sg]=await Promise.all([
     safe('wave',t('srcWave'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
-        '&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height&models='+WAVE_MODELS.join(','))),
+        '&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height,wind_wave_height&models='+WAVE_MODELS.join(','))),
     safe('wind',t('srcWind'),()=>
       jget('https://api.open-meteo.com/v1/forecast?'+base+
-        '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms&models='+WIND_MODELS.join(','))),
+        '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&wind_speed_unit=ms&models='+WIND_MODELS.join(','))),
     // температура воды и уровень моря есть ТОЛЬКО в best_match — отдельным запросом
     safe('sea',t('srcSea'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
@@ -722,6 +726,8 @@ async function load(){
         sst:th.sea_surface_temperature?.[k] ?? sgWater,
         tideRaw:th.sea_level_height_msl?.[k] ?? sgTide,
         sgTide, sgWater,
+        windWave:median(WAVE_MODELS.map(md=>mh['wind_wave_height_'+md]?.[k])),
+        rain:median(WIND_MODELS.map(md=>wh['precipitation_'+md]?.[k])),
         wind:median(wS), wdir:circMean(wRaw.map(x=>x.d)),
         gust:median(wRaw.map(x=>x.g)),
         // сырые значения каждой модели — чтобы итог можно было проверить руками
@@ -771,19 +777,23 @@ function hourStrip(rows,i0){
   const cells=slice.map(r=>{
     const s=r.score??0, night=!isDay(r), h=Math.max(3,Math.round(s/10*30));
     const isNow=rows.indexOf(r)===i0;
-    return {hh:r.t.slice(11,13), s, night, h, isNow,
+    return {hh:r.t.slice(11,13), s, night, h, isNow, rain:r.rain,
       top:(!night&&s===best&&s>4), sw:fmt(r.swell,1), wd:fmt(r.wind,0)};
   });
+  // строку дождя показываем только когда он вообще ожидается
+  const wet=cells.some(c=>(c.rain??0)>=0.1);
   const row=(cls,fn)=>cells.map(c=>`<div class="hc ${c.isNow?'now':''} ${cls}"
     style="${c.night?'opacity:.35':''}">${fn(c)}</div>`).join('');
   return `<div class="grid">
-    <div class="glab"><div>${t('hHour')}</div><div>${t('hScore')}</div><div>${t('hWave')}</div><div>${t('hWind')}</div></div>
+    <div class="glab"><div>${t('hHour')}</div><div>${t('hScore')}</div><div>${t('hWave')}</div><div>${t('hWind')}</div>${
+      wet?`<div>${t('hRain')}</div>`:''}</div>
     <div class="gscroll"><div class="grow">${row('gh',c=>
         `${c.hh}${c.top?'<u>'+t('peak')+'</u>':''}`)}</div>
       <div class="grow gbar">${row('',c=>
         `<i style="height:${c.h}px;background:${c.night?'var(--no)':scoreColor(c.s)}"></i>`)}</div>
       <div class="grow">${row('gv',c=>c.sw)}</div>
       <div class="grow">${row('gv gw',c=>c.wd)}</div>
+      ${wet?`<div class="grow">${row('gv grain',c=>(c.rain??0)>=0.1?fmt(c.rain,1):'·')}</div>`:''}
     </div></div>
   <div class="glegend">${t('legend')}</div>`;
 }
@@ -842,6 +852,9 @@ function why(sp,r){
   else if(worst>=1.6) conf=['var(--mid)',t('agreeMid',worst.toFixed(1))];
   else conf=['var(--go)',t('agreeOk')];
   const detail=(sr&&wr)?t('bySource',fmt(sr.lo,2),fmt(sr.hi,2),fmt(wr.lo,1),fmt(wr.hi,1)):'';
+  // сколько в волне местного ветрового мусора — это меняет ощущение на воде
+  if(r.windWave!=null && r.swell!=null && r.windWave>0.05 && r.windWave>=r.swell*0.35)
+    b.push(t('chop',fmt(r.windWave,2)));
   return `<div class="why">${b.join(' · ')}<br>
     <span class="conf" style="color:${conf[0]}">◆ ${conf[1]}</span>
     ${detail?`<div style="margin-top:5px;color:var(--dim2);font-size:11px">${detail}</div>`:''}
