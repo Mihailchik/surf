@@ -35,15 +35,17 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .tgl{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;
   width:28px;height:26px;font-size:13px;cursor:pointer;line-height:1;padding:0}
 /* верхний бар: дата, погода, ветер, солнце */
-.wxbar{display:flex;align-items:center;gap:0;padding:7px 12px 0;overflow-x:auto;
-  scrollbar-width:none;font-variant-numeric:tabular-nums}
-.wxbar::-webkit-scrollbar{display:none}
-.wx{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--dim);white-space:nowrap;
-  padding:0 9px;border-right:1px solid var(--line)}
+.wxbar{padding:6px 12px 1px;font-variant-numeric:tabular-nums}
+.wxline{display:flex;align-items:baseline;flex-wrap:nowrap;gap:0;line-height:1.5}
+.wx{display:inline-flex;align-items:baseline;gap:4px;font-size:11.5px;color:var(--dim);
+  white-space:nowrap;padding:0 7px;border-right:1px solid var(--line);
+  overflow:hidden;text-overflow:ellipsis}
 .wx:first-child{padding-left:0}
 .wx:last-child{border-right:0;padding-right:0}
 .wx b{color:var(--tx);font-weight:650}
-.wx .ico{font-size:14px;line-height:1}
+.wx .mut{color:var(--dim2);font-size:10.5px}
+.wx .ico{font-size:12.5px;font-style:normal;line-height:1}
+@media (max-width:359px){.wx{font-size:10.5px;padding:0 5px}}
 .tabs{display:flex;margin-top:7px;padding:0 12px}
 .tab{flex:1;padding:9px 4px;text-align:center;font-size:13px;font-weight:600;color:var(--dim);
   background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit}
@@ -688,18 +690,22 @@ function wxbar(){
   const c=WEATHER.current, d=WEATHER.daily;
   const [ico,txt]=WMO[c.weather_code]||['·','—'];
   const now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
-  const date=now.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
-  document.getElementById('wxbar').innerHTML=`
-    <div class="wx"><b>${date[0].toUpperCase()+date.slice(1)}</b></div>
-    <div class="wx"><span class="ico">${ico}</span>${txt}</div>
-    <div class="wx"><b>${Math.round(c.temperature_2m)}°</b>
-      <span style="color:var(--dim2)">ощущ ${Math.round(c.apparent_temperature)}°</span></div>
-    <div class="wx">ветер <b>${dirRu(c.wind_direction_10m)} ${c.wind_speed_10m.toFixed(0)}</b>
-      <span style="color:var(--dim2)">порывы ${c.wind_gusts_10m.toFixed(0)} м/с</span></div>
-    ${c.precipitation>0?`<div class="wx" style="color:var(--acc)">дождь <b>${c.precipitation} мм</b></div>`:''}
-    <div class="wx">☀ <b>${d.sunrise[0].slice(11,16)}</b>–<b>${d.sunset[0].slice(11,16)}</b></div>
-    <div class="wx">УФ <b>${Math.round(d.uv_index_max[0])}</b></div>
-    <div class="wx"><span style="color:var(--dim2)">облачность</span> <b>${c.cloud_cover}%</b></div>`;
+  const date=now.toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'short'});
+  // ровно две строки, без горизонтальной прокрутки
+  bar.innerHTML=`
+    <div class="wxline">
+      <span class="wx"><b>${date[0].toUpperCase()+date.slice(1)}</b></span>
+      <span class="wx"><i class="ico">${ico}</i>${txt}</span>
+      <span class="wx"><b>${Math.round(c.temperature_2m)}°</b>
+        <span class="mut">ощущ ${Math.round(c.apparent_temperature)}°</span></span>
+      ${c.precipitation>0?`<span class="wx" style="color:var(--acc)"><b>${c.precipitation} мм</b></span>`:''}
+    </div>
+    <div class="wxline">
+      <span class="wx">ветер <b>${dirRu(c.wind_direction_10m)} ${c.wind_speed_10m.toFixed(0)}</b><span
+        class="mut">↗${c.wind_gusts_10m.toFixed(0)} м/с</span></span>
+      <span class="wx"><i class="ico">☀</i><b>${d.sunrise[0].slice(11,16)}–${d.sunset[0].slice(11,16)}</b></span>
+      <span class="wx"><span class="mut">УФ</span> <b>${Math.round(d.uv_index_max[0])}</b></span>
+    </div>`;
 }
 
 /* Явный список: какие источники ответили, какие нет и почему */
