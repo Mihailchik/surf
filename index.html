@@ -131,6 +131,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .snote{padding:7px 13px 10px;font-size:11px;color:var(--dim2);line-height:1.5}
 .snote b{color:var(--dim)}
 .stab .rngrow td{color:var(--dim2);font-size:11px;border-top:0;padding-top:0}
+.stab .xrow td{color:var(--dim);border-top:1px dashed var(--line)}
+.stab .xrow td:first-child{color:var(--tx)}
 .stat{border-top:1px solid var(--line);padding:8px 13px 10px}
 .stline{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--dim);padding:2.5px 0}
 .stline b{margin-left:auto;font-weight:600;font-size:11px}
@@ -381,6 +383,32 @@ async function jget(u,opt){
    и не ломает вёрстку — он просто помечается как недоступный. */
 const STATUS={};
 
+/* ── NOAA WaveWatch III через PacIOOS ERDDAP ───────────────────
+   Независимая от Open-Meteo модель, без ключа и без лимитов.
+   Отдаёт суммарную волну и ветровую на 6 суток, а вот свелл-компоненту
+   почти не публикует (8 часов) — поэтому в медиану свелла её не мешаем,
+   а показываем отдельной строкой для сверки порядка величины.
+   Сетка 0.5°, так что весь Пхукет попадает в один узел — хватает
+   одного запроса на всю страницу.                                  */
+async function loadWW3(){
+  const pad=n=>String(n).padStart(2,'0');
+  const iso=d=>`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:00:00Z`;
+  const t0=iso(new Date()), t1=iso(new Date(Date.now()+6*864e5));
+  const idx=`%5B(${t0}):1:(${t1})%5D%5B(0.0)%5D%5B(7.9)%5D%5B(98.3)%5D`;
+  const url='https://pae-paha.pacioos.hawaii.edu/erddap/griddap/ww3_global.json?'+
+    ['Thgt','Tper','Tdir','whgt'].map(v=>v+idx).join(',');
+  const j=await jget(url);
+  const cols=j.table.columnNames, out={};
+  const ci=n=>cols.indexOf(n);
+  for(const r of j.table.rows){
+    // ERDDAP отдаёт UTC — переводим в местный час Пхукета
+    const k=new Date(r[ci('time')]).toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'})
+      .slice(0,13).replace(' ','T');
+    out[k]={h:r[ci('Thgt')], p:r[ci('Tper')], d:r[ci('Tdir')], wh:r[ci('whgt')]};
+  }
+  return out;
+}
+
 /* ── Stormglass ────────────────────────────────────────────────
    Квота 10 запросов/сутки, а страница обновляется каждые 10 минут.
    Спасает то, что один запрос отдаёт сразу 240 часов вперёд:
@@ -430,7 +458,7 @@ async function load(){
   const pts=[...new Set(SPOTS.map(s=>s.lat.toFixed(2)+','+s.lon.toFixed(2)))];
   const lats=pts.map(p=>p.split(',')[0]).join(','), lons=pts.map(p=>p.split(',')[1]).join(',');
   const base='latitude='+lats+'&longitude='+lons+'&timezone=Asia%2FBangkok&forecast_days=7';
-  const [m,w,t,g,mn,sg]=await Promise.all([
+  const [m,w,t,g,mn,ww3,sg]=await Promise.all([
     safe('wave','Волна · Open-Meteo (3 модели)',()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
         '&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height&models='+WAVE_MODELS.join(','))),
@@ -451,6 +479,7 @@ async function load(){
     // независимый провайдер: Норвежский метинститут, своя модель, не Open-Meteo
     safe('metno','Ветер · MET Norway (независимый)',()=>
       jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=7.87&lon=98.29')),
+    safe('ww3','Волна · NOAA WaveWatch III (независимый)',loadWW3),
     loadStormglass()
   ]);
   if(!m||!w) throw new Error('основные источники недоступны');
@@ -499,6 +528,7 @@ async function load(){
       // независимая сверка прилива и воды от UK Met Office
       const sgTide=sgh?pick(sgh.seaLevel,'meto'):null;
       const sgWater=sgh?pick(sgh.waterTemperature,'meto'):null;
+      const w3=ww3?ww3[hourKey]:null;
 
       rows.push({t:time,
         swell:median(sH), period:median(sRaw.map(x=>x.p)),
@@ -512,6 +542,7 @@ async function load(){
         agree:1-clamp(spread(sH)*0.6+spread(wS)*0.4,0,1),
         nSwell:sH.filter(x=>x!=null).length, nWind:wS.filter(x=>x!=null).length,
         // сырые значения каждой модели — чтобы итог можно было проверить руками
+        ww3:w3,
         raw:{wave:sRaw, wind:wRaw}});
     }
     const tv=rows.map(r=>r.tideRaw).filter(x=>x!=null);
@@ -751,6 +782,10 @@ function sources(r){
         <td>${r.sdir==null?'—':Math.round(r.sdir)+'°'}</td></tr>
       ${r.swellRange?`<tr class="rngrow"><td>разброс</td>
         <td colspan="3">${fmt(r.swellRange.lo,2)}–${fmt(r.swellRange.hi,2)} м</td></tr>`:''}
+      ${r.ww3?`<tr class="xrow"><td>NOAA WW3 ⧉</td><td>${fmt(r.ww3.h,2)}</td>
+        <td>${fmt(r.ww3.p,1)}</td><td>${r.ww3.d==null?'—':Math.round(r.ww3.d)+'°'}</td></tr>
+      <tr class="rngrow"><td></td><td colspan="3">↑ это суммарная волна, не свелл —
+        для сверки, в медиану не входит</td></tr>`:''}
       </tbody></table>
     <table class="stab"><thead><tr><th>ветер</th><th>м/с</th><th>напр.</th><th>порывы</th></tr></thead>
       <tbody>${wind}
