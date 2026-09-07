@@ -83,7 +83,14 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .srow{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--line);
   cursor:pointer;font-variant-numeric:tabular-nums}
 .srow.nolink{cursor:default}
-.srow .map{margin-left:2px}
+.srow .map{margin-left:4px}
+/* На узком экране цифры важнее времени пика: пик прячем, чтобы
+   волна/период/ветер помещались рядом с пином. */
+@media (max-width:430px){
+  .srow .speak{display:none}
+  .sname{flex:0 0 66px;font-size:13px}
+  .sdat{font-size:11.5px}
+}
 .srow:last-child{border-bottom:0}
 .sbadge{flex:0 0 30px;height:30px;border-radius:9px;display:flex;align-items:center;
   justify-content:center;font-weight:800;font-size:14px}
@@ -96,13 +103,13 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .card{margin:10px 0;border-radius:14px;background:var(--card);border:1px solid var(--line);
   overflow:hidden;box-shadow:var(--shadow)}
 .chead{display:flex;align-items:center;gap:10px;padding:9px 13px;cursor:pointer}
+.chead .map{align-self:flex-start;margin-top:1px}
 .score{flex:0 0 40px;height:40px;border-radius:11px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;font-weight:800;line-height:1}
 .score b{font-size:16px}
 .score i{font-size:8px;font-style:normal;opacity:.8;margin-top:1px}
 .cname{flex:1;min-width:0}
-.cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px;
-  display:flex;align-items:center;gap:6px;line-height:1.2}
+.cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
 .map{position:relative;display:inline-flex;align-items:center;justify-content:center;
   width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:var(--card2);
   text-decoration:none;line-height:1;flex:0 0 auto}
@@ -145,6 +152,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .trow>div{flex:1;color:var(--dim);font-variant-numeric:tabular-nums}
 .trow b{color:var(--tx);font-weight:700}
 .trow i{font-style:normal;font-size:10px;color:var(--dim2);margin-left:6px}
+.tides{display:flex;gap:14px;flex-wrap:wrap}
+.td{display:inline-flex;flex-direction:column;line-height:1.15}
+.td em{font-style:normal;font-size:9.5px;color:var(--dim2);text-transform:uppercase;letter-spacing:.3px}
+.td b{font-size:12.5px}
 .why{padding:9px 13px;font-size:12.5px;color:var(--dim);line-height:1.5;border-top:1px solid var(--line)}
 .why b{color:var(--tx);font-weight:650}
 .conf{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 7px;border-radius:5px;
@@ -378,7 +389,7 @@ const I18N={
   wave:'wave', period:'period', wind:'wind', water:'water',
   noCam:'no camera', camNone:'no public camera',
   tPeak:'peak', tTide:'tide', tNow:'now',
-  tideHigh:'high', tideLow:'low', tideLegend:'▲ high · ▼ low',
+  tideHigh:'high', tideLow:'low',
   rising:'conditions improving', falling:'conditions worsening', atPeak:'best right now', flat:'holding steady',
   darkUntil:'dark · next window {0}', dark:'dark',
   noPeak:'flat all day, no peak',
@@ -443,7 +454,7 @@ const I18N={
   wave:'волна', period:'период', wind:'ветер', water:'вода',
   noCam:'камеры нет', camNone:'публичных камер нет',
   tPeak:'пик', tTide:'прилив', tNow:'сейчас',
-  tideHigh:'полная', tideLow:'малая', tideLegend:'▲ полная · ▼ малая',
+  tideHigh:'полная', tideLow:'малая',
   rising:'условия улучшаются', falling:'условия ухудшаются', atPeak:'сейчас лучший момент', flat:'без изменений',
   darkUntil:'темно · ближайшее окно {0}', dark:'темно',
   noPeak:'ровно весь день, пика нет',
@@ -508,7 +519,7 @@ const I18N={
   wave:'คลื่น', period:'คาบคลื่น', wind:'ลม', water:'น้ำ',
   noCam:'ไม่มีกล้อง', camNone:'ไม่มีกล้องสาธารณะ',
   tPeak:'สูงสุด', tTide:'น้ำขึ้นลง', tNow:'ตอนนี้',
-  tideHigh:'น้ำขึ้น', tideLow:'น้ำลง', tideLegend:'▲ น้ำขึ้น · ▼ น้ำลง',
+  tideHigh:'น้ำขึ้น', tideLow:'น้ำลง',
   rising:'สภาพกำลังดีขึ้น', falling:'สภาพกำลังแย่ลง', atPeak:'ตอนนี้ดีที่สุด', flat:'คงที่',
   darkUntil:'มืดแล้ว · ช่วงถัดไป {0}', dark:'มืด',
   noPeak:'คงที่ทั้งวัน ไม่มีช่วงพีค',
@@ -891,9 +902,10 @@ function timing(sp,rows,i0){
     }).join(' · '):`<span style="color:var(--dim2)">${t('noPeak')}</span>`;
   return `<div class="tim">
     <div class="trow"><span>${t('tPeak')}</span><div>${pk}</div></div>
-    <div class="trow"><span>${t('tTide')}</span><div>${
-      tides.map(td=>`${td.type==='high'?'▲':'▼'} <b>${td.hhmm}</b>`).join(' · ')||'—'}
-      <i>${t('tideLegend')}</i></div></div>
+    <div class="trow"><span>${t('tTide')}</span><div class="tides">${
+      tides.slice(0,3).map(td=>`<span class="td"><em>${
+        td.type==='high'?t('tideHigh'):t('tideLow')}</em><b>${td.hhmm}</b></span>`).join('')||'—'}
+      </div></div>
     <div class="trow"><span>${t('tNow')}</span><div style="color:${pcol};font-weight:650">${phase}</div></div>
   </div>`;
 }
@@ -972,7 +984,8 @@ function card(sp,rows,pinned){
     <div class="chead">
       <div class="score" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
         color:${scoreColor(s)}"><b>${s.toFixed(0)}</b><i>${t('outOf')}</i></div>
-      <div class="cname"><h3>${nameOf(sp)}${mapLink(sp)}</h3><p>${sub}</p></div>
+      <div class="cname"><h3>${nameOf(sp)}</h3><p>${sub}</p></div>
+      ${mapLink(sp)}
       ${pinned?'':'<div class="chev">›</div>'}
     </div>
     <div class="cbody">${body}</div></div>`;
@@ -1173,8 +1186,9 @@ function render(){
         color:${scoreColor(s)}">${s.toFixed(0)}</div>
       <div class="sname">${nameOf(x.sp)}</div>
       <div class="sdat">${fmt(x.pick.swell,1)} ${t('uM')} · ${fmt(x.pick.period,1)} ${t('uS')} · ${
-        dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)} ${t('uMs')}</div>
+        dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)}</div>
       <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>—</b>'}</div>
+      ${mapLink(x.sp)}
     </div>`}).join('');
 
   document.getElementById('summary').innerHTML=(TAB==='island'||TAB==='d7')?'':`<div class="sum">
@@ -1217,8 +1231,8 @@ function render(){
           <div class="sname">${nameOf(x.sp)}</div>
           <div class="sdat">${fmt(x.pick.swell,1)} ${t('uM')} · ${fmt(x.pick.period,1)} ${t('uS')} · ${
             dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)}</div>
-          ${mapLink(x.sp)}
           <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>—</b>'}</div>
+          ${mapLink(x.sp)}
         </div>`}).join('')}</div>`
     : restSorted.map(x=>card(x.sp,x.rows,false)).join('');
   }
