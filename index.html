@@ -385,7 +385,7 @@ const OCEAN=[
   {id:'bengal',  lat:12.0, lon:92.0, dist:900,  pass:0.30, lag:16},
   {id:'open',    lat:5.0,  lon:88.0, dist:1300, pass:0.30, lag:24}
 ];
-const WAVE_MODELS=['gwam','meteofrance_wave','ecmwf_wam025'];
+const WAVE_MODELS=['gwam','meteofrance_wave','ncep_gfswave016','ecmwf_wam025'];
 const WIND_MODELS=['icon_seamless','gfs_seamless','ecmwf_ifs025','meteofrance_seamless','jma_seamless'];
 let TAB='now', PICK=null, DATA=null, WEATHER=null, OCEANDATA=null, LAST_OK=null, STALE=false, STALE_REASON='noConnection';
 
@@ -433,7 +433,7 @@ const I18N={
   agreeMid:'sources disagree by {0}×', agreeOk:'sources agree',
   bySource:'by source: wave {0}–{1} m, wind {2}–{3} m/s',
   bestWindow:'best window {0} {1}, {2}/10',
-  footer:'<b>Wave:</b> DWD GWAM, MeteoFrance WAM, ECMWF WAM. Plus NOAA WaveWatch III for comparison.<br><b>Wind:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br><b>Cameras:</b> Kata SSS Dive &amp; Surf, Patong Patong Tower, Karon Marina Phuket Resort.<br>The wave model grid is about 9 km, so neighbouring beaches share a node. The difference comes from each spot profile. Forecast runs 10 days.',
+  footer:'<b>Wave:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Plus NOAA WaveWatch III for comparison.<br><b>Wind:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br><b>Cameras:</b> Kata SSS Dive &amp; Surf, Patong Patong Tower, Karon Marina Phuket Resort.<br>The wave model grid is about 9 km, so neighbouring beaches share a node. The difference comes from each spot profile. Forecast runs 10 days.',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'clear',1:'mostly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',
    51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'heavy rain',66:'rain',67:'heavy rain',
@@ -460,7 +460,7 @@ const I18N={
   staleLimit:'Request limit reached. Data below is from {0}.',
   limited:'limit',
   totalWave:'total wave',
-  srcWave:'Waves · Open-Meteo (3 models)', srcWind:'Wind · Open-Meteo (5 models)',
+  srcWave:'Waves · Open-Meteo (4 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
  },
@@ -499,7 +499,7 @@ const I18N={
   agreeMid:'источники расходятся в {0} раза', agreeOk:'источники сходятся',
   bySource:'по источникам: волна {0}–{1} м, ветер {2}–{3} м/с',
   bestWindow:'лучшее окно {0} {1}, {2}/10',
-  footer:'<b>Волна:</b> DWD GWAM, MeteoFrance WAM, ECMWF WAM. Плюс NOAA WaveWatch III для сверки.<br><b>Ветер:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br><b>Камеры:</b> Ката SSS Dive &amp; Surf, Патонг Patong Tower, Карон Marina Phuket Resort.<br>Сетка волновой модели около 9 км, поэтому соседние пляжи берут один узел. Разницу даёт профиль спота. Прогноз на 10 дней.',
+  footer:'<b>Волна:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Плюс NOAA WaveWatch III для сверки.<br><b>Ветер:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br><b>Камеры:</b> Ката SSS Dive &amp; Surf, Патонг Patong Tower, Карон Marina Phuket Resort.<br>Сетка волновой модели около 9 км, поэтому соседние пляжи берут один узел. Разницу даёт профиль спота. Прогноз на 10 дней.',
   dirs:['С','ССВ','СВ','ВСВ','В','ВЮВ','ЮВ','ЮЮВ','Ю','ЮЮЗ','ЮЗ','ЗЮЗ','З','ЗСЗ','СЗ','ССЗ'],
   wmo:{0:'ясно',1:'почти ясно',2:'переменная',3:'пасмурно',45:'туман',48:'туман',
    51:'морось',53:'морось',55:'морось',61:'дождь',63:'дождь',65:'ливень',66:'дождь',67:'ливень',
@@ -526,7 +526,7 @@ const I18N={
   staleLimit:'Лимит запросов исчерпан. Данные ниже от {0}.',
   limited:'лимит',
   totalWave:'сумм. волна',
-  srcWave:'Волна · Open-Meteo (3 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
+  srcWave:'Волна · Open-Meteo (4 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
  },
@@ -565,7 +565,7 @@ const I18N={
   agreeMid:'แหล่งข้อมูลต่างกัน {0} เท่า', agreeOk:'แหล่งข้อมูลตรงกัน',
   bySource:'ตามแหล่งข้อมูล: คลื่น {0}–{1} ม. · ลม {2}–{3} m/s',
   bestWindow:'ช่วงที่ดีที่สุด {0} {1} · {2}/10',
-  footer:'<b>คลื่น:</b> DWD GWAM, MeteoFrance WAM, ECMWF WAM และ NOAA WaveWatch III สำหรับเทียบ<br><b>ลม:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br><b>กล้อง:</b> กะตะ SSS Dive &amp; Surf, ป่าตอง Patong Tower, กะรน Marina Phuket Resort<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะหาด พยากรณ์ 10 วัน',
+  footer:'<b>คลื่น:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM และ NOAA WaveWatch III สำหรับเทียบ<br><b>ลม:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br><b>กล้อง:</b> กะตะ SSS Dive &amp; Surf, ป่าตอง Patong Tower, กะรน Marina Phuket Resort<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะหาด พยากรณ์ 10 วัน',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'ท้องฟ้าแจ่มใส',1:'แจ่มใสเป็นส่วนใหญ่',2:'มีเมฆบางส่วน',3:'เมฆมาก',45:'หมอก',48:'หมอก',
    51:'ฝนละออง',53:'ฝนละออง',55:'ฝนละออง',61:'ฝนตก',63:'ฝนตก',65:'ฝนตกหนัก',66:'ฝนตก',67:'ฝนตกหนัก',
@@ -592,7 +592,7 @@ const I18N={
   staleLimit:'ใช้โควตาคำขอหมดแล้ว ข้อมูลด้านล่างจาก {0}',
   limited:'เกินโควตา',
   totalWave:'คลื่นรวม',
-  srcWave:'คลื่น · Open-Meteo (3 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
+  srcWave:'คลื่น · Open-Meteo (4 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
  }
@@ -1061,7 +1061,8 @@ function statusPill(){
 /* Every model separately, so the median can be checked by hand. */
 function sources(r){
   if(!r.raw) return '';
-  const NAME={gwam:'DWD GWAM',meteofrance_wave:'MeteoFrance WAM',ecmwf_wam025:'ECMWF WAM',
+  const NAME={gwam:'DWD GWAM',meteofrance_wave:'MeteoFrance WAM',
+    ncep_gfswave016:'NOAA GFS-Wave',ecmwf_wam025:'ECMWF WAM',
     icon_seamless:'ICON (DWD)',gfs_seamless:'GFS (NOAA)',ecmwf_ifs025:'ECMWF IFS',
     meteofrance_seamless:'ARPEGE (MF)',jma_seamless:'JMA',metno:'MET Norway ⧉', ww3:'NOAA WW3 ⧉'};
   const wave=r.raw.wave.filter(x=>x.h!=null).map(x=>`<tr><td>${NAME[x.m]}</td>

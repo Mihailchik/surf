@@ -14,12 +14,12 @@ source is fetched straight from the browser and works without registration.
 
 | Source | Provides |
 |---|---|
-| Open-Meteo Marine | swell height, period, direction, wind wave — DWD GWAM, MeteoFrance WAM, ECMWF WAM |
-| Open-Meteo Forecast | wind, gusts, precipitation — ICON, GFS, ECMWF, ARPEGE, JMA |
+| Open-Meteo Marine | swell height, period, direction, wind wave: DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave 0.16°, ECMWF WAM |
+| Open-Meteo Forecast | wind, gusts, precipitation: ICON, GFS, ECMWF, ARPEGE, JMA |
 | Open-Meteo Marine | tide and sea temperature |
 | Open-Meteo Forecast | general weather, sunrise, UV |
 | MET Norway | wind, independent of Open-Meteo |
-| NOAA WaveWatch III (PacIOOS ERDDAP) | total wave height, independent |
+| NOAA WaveWatch III (PacIOOS ERDDAP) | total wave height, independent of Open-Meteo |
 | Open-Meteo | wave and wind at three ocean watchpoints |
 
 Each value is the **median** across models, not the mean — a single outlier
