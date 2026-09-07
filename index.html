@@ -237,6 +237,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .src{margin:20px 0 0;padding:12px 13px;border-radius:12px;background:var(--card2);
   border:1px solid var(--line);font-size:11px;color:var(--dim2);line-height:1.6}
 .src b{color:var(--dim)}
+.lic{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:10.5px;line-height:1.5}
+.lic a{color:var(--dim);text-decoration:underline}
 .hits{display:flex;justify-content:center;padding:14px 0 4px;opacity:.65}
 .hits img{height:18px}
 .err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
@@ -399,6 +401,7 @@ const I18N={
   iOceanNote:'Only about 41% of ocean swell gets past the Andaman and Nicobar islands, and the period drops from 10 s to 5–6 s. The arrival figure already accounts for that — measured, not guessed.',
   iSeasonText:'Surf season on the west coast runs May to October, driven by the southwest monsoon. Waves here are mostly built by local wind rather than distant swell, so wind matters more than anywhere with an open coastline. November to April is flat and glassy.',
   iTyphoonText:'Phuket sits outside the typhoon belt — cyclones form in the Bay of Bengal and the western Pacific, not in the Andaman Sea. A Bay of Bengal cyclone can still push extra swell down, and that shows up in the ocean watchpoints above as a jump in wind and wave height. A dedicated cyclone feed is not wired in: the open ones (GDACS, JTWC) do not allow browser access, and inventing an alert would be worse than none.',
+  licence:"Data: Open-Meteo and MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III via PacIOOS, public domain. Camera streams belong to their operators. Forecasts can be wrong — not a safety service.",
   srcWave:'Waves · Open-Meteo (3 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
@@ -457,6 +460,7 @@ const I18N={
   iOceanNote:'Через Андаманские и Никобарские острова к берегу проходит около 41% океанского свелла, а период падает с 10 с до 5–6 с. Цифра прихода это уже учитывает — коэффициент измерен, а не придуман.',
   iSeasonText:'Сезон на западном побережье — с мая по октябрь, его гонит юго-западный муссон. Волна здесь в основном рождается местным ветром, а не приходит дальним свеллом, поэтому ветер важнее, чем на открытом побережье. С ноября по апрель — штиль и гладкая вода.',
   iTyphoonText:'Пхукет лежит вне тайфунного пояса: циклоны рождаются в Бенгальском заливе и западной части Тихого океана, а не в Андаманском море. Циклон в Бенгальском заливе всё же может подогнать сюда лишний свелл — и это видно в океанских точках выше как скачок ветра и высоты волны. Отдельной ленты по циклонам здесь нет: открытые источники (GDACS, JTWC) не пускают браузер напрямую, а выдумывать предупреждение хуже, чем не показывать его вовсе.',
+  licence:"Данные: Open-Meteo и MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III через PacIOOS, общественное достояние. Камеры принадлежат их владельцам. Прогноз может ошибаться — не полагайтесь на него как на единственный источник.",
   srcWave:'Волна · Open-Meteo (3 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
@@ -515,6 +519,7 @@ const I18N={
   iOceanNote:'คลื่นจากมหาสมุทรผ่านหมู่เกาะอันดามันและนิโคบาร์มาถึงชายฝั่งราว 41% และคาบลดจาก 10 วิ. เหลือ 5–6 วิ. ตัวเลขที่แสดงคำนวณจากค่านี้แล้ว',
   iSeasonText:'ฤดูเซิร์ฟฝั่งตะวันตกคือพฤษภาคมถึงตุลาคม ขับด้วยมรสุมตะวันตกเฉียงใต้ คลื่นที่นี่เกิดจากลมท้องถิ่นเป็นหลัก ลมจึงสำคัญกว่าที่อื่น ช่วงพฤศจิกายนถึงเมษายนน้ำนิ่ง',
   iTyphoonText:'ภูเก็ตอยู่นอกแนวไต้ฝุ่น พายุหมุนก่อตัวในอ่าวเบงกอลและแปซิฟิกตะวันตก ไม่ใช่ทะเลอันดามัน พายุในอ่าวเบงกอลอาจส่งคลื่นเพิ่มมาได้ ซึ่งจะเห็นได้จากจุดสังเกตด้านบน ที่นี่ไม่มีฟีดพายุโดยตรง เพราะแหล่งข้อมูลเปิด (GDACS, JTWC) ไม่อนุญาตให้เบราว์เซอร์เข้าถึง',
+  licence:"ข้อมูล: Open-Meteo และ MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III ผ่าน PacIOOS สาธารณสมบัติ กล้องเป็นของเจ้าของแต่ละราย พยากรณ์อาจคลาดเคลื่อน",
   srcWave:'คลื่น · Open-Meteo (3 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -1140,7 +1145,7 @@ function render(){
 
   document.getElementById('upd').innerHTML=statusPill()+' '+t('updAt',
     new Date().toLocaleTimeString(LOCALE[LANG],{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit'}));
-  document.getElementById('src').innerHTML=t('footer');
+  document.getElementById('src').innerHTML=t('footer')+`<div class="lic">${t('licence')}</div>`;
 }
 
 async function boot(){

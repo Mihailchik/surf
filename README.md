@@ -60,3 +60,46 @@ the shore (16%), plus a tide adjustment.
   warning would be worse than none.
 - **Spot thresholds are not calibrated.** The working swell range and preferred
   tide for each break in `SPOTS` are estimates and need real sessions to verify.
+
+## Attribution and terms
+
+Code in this repository is MIT (see `LICENSE`). The data is not — each provider
+sets its own terms, and they are met as follows.
+
+**Open-Meteo** — data is CC BY 4.0 and requires attribution. The free tier is
+limited to **non-commercial use** and 10 000 calls per day. This site is
+non-commercial: no subscriptions, no advertising. Requests are made from each
+visitor's own browser, so the daily limit applies per visitor, not to the site
+as a whole. Adding ads or paid features would require a paid plan.
+
+**MET Norway** — data is CC BY 4.0 and requires attribution. Their terms also
+require an identifying User-Agent; a browser cannot set one, so requests carry
+the Origin header instead, which their terms accept as the fallback. Data is
+requested once per page load, far below their limits. Their terms forbid using
+the Yr name or logo, or implying any affiliation — this site does neither.
+
+**NOAA WaveWatch III via PacIOOS ERDDAP** — a work of the US government, in the
+public domain. Credited in the footer.
+
+**Webcams** — the streams belong to SSS Phuket Dive & Surf (Kata), Patong Tower
+(Patong) and Marina Phuket Resort (Karon). They are embedded from the original
+sources and credited on every frame. Nothing is re-hosted, recorded or passed
+off as this site's own. If an operator asks for their stream to be removed,
+remove it.
+
+**Visit counter** — hits.sh, a third-party service. It sees visitors' IP
+addresses, as any external analytics does. Remove the `.hits` block to drop it.
+
+### What could actually go wrong
+
+Not fines — none of these providers issue them. The realistic outcomes are:
+rate limiting or a block from MET Norway if their terms are broken, a request
+from a camera operator to stop embedding, and a requirement to move to a paid
+Open-Meteo plan if the site ever becomes commercial. Attribution is a licence
+condition in all three cases and is present in the page footer.
+
+### Not a safety service
+
+Forecasts are model output and can be wrong — the page shows the spread between
+sources precisely because they often disagree. Do not use it as the sole basis
+for decisions about entering the water.
