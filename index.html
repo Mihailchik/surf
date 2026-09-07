@@ -649,7 +649,10 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const angDiff=(a,b)=>{let d=Math.abs(a-b)%360;return d>180?360-d:d};
 const dirRu=d=>t('dirs')[Math.round(d/22.5)%16];
 const fmt=(v,d=1,dash='–')=>v==null||isNaN(v)?dash:v.toFixed(d);
-const scoreColor=s=>s>=8?'var(--go)':s>=6?'var(--ok)':s>=4?'var(--mid)':s>=2?'var(--bad)':'var(--no)';
+// цвет считаем от округлённого балла: иначе 5.6 показывается как «6»,
+// но красится в цвет пятёрки
+const scoreColor=v=>{const s=Math.round(v??0);
+  return s>=8?'var(--go)':s>=6?'var(--ok)':s>=4?'var(--mid)':s>=2?'var(--bad)':'var(--no)';};
 
 /* Tropics: sunrise ~06:15, sunset ~18:35 year round. */
 const DAY_FROM=6, DAY_TO=18;   
@@ -988,7 +991,10 @@ function dayRows(sp,rows,n){
 }
 
 function card(sp,rows,pinned){
-  const i0=nowIdx(rows), r=rows[i0], s=r.score??0;
+  const i0=nowIdx(rows);
+  const dark=!isDay(rows[i0]);
+  const r=(dark?bestDaylight(rows,i0,30):rows[i0])||rows[i0];
+  const s=r.score??0;
   let body;
   if(TAB==='now'){
     // camera and verdict up top, everything else under details
@@ -1008,7 +1014,7 @@ function card(sp,rows,pinned){
   return `<div class="card ${pinned?'pin':''}" data-id="${sp.id}" id="c-${sp.id}">
     <div class="chead">
       <div class="score" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
-        color:${scoreColor(s)}"><b>${s.toFixed(0)}</b><i>${t('outOf')}</i></div>
+        color:${scoreColor(s)}"><b>${s.toFixed(0)}</b></div>
       <div class="cname"><h3>${nameOf(sp)}</h3><p>${sub}</p></div>
       ${mapLink(sp)}
       ${pinned?'':'<div class="chev">›</div>'}
