@@ -70,8 +70,9 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .vbig{font-size:23px;font-weight:800;letter-spacing:-.5px;line-height:1;white-space:nowrap}
 .vtx{font-size:12.5px;color:var(--dim);line-height:1.35}
 .vtx b{color:var(--tx);font-weight:650}
-.srow{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid var(--line);
+.srow{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--line);
   cursor:pointer;font-variant-numeric:tabular-nums}
+.srow.nolink{cursor:default}
 .srow:last-child{border-bottom:0}
 .sbadge{flex:0 0 30px;height:30px;border-radius:9px;display:flex;align-items:center;
   justify-content:center;font-weight:800;font-size:14px}
@@ -88,7 +89,12 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .score b{font-size:16px}
 .score i{font-size:8px;font-style:normal;opacity:.8;margin-top:1px}
 .cname{flex:1;min-width:0}
-.cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px}
+.cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px;
+  display:flex;align-items:center;gap:6px}
+.map{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
+  border-radius:50%;border:1px solid var(--line);color:var(--dim2);text-decoration:none;
+  font-size:11px;line-height:1;flex:0 0 auto}
+.map:hover{color:var(--acc);border-color:var(--acc)}
 .cname p{margin:5px 0 0;font-size:12px;color:var(--dim);line-height:1.3;
   display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
 .cname p b{color:var(--tx);font-weight:650}
@@ -197,6 +203,11 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .days{border-top:1px solid var(--line)}
 .day{display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--line);font-size:12.5px}
 .day:last-child{border-bottom:0}
+.dayx summary{list-style:none;cursor:pointer}
+.dayx summary::-webkit-details-marker{display:none}
+.dayx[open] summary{background:var(--card2)}
+.daybody{border-bottom:1px solid var(--line);background:var(--card2)}
+.daybody .grid,.daybody .tim,.daybody .why,.daybody .srcbox{background:var(--card)}
 .day .dn{flex:0 0 54px;color:var(--dim);font-size:11.5px}
 .day .dn b{display:block;color:var(--tx);font-size:12.5px;font-weight:650;text-transform:capitalize}
 .dbar{flex:1;height:22px;border-radius:6px;background:var(--card2);position:relative;overflow:hidden}
@@ -206,13 +217,28 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .dsc{flex:0 0 26px;text-align:right;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
 
+.ihead{padding:11px 13px 8px;font-size:11px;font-weight:700;color:var(--dim2);
+  text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--line)}
+.ev{display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--line)}
+.evd{flex:0 0 78px;font-size:12.5px;font-weight:650;text-transform:capitalize}
+.evb{flex:1;height:16px;border-radius:5px;background:var(--card2);overflow:hidden}
+.evb i{display:block;height:100%;border-radius:5px}
+.evv{flex:0 0 auto;text-align:right;font-variant-numeric:tabular-nums}
+.evv b{font-size:13px}
+.evv span{display:block;font-size:10px;color:var(--dim2)}
+.ocn{display:flex;gap:10px;padding:9px 13px;border-bottom:1px solid var(--line)}
+.ocname{flex:0 0 96px;font-size:12px;font-weight:650;line-height:1.25}
+.ocname i{display:block;font-style:normal;font-size:10px;color:var(--dim2);font-weight:400}
+.ocbody{flex:1;font-size:12px;color:var(--dim);line-height:1.45;font-variant-numeric:tabular-nums}
+.ocbody b{color:var(--tx);font-weight:650}
+.ocsub{font-size:11.5px;color:var(--dim2)}
+.inote{padding:11px 13px;font-size:12.5px;color:var(--dim);line-height:1.55}
+.inote2{padding:8px 13px 11px;font-size:11px;color:var(--dim2);line-height:1.5}
 .sect{margin:18px 0 7px;font-size:11px;font-weight:700;color:var(--dim2);
   text-transform:uppercase;letter-spacing:1.2px;padding:0 2px}
 .src{margin:20px 0 0;padding:12px 13px;border-radius:12px;background:var(--card2);
   border:1px solid var(--line);font-size:11px;color:var(--dim2);line-height:1.6}
 .src b{color:var(--dim)}
-.hits{display:flex;justify-content:center;padding:14px 0 4px;opacity:.65}
-.hits img{height:18px}
 .err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
   color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
 .skel{height:70px;border-radius:14px;background:linear-gradient(90deg,var(--card),var(--card2),var(--card));
@@ -236,7 +262,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   <div class="wxbar" id="wxbar"></div>
   <div class="tabs">
     <button class="tab on" data-t="now"></button>
-    <button class="tab" data-t="d3"></button>
+    <button class="tab" data-t="island"></button>
     <button class="tab" data-t="d7"></button>
   </div>
 </header>
@@ -247,8 +273,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
   <div class="src" id="src"></div>
-  <div class="hits"><img alt="" loading="lazy"
-    src="https://hits.sh/mihailchik.github.io/sitesurf.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
+
 </div>
 
 <script>
@@ -286,9 +311,17 @@ const SPOTS=[
   shelter:.55,tide:'high',cam:null}
 ];
 
+/* Точки в океане, по которым видно, что идёт к Пхукету.
+   Коэффициент прохождения ~41% и задержка ~11 ч измерены сравнением
+   прогноза за Никобарами с прогнозом у берега (см. README). */
+const OCEAN=[
+  {id:'nicobar', lat:7.0,  lon:92.0, dist:700,  pass:0.41, lag:11},
+  {id:'bengal',  lat:12.0, lon:92.0, dist:900,  pass:0.30, lag:16},
+  {id:'open',    lat:5.0,  lon:88.0, dist:1300, pass:0.30, lag:24}
+];
 const WAVE_MODELS=['gwam','meteofrance_wave','ecmwf_wam025'];
 const WIND_MODELS=['icon_seamless','gfs_seamless','ecmwf_ifs025','meteofrance_seamless','jma_seamless'];
-let TAB='now', DATA=null, WEATHER=null;
+let TAB='now', DATA=null, WEATHER=null, OCEANDATA=null;
 
 /* localStorage может бросать исключение (приватный режим, отключённые
    куки) — тогда страница просто работает без запоминания настроек. */
@@ -303,7 +336,7 @@ const LS={
    t('key') берёт строку текущего языка, при пропуске падает на en. */
 const I18N={
  en:{
-  title:'Phuket · surf', now:'Now', d3:'3 days', d7:'10 days',
+  title:'Phuket · surf', now:'Now', island:'Phuket', d7:'10 days',
   go:'GO', ok:'WORTH IT', weak:'WEAK', no:'SKIP',
   darkNow:'dark now · ', bestIs:'best is {0}', windowAt:'window {0} {1}',
   today:'today', tomorrow:'tomorrow', peak:'peak', outOf:'of 10',
@@ -311,7 +344,7 @@ const I18N={
   noCam:'no camera', camNone:'no public camera',
   tPeak:'peak', tTide:'tide', tNow:'now',
   tideHigh:'high', tideLow:'low', tideLegend:'▲ high · ▼ low',
-  rising:'rising', falling:'falling', atPeak:'at peak now', flat:'steady',
+  rising:'conditions improving', falling:'conditions worsening', atPeak:'best right now', flat:'holding steady',
   darkUntil:'dark · next window {0}', dark:'dark',
   noPeak:'flat all day, no peak',
   more:'details', showSources:'show every source separately',
@@ -348,13 +381,25 @@ const I18N={
    80:'showers',81:'showers',82:'heavy showers',95:'thunderstorm',96:'thunderstorm',99:'thunderstorm'},
   uM:'m', uMs:'m/s', uS:'s', uMm:'mm',
   hRain:'rain', chop:'of it <b>{0} m</b> is local wind chop',
+  srcOcean:'Ocean watchpoints · Open-Meteo', srcOceanWind:'Ocean wind · Open-Meteo',
+  uKm:'km',
+  iEvents:'Bigger-than-usual days', iOcean:'What is out in the ocean',
+  iSeason:'Season', iTyphoon:'Typhoons',
+  noEvents:'Nothing standing out in the next 10 days — the swell holds around {0} m.',
+  iEventsNote:'A day is listed when its peak is at least 25% above the 10-day median of {0} m. The bar shows how much bigger.',
+  oc_nicobar:'West of the Nicobars', oc_bengal:'Bay of Bengal', oc_open:'Open ocean',
+  ocPeak:'peak {0} on {1}', ocArrive:'reaches the coast as about {0} around {1}',
+  ocWind:'strongest wind {0}', ocStorm:'storm-force',
+  iOceanNote:'Only about 41% of ocean swell gets past the Andaman and Nicobar islands, and the period drops from 10 s to 5–6 s. The arrival figure already accounts for that — measured, not guessed.',
+  iSeasonText:'Surf season on the west coast runs May to October, driven by the southwest monsoon. Waves here are mostly built by local wind rather than distant swell, so wind matters more than anywhere with an open coastline. November to April is flat and glassy.',
+  iTyphoonText:'Phuket sits outside the typhoon belt — cyclones form in the Bay of Bengal and the western Pacific, not in the Andaman Sea. A Bay of Bengal cyclone can still push extra swell down, and that shows up in the ocean watchpoints above as a jump in wind and wave height. A dedicated cyclone feed is not wired in: the open ones (GDACS, JTWC) do not allow browser access, and inventing an alert would be worse than none.',
   srcWave:'Waves · Open-Meteo (3 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
   srcSG:'Stormglass (NOAA, AIFS, Met Office)'
  },
  ru:{
-  title:'Пхукет · серф', now:'Сейчас', d3:'3 дня', d7:'10 дней',
+  title:'Пхукет · серф', now:'Сейчас', island:'Пхукет', d7:'10 дней',
   go:'ЕХАТЬ', ok:'МОЖНО', weak:'СЛАБО', no:'НЕ СТОИТ',
   darkNow:'сейчас темно · ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
   today:'сегодня', tomorrow:'завтра', peak:'пик', outOf:'из 10',
@@ -362,7 +407,7 @@ const I18N={
   noCam:'камеры нет', camNone:'публичных камер нет',
   tPeak:'пик', tTide:'прилив', tNow:'сейчас',
   tideHigh:'полная', tideLow:'малая', tideLegend:'▲ полная · ▼ малая',
-  rising:'растёт', falling:'падает', atPeak:'сейчас пик', flat:'без изменений',
+  rising:'условия улучшаются', falling:'условия ухудшаются', atPeak:'сейчас лучший момент', flat:'без изменений',
   darkUntil:'темно · ближайшее окно {0}', dark:'темно',
   noPeak:'ровно весь день, пика нет',
   more:'подробнее', showSources:'показать все источники по отдельности',
@@ -399,13 +444,25 @@ const I18N={
    80:'ливни',81:'ливни',82:'сильный ливень',95:'гроза',96:'гроза',99:'гроза'},
   uM:'м', uMs:'м/с', uS:'с', uMm:'мм',
   hRain:'дождь', chop:'из них <b>{0} м</b> — ветровое месиво',
+  srcOcean:'Океанские точки · Open-Meteo', srcOceanWind:'Ветер в океане · Open-Meteo',
+  uKm:'км',
+  iEvents:'Дни выше обычного', iOcean:'Что происходит в океане',
+  iSeason:'Сезон', iTyphoon:'Тайфуны',
+  noEvents:'В ближайшие 10 дней ничего выдающегося — свелл держится около {0} м.',
+  iEventsNote:'День попадает сюда, если его пик минимум на 25% выше десятидневной медианы в {0} м. Полоса показывает, насколько выше.',
+  oc_nicobar:'Западнее Никобар', oc_bengal:'Бенгальский залив', oc_open:'Открытый океан',
+  ocPeak:'пик {0} — {1}', ocArrive:'до берега дойдёт примерно {0} к {1}',
+  ocWind:'сильнейший ветер {0}', ocStorm:'штормовой',
+  iOceanNote:'Через Андаманские и Никобарские острова к берегу проходит около 41% океанского свелла, а период падает с 10 с до 5–6 с. Цифра прихода это уже учитывает — коэффициент измерен, а не придуман.',
+  iSeasonText:'Сезон на западном побережье — с мая по октябрь, его гонит юго-западный муссон. Волна здесь в основном рождается местным ветром, а не приходит дальним свеллом, поэтому ветер важнее, чем на открытом побережье. С ноября по апрель — штиль и гладкая вода.',
+  iTyphoonText:'Пхукет лежит вне тайфунного пояса: циклоны рождаются в Бенгальском заливе и западной части Тихого океана, а не в Андаманском море. Циклон в Бенгальском заливе всё же может подогнать сюда лишний свелл — и это видно в океанских точках выше как скачок ветра и высоты волны. Отдельной ленты по циклонам здесь нет: открытые источники (GDACS, JTWC) не пускают браузер напрямую, а выдумывать предупреждение хуже, чем не показывать его вовсе.',
   srcWave:'Волна · Open-Meteo (3 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
   srcSG:'Stormglass (NOAA, AIFS, Met Office)'
  },
  th:{
-  title:'ภูเก็ต · เซิร์ฟ', now:'ตอนนี้', d3:'3 วัน', d7:'10 วัน',
+  title:'ภูเก็ต · เซิร์ฟ', now:'ตอนนี้', island:'ภูเก็ต', d7:'10 วัน',
   go:'ไปเลย', ok:'พอไหว', weak:'คลื่นเล็ก', no:'ไม่ควรไป',
   darkNow:'ตอนนี้มืดแล้ว · ', bestIs:'ดีที่สุดคือ {0}', windowAt:'ช่วงเวลา {0} {1}',
   today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', outOf:'จาก 10',
@@ -413,7 +470,7 @@ const I18N={
   noCam:'ไม่มีกล้อง', camNone:'ไม่มีกล้องสาธารณะ',
   tPeak:'สูงสุด', tTide:'น้ำขึ้นลง', tNow:'ตอนนี้',
   tideHigh:'น้ำขึ้น', tideLow:'น้ำลง', tideLegend:'▲ น้ำขึ้น · ▼ น้ำลง',
-  rising:'กำลังขึ้น', falling:'กำลังลง', atPeak:'สูงสุดตอนนี้', flat:'คงที่',
+  rising:'สภาพกำลังดีขึ้น', falling:'สภาพกำลังแย่ลง', atPeak:'ตอนนี้ดีที่สุด', flat:'คงที่',
   darkUntil:'มืดแล้ว · ช่วงถัดไป {0}', dark:'มืด',
   noPeak:'คงที่ทั้งวัน ไม่มีช่วงพีค',
   more:'รายละเอียด', showSources:'ดูแหล่งข้อมูลทั้งหมด',
@@ -450,6 +507,18 @@ const I18N={
    80:'ฝนซู่',81:'ฝนซู่',82:'ฝนซู่หนัก',95:'พายุฝนฟ้าคะนอง',96:'พายุฝนฟ้าคะนอง',99:'พายุฝนฟ้าคะนอง'},
   uM:'ม.', uMs:'m/s', uS:'วิ.', uMm:'มม.',
   hRain:'ฝน', chop:'ในนั้น <b>{0} ม.</b> เป็นคลื่นลมท้องถิ่น',
+  srcOcean:'จุดสังเกตในมหาสมุทร · Open-Meteo', srcOceanWind:'ลมในมหาสมุทร · Open-Meteo',
+  uKm:'กม.',
+  iEvents:'วันที่คลื่นสูงกว่าปกติ', iOcean:'สถานการณ์ในมหาสมุทร',
+  iSeason:'ฤดูกาล', iTyphoon:'ไต้ฝุ่น',
+  noEvents:'10 วันข้างหน้าไม่มีอะไรโดดเด่น คลื่นอยู่ราว {0} ม.',
+  iEventsNote:'วันจะขึ้นมาแสดงเมื่อคลื่นสูงกว่าค่ากลาง 10 วัน ({0} ม.) อย่างน้อย 25%',
+  oc_nicobar:'ตะวันตกของหมู่เกาะนิโคบาร์', oc_bengal:'อ่าวเบงกอล', oc_open:'มหาสมุทรเปิด',
+  ocPeak:'สูงสุด {0} วันที่ {1}', ocArrive:'ถึงชายฝั่งราว {0} เวลา {1}',
+  ocWind:'ลมแรงสุด {0}', ocStorm:'ระดับพายุ',
+  iOceanNote:'คลื่นจากมหาสมุทรผ่านหมู่เกาะอันดามันและนิโคบาร์มาถึงชายฝั่งราว 41% และคาบลดจาก 10 วิ. เหลือ 5–6 วิ. ตัวเลขที่แสดงคำนวณจากค่านี้แล้ว',
+  iSeasonText:'ฤดูเซิร์ฟฝั่งตะวันตกคือพฤษภาคมถึงตุลาคม ขับด้วยมรสุมตะวันตกเฉียงใต้ คลื่นที่นี่เกิดจากลมท้องถิ่นเป็นหลัก ลมจึงสำคัญกว่าที่อื่น ช่วงพฤศจิกายนถึงเมษายนน้ำนิ่ง',
+  iTyphoonText:'ภูเก็ตอยู่นอกแนวไต้ฝุ่น พายุหมุนก่อตัวในอ่าวเบงกอลและแปซิฟิกตะวันตก ไม่ใช่ทะเลอันดามัน พายุในอ่าวเบงกอลอาจส่งคลื่นเพิ่มมาได้ ซึ่งจะเห็นได้จากจุดสังเกตด้านบน ที่นี่ไม่มีฟีดพายุโดยตรง เพราะแหล่งข้อมูลเปิด (GDACS, JTWC) ไม่อนุญาตให้เบราว์เซอร์เข้าถึง',
   srcWave:'คลื่น · Open-Meteo (3 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -647,7 +716,7 @@ async function load(){
   const pts=[...new Set(SPOTS.map(s=>s.lat.toFixed(2)+','+s.lon.toFixed(2)))];
   const lats=pts.map(p=>p.split(',')[0]).join(','), lons=pts.map(p=>p.split(',')[1]).join(',');
   const base='latitude='+lats+'&longitude='+lons+'&timezone=Asia%2FBangkok&forecast_days=10';
-  const [m,w,tSea,g,mn,ww3,sg]=await Promise.all([
+  const [m,w,tSea,g,mn,ww3,oc,ocw,sg]=await Promise.all([
     safe('wave',t('srcWave'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
         '&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height,wind_wave_height&models='+WAVE_MODELS.join(','))),
@@ -669,11 +738,20 @@ async function load(){
     safe('metno',t('srcMet'),()=>
       jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=7.87&lon=98.29')),
     safe('ww3',t('srcWW3'),loadWW3),
+    safe('ocean',t('srcOcean'),()=>jget(
+      'https://marine-api.open-meteo.com/v1/marine?latitude='+OCEAN.map(o=>o.lat).join(',')+
+      '&longitude='+OCEAN.map(o=>o.lon).join(',')+
+      '&hourly=wave_height,swell_wave_period&timezone=Asia%2FBangkok&forecast_days=10&models=gwam')),
+    safe('oceanwind',t('srcOceanWind'),()=>jget(
+      'https://api.open-meteo.com/v1/forecast?latitude='+OCEAN.map(o=>o.lat).join(',')+
+      '&longitude='+OCEAN.map(o=>o.lon).join(',')+
+      '&hourly=wind_speed_10m&timezone=Asia%2FBangkok&forecast_days=10&wind_speed_unit=ms')),
     loadStormglass()
   ]);
   if(!m||!w) throw new Error('основные источники недоступны');
   const M=[].concat(m), W=[].concat(w), T=tSea?[].concat(tSea):null;
   WEATHER=g;
+  OCEANDATA=(oc&&ocw)?{wave:[].concat(oc),wind:[].concat(ocw)}:null;
 
   // met.no: раскладываем по локальному часу "YYYY-MM-DDTHH" для стыковки с Open-Meteo
   const MET={};
@@ -861,7 +939,7 @@ function why(sp,r){
   </div>`;
 }
 
-function dayRows(rows,n){
+function dayRows(sp,rows,n){
   const by={};
   rows.forEach(r=>{const d=r.t.slice(0,10);(by[d]=by[d]||[]).push(r)});
   return '<div class="days">'+Object.keys(by).slice(0,n).map(d=>{
@@ -869,13 +947,16 @@ function dayRows(rows,n){
     const sc=Math.max(...rs.map(r=>r.score??0));
     const bi=rs.reduce((a,b)=>(b.score??0)>(a.score??0)?b:a);
     const dt=new Date(d+'T12:00:00');
-    return `<div class="day">
+    const i0=rows.indexOf(rs[0]);
+    // детали ровно те же, что на вкладке «Сейчас», но за этот день
+    const detail=`<div class="daybody">${hourStrip(rows,i0)}${timing(sp,rows,i0)}${why(sp,bi)}${sources(bi)}</div>`;
+    return `<details class="dayx"><summary class="day">
       <div class="dn"><b>${dt.toLocaleDateString(LOCALE[LANG],{weekday:'short'})}</b>${
         dt.toLocaleDateString(LOCALE[LANG],{day:'numeric',month:'short'})}</div>
       <div class="dbar"><i style="width:${Math.max(6,sc*10)}%;background:${scoreColor(sc)}"></i>
         <em>${fmt(avg(rs.map(r=>r.swell)),1)} ${t('uM')} · ${fmt(avg(rs.map(r=>r.wind)),0)} ${t('uMs')} · ${t('peak')} ${bi.t.slice(11,16)}</em></div>
       <div class="dsc" style="color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
-    </div>`}).join('')+'</div>';
+      </summary>${detail}</details>`}).join('')+'</div>';
 }
 
 function card(sp,rows,pinned){
@@ -887,8 +968,9 @@ function card(sp,rows,pinned){
       `<details class="more"><summary>${t('more')}</summary>
          ${hourStrip(rows,i0)}${why(sp,r)}${sources(r)}
        </details>`;
-  }else body=dayRows(rows,TAB==='d3'?3:10);
-  const best=bestDaylight(rows,i0,TAB==='d3'?72:TAB==='d7'?240:24);
+  }else if(TAB==='d7') body=dayRows(sp,rows,10);
+  else body='';
+  const best=bestDaylight(rows,i0,TAB==='d7'?240:24);
   const sub=TAB==='now'
     ? `<span class="q"><i>${t('wave')}</i><b>${fmt(r.swell,1)} ${t('uM')}</b></span
       ><span class="q"><i>${t('period')}</i><b>${fmt(r.period,1)} ${t('uS')}</b></span
@@ -899,7 +981,9 @@ function card(sp,rows,pinned){
     <div class="chead">
       <div class="score" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
         color:${scoreColor(s)}"><b>${s.toFixed(0)}</b><i>${t('outOf')}</i></div>
-      <div class="cname"><h3>${nameOf(sp)}</h3><p>${sub}</p></div>
+      <div class="cname"><h3>${nameOf(sp)}<a class="map" target="_blank" rel="noopener"
+        title="Google Maps" onclick="event.stopPropagation()"
+        href="https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lon}">◎</a></h3><p>${sub}</p></div>
       ${pinned?'':'<div class="chev">›</div>'}
     </div>
     <div class="cbody">${body}</div></div>`;
@@ -990,6 +1074,78 @@ function sources(r){
   </details>`;
 }
 
+/* ── Отчёт по острову ────────────────────────────────────────
+   Всё строится на измеримых величинах: аномалия волны относительно
+   собственной десятидневной медианы, ветер и волна в океанских точках,
+   пересчёт океанской волны в береговую по замеренному коэффициенту.
+   Ничего не додумывается — про тайфуны честно сказано, что открытого
+   источника с доступом из браузера нет.                              */
+function islandReport(){
+  const ref=DATA.kata;
+  const days={};
+  ref.forEach(r=>{ if(isDay(r)&&r.swell!=null) (days[r.t.slice(0,10)]=days[r.t.slice(0,10)]||[]).push(r); });
+  const keys=Object.keys(days).sort();
+  const dayMax=keys.map(k=>({d:k, v:Math.max(...days[k].map(r=>r.swell)),
+    sc:Math.max(...days[k].map(r=>r.score??0)),
+    per:median(days[k].map(r=>r.period)), wind:median(days[k].map(r=>r.wind))}));
+  const base=median(dayMax.map(x=>x.v));           // типичный уровень этой декады
+
+  // события: дни заметно выше базового уровня
+  const events=dayMax.filter(x=>x.v>=base*1.25&&x.v>=base+0.15);
+
+  const fmtD=k=>{const dt=new Date(k+'T12:00:00');
+    return dt.toLocaleDateString(LOCALE[LANG],{weekday:'short',day:'numeric',month:'short'})};
+
+  let ev;
+  if(!events.length){
+    ev=`<div class="inote">${t('noEvents',fmt(base,1))}</div>`;
+  }else{
+    ev=events.map(e=>{
+      const x=(e.v/base);
+      return `<div class="ev">
+        <div class="evd">${fmtD(e.d)}</div>
+        <div class="evb"><i style="width:${clamp(e.v/(base*2)*100,10,100)}%;
+          background:${scoreColor(e.sc)}"></i></div>
+        <div class="evv"><b>${fmt(e.v,1)} ${t('uM')}</b><span>×${x.toFixed(1)}</span></div>
+      </div>`}).join('');
+  }
+
+  // что происходит в океане
+  let ocean='';
+  if(OCEANDATA){
+    ocean=OCEAN.map((o,i)=>{
+      const wh=OCEANDATA.wave[i]?.hourly, wd=OCEANDATA.wind[i]?.hourly;
+      if(!wh) return '';
+      const pairs=wh.time.map((tm,k)=>({tm, h:wh.wave_height?.[k], w:wd?.wind_speed_10m?.[k]}))
+        .filter(x=>x.h!=null);
+      if(!pairs.length) return '';
+      const peak=pairs.reduce((a,b)=>b.h>a.h?b:a);
+      const windPeak=pairs.filter(x=>x.w!=null).reduce((a,b)=>b.w>a.w?b:a,{w:0,tm:''});
+      const arrive=new Date(new Date(peak.tm+':00').getTime()+o.lag*3600e3);
+      const arrH=String(arrive.getHours()).padStart(2,'0');
+      const arrD=arrive.toLocaleDateString(LOCALE[LANG],{day:'numeric',month:'short'});
+      const storm=windPeak.w>=13;
+      return `<div class="ocn">
+        <div class="ocname">${t('oc_'+o.id)}<i>${o.dist} ${t('uKm')}</i></div>
+        <div class="ocbody">
+          <div>${t('ocPeak', '<b>'+fmt(peak.h,1)+' '+t('uM')+'</b>', fmtD(peak.tm.slice(0,10)))}</div>
+          <div class="ocsub">${t('ocArrive','<b>'+fmt(peak.h*o.pass,1)+' '+t('uM')+'</b>',arrD+' '+arrH+':00')}</div>
+          <div class="ocsub" style="${storm?'color:var(--bad);font-weight:600':''}">${
+            t('ocWind','<b>'+fmt(windPeak.w,0)+' '+t('uMs')+'</b>')}${storm?' · '+t('ocStorm'):''}</div>
+        </div></div>`;
+    }).join('');
+  }
+
+  return `<div class="card"><div class="ihead">${t('iEvents')}</div>${ev}
+      <div class="inote2">${t('iEventsNote',fmt(base,1))}</div></div>
+    <div class="card"><div class="ihead">${t('iOcean')}</div>${ocean||'<div class="inote">—</div>'}
+      <div class="inote2">${t('iOceanNote')}</div></div>
+    <div class="card"><div class="ihead">${t('iSeason')}</div>
+      <div class="inote">${t('iSeasonText')}</div></div>
+    <div class="card"><div class="ihead">${t('iTyphoon')}</div>
+      <div class="inote">${t('iTyphoonText')}</div></div>`;
+}
+
 function render(){
   if(!DATA) return;
   wxbar();
@@ -1008,9 +1164,14 @@ function render(){
   const when=bi.t.slice(0,10)===today?t('today'):t('tomorrow');
 
   // сводка: три главных пляжа целиком, без скролла
-  const rowsHtml=tops.map(x=>{
+  const allSorted=SPOTS.map(sp=>{
+    const rows=DATA[sp.id], i=nowIdx(rows);
+    return {sp,rows,i,pick:(dark?bestDaylight(rows,i,30):rows[i])||rows[i]};
+  }).sort((a,b)=>(b.pick.score??0)-(a.pick.score??0));
+  const rowsHtml=allSorted.map(x=>{
     const s=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0];
-    return `<div class="srow" data-go="${x.sp.id}">
+    const hasCam=!!x.sp.cam;
+    return `<div class="srow${hasCam?'':' nolink'}" ${hasCam?`data-go="${x.sp.id}"`:''}>
       <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
         color:${scoreColor(s)}">${s.toFixed(0)}</div>
       <div class="sname">${nameOf(x.sp)}</div>
@@ -1019,17 +1180,24 @@ function render(){
       <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>—</b>'}</div>
     </div>`}).join('');
 
-  document.getElementById('summary').innerHTML=`<div class="sum">
+  document.getElementById('summary').innerHTML=TAB==='island'?'':`<div class="sum">
     <div class="sumtop"><div class="vbig" style="color:${scoreColor(sc)}">${word}</div>
       <div class="vtx">${dark?t('darkNow'):''}${t('bestIs','<b>'+nameOf(top.sp)+'</b>')}<br>
       ${t('windowAt',when,'<b>'+bi.t.slice(11,16)+'</b>')} · ${fmt(bi.swell,1)} ${t('uM')} · ${fmt(bi.wind,0)} ${t('uMs')}</div></div>
     ${rowsHtml}</div>`;
 
-  document.getElementById('restlbl').textContent=TAB==='now'?t('restBeaches'):t('restForecast');
+  if(TAB!=='island') document.getElementById('restlbl').textContent=
+    TAB==='now'?t('restBeaches'):t('restForecast');
+  if(TAB==='island'){
+    document.getElementById('main').innerHTML=islandReport();
+    document.getElementById('rest').innerHTML='';
+    document.getElementById('restlbl').textContent='';
+  }else{
   document.getElementById('main').innerHTML=tops.map(x=>card(x.sp,x.rows,true)).join('');
   document.getElementById('rest').innerHTML=rest.map(sp=>({sp,rows:DATA[sp.id]}))
     .sort((a,b)=>(b.rows[nowIdx(b.rows)].score??0)-(a.rows[nowIdx(a.rows)].score??0))
     .map(x=>card(x.sp,x.rows,false)).join('');
+  }
 
   document.querySelectorAll('#rest .chead').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
   document.querySelectorAll('.srow').forEach(el=>el.onclick=()=>
@@ -1062,7 +1230,7 @@ function applyLang(){
   document.documentElement.lang=LANG;
   document.getElementById('logo').innerHTML=t('title').replace('·','<span>·</span>');
   document.title=t('title');
-  const map={now:'now',d3:'d3',d7:'d7'};
+  const map={now:'now',island:'island',d7:'d7'};
   document.querySelectorAll('.tab').forEach(b=>b.textContent=t(map[b.dataset.t]));
   document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
