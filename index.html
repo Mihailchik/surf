@@ -377,7 +377,7 @@ const I18N={
   keyPlaceholder:'Stormglass key — adds NOAA, AIFS, Met Office',
   keyOk:'save', keyReplace:'replace', keyRemove:'remove',
   keyNote:'The key is stored in this browser only, never in the code. One request per 6 hours — 4 of 10 daily.',
-  keyMissing:'no key set', fromCache:'cached, {0}', refreshed:'refreshed, {0}/{1} today',
+  keyMissing:'optional · add key below', fromCache:'cached, {0}', refreshed:'refreshed, {0}/{1} today',
   srcCount:'sources {0}', srcSome:'sources {0}/{1}', updAt:'{0}',
   noData:'no data · ', timeout:'timeout',
   wxUnavailable:'weather unavailable — source did not respond',
@@ -440,7 +440,7 @@ const I18N={
   keyPlaceholder:'ключ Stormglass — даёт NOAA, AIFS и Met Office',
   keyOk:'ок', keyReplace:'заменить', keyRemove:'убрать',
   keyNote:'Ключ хранится только в этом браузере, в код не попадает. Запрос раз в 6 часов — 4 из 10 суточных.',
-  keyMissing:'ключ не задан', fromCache:'из кэша, {0}', refreshed:'обновлён, {0}/{1} за сутки',
+  keyMissing:'необязательный · ключ ниже', fromCache:'из кэша, {0}', refreshed:'обновлён, {0}/{1} за сутки',
   srcCount:'источников {0}', srcSome:'источники {0}/{1}', updAt:'{0}',
   noData:'нет данных · ', timeout:'таймаут',
   wxUnavailable:'погода недоступна — источник не ответил',
@@ -503,7 +503,7 @@ const I18N={
   keyPlaceholder:'คีย์ Stormglass — เพิ่ม NOAA, AIFS, Met Office',
   keyOk:'บันทึก', keyReplace:'เปลี่ยน', keyRemove:'ลบ',
   keyNote:'คีย์เก็บไว้ในเบราว์เซอร์นี้เท่านั้น ไม่อยู่ในโค้ด ขอข้อมูลทุก 6 ชั่วโมง — 4 จาก 10 ครั้งต่อวัน',
-  keyMissing:'ยังไม่ได้ใส่คีย์', fromCache:'จากแคช {0}', refreshed:'อัปเดตแล้ว {0}/{1} วันนี้',
+  keyMissing:'ไม่บังคับ · ใส่คีย์ด้านล่าง', fromCache:'จากแคช {0}', refreshed:'อัปเดตแล้ว {0}/{1} วันนี้',
   srcCount:'แหล่งข้อมูล {0}', srcSome:'แหล่งข้อมูล {0}/{1}', updAt:'{0}',
   noData:'ไม่มีข้อมูล · ', timeout:'หมดเวลา',
   wxUnavailable:'ไม่มีข้อมูลอากาศ — แหล่งข้อมูลไม่ตอบสนอง',
@@ -696,7 +696,7 @@ const SG_TTL=6*3600*1000;
 const sgKey=()=>LS.get('sg_key')||'';
 async function loadStormglass(){
   const key=sgKey();
-  if(!key){ STATUS.sg={ok:false,label:t('srcSG'),err:t('keyMissing')}; return null }
+  if(!key){ STATUS.sg={ok:false,optional:true,label:t('srcSG'),err:t('keyMissing')}; return null }
   try{
     const cached=JSON.parse(LS.get('sg_cache')||'null');
     if(cached && Date.now()-cached.at<SG_TTL){
@@ -731,6 +731,8 @@ async function safe(key,label,fn){
   try{ const v=await fn(); STATUS[key]={ok:true,label}; return v }
   catch(e){ STATUS[key]={ok:false,label,err:e.name==='AbortError'?t('timeout'):e.message}; return null }
 }
+/* optional:true — источник не подключён (нет ключа), а не упал.
+   В счётчике источников он не участвует, чтобы не выглядеть аварией. */
 
 async function load(){
   const pts=[...new Set(SPOTS.map(s=>s.lat.toFixed(2)+','+s.lon.toFixed(2)))];
@@ -1044,9 +1046,10 @@ function wxbar(){
 /* Явный список: какие источники ответили, какие нет и почему */
 function statusBlock(){
   const rows=Object.values(STATUS).map(s=>
-    `<div class="stline"><span class="sdot" style="background:${s.ok?'var(--go)':'var(--bad)'}"></span>
-     ${s.label}<b style="color:${s.ok?'var(--dim)':'var(--bad)'}">${
-       s.ok?(s.note||'ok'):t('noData')+s.err}</b></div>`).join('');
+    `<div class="stline"><span class="sdot" style="background:${
+       s.ok?'var(--go)':s.optional?'var(--dim2)':'var(--bad)'}"></span>
+     ${s.label}<b style="color:${s.ok?'var(--dim)':s.optional?'var(--dim2)':'var(--bad)'}">${
+       s.ok?(s.note||'ok'):s.optional?s.err:t('noData')+s.err}</b></div>`).join('');
   const has=!!sgKey();
   return `<div class="stat">${rows}
     <div class="sgkey">
@@ -1059,7 +1062,8 @@ function statusBlock(){
   </div>`;
 }
 function statusPill(){
-  const all=Object.values(STATUS), bad=all.filter(s=>!s.ok);
+  const all=Object.values(STATUS).filter(s=>!(s.optional&&!s.ok));
+  const bad=all.filter(s=>!s.ok);
   if(!all.length) return '';
   return bad.length
     ? `<span class="pill bad" title="${bad.map(b=>b.label).join(', ')}">${t('srcSome',all.length-bad.length,all.length)}</span>`
