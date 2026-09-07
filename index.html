@@ -69,7 +69,9 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .sum{margin:11px 0 4px;border-radius:14px;background:var(--card);border:1px solid var(--line);
   overflow:hidden;box-shadow:var(--shadow)}
 .sumtop{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:1px solid var(--line)}
-.vbig{font-size:23px;font-weight:800;letter-spacing:-.5px;line-height:1;white-space:nowrap}
+.vbig{font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1.05;
+  white-space:nowrap;flex:0 0 auto}
+@media (max-width:400px){.vbig{font-size:19px}}
 .vtx{font-size:12.5px;color:var(--dim);line-height:1.35}
 .vtx b{color:var(--tx);font-weight:650}
 .srow{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--line);
@@ -81,8 +83,9 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   justify-content:center;font-weight:800;font-size:14px}
 .sname{flex:0 0 72px;font-size:13.5px;font-weight:650;letter-spacing:-.2px}
 .sdat{flex:1;font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.speak{flex:0 0 auto;font-size:11.5px;color:var(--dim);text-align:right}
-.speak b{display:block;color:var(--tx);font-size:12.5px;font-weight:700}
+.speak{flex:0 0 auto;font-size:10px;color:var(--dim2);text-align:right;
+  display:flex;align-items:baseline;gap:4px;white-space:nowrap}
+.speak b{color:var(--tx);font-size:12.5px;font-weight:700}
 
 .card{margin:10px 0;border-radius:14px;background:var(--card);border:1px solid var(--line);
   overflow:hidden;box-shadow:var(--shadow)}
@@ -94,8 +97,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .cname{flex:1;min-width:0}
 .cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px;
   display:flex;align-items:center;gap:6px}
-.map{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
-  border-radius:6px;border:1px solid var(--line);background:var(--card2);text-decoration:none;
+.map{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
+  border-radius:5px;border:1px solid var(--line);background:var(--card2);text-decoration:none;
   line-height:1;flex:0 0 auto}
 .map:hover{border-color:var(--acc)}
 .map svg{display:block}
@@ -769,7 +772,7 @@ function mapLink(sp){
   return `<a class="map" target="_blank" rel="noopener" title="Google Maps"
     onclick="event.stopPropagation()"
     href="https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lon}"><svg viewBox="0 0 24 24"
-    width="13" height="13" aria-hidden="true"><path fill="#EA4335" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></a>`;
+    width="11" height="11" aria-hidden="true"><path fill="#EA4335" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></a>`;
 }
 function camBlock(sp){
   // original streams: autoplay, no redirect
@@ -837,9 +840,13 @@ function timing(sp,rows,i0){
   else if(nxt>cur+0.25){phase=t('rising');pcol='var(--ok)'}
   else if(nxt<cur-0.25){phase=t('falling');pcol='var(--bad)'}
   else{phase=t('flat');pcol='var(--dim)'}
+  // день пишем один раз, а не перед каждым пиком
+  let lastDay='';
   const pk=peaks.length?peaks.map(p=>{
-      const d=rows[p.idx].t.slice(0,10)===today?'':t('tomorrow')+' ';
-      return `<b>${d}${p.hhmm}</b> <span style="color:${scoreColor(p.v)}">${p.v.toFixed(0)}/10</span>`;
+      const day=rows[p.idx].t.slice(0,10);
+      const pre=(day===today||day===lastDay)?'':t('tomorrow')+' ';
+      lastDay=day;
+      return `${pre}<b>${p.hhmm}</b> <span style="color:${scoreColor(p.v)}">${p.v.toFixed(0)}</span>`;
     }).join(' · '):`<span style="color:var(--dim2)">${t('noPeak')}</span>`;
   return `<div class="tim">
     <div class="trow"><span>${t('tPeak')}</span><div>${pk}</div></div>
