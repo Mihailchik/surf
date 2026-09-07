@@ -33,7 +33,8 @@ body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-
 
 header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);
   backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:9px 0 0}
-.hrow{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 12px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 12px;
+  max-width:560px;margin:0 auto}
 .logo{font-size:15px;font-weight:750;letter-spacing:-.3px;white-space:nowrap;flex:0 0 auto}
 .logo span{color:var(--acc)}
 .hr2{display:flex;align-items:center;gap:6px;flex:0 0 auto}
@@ -58,7 +59,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .wx .mut{color:var(--dim2);font-size:10.5px}
 .wx .ico{font-size:12.5px;font-style:normal;line-height:1}
 @media (max-width:359px){.wx{font-size:10.5px;padding:0 5px}}
-.tabs{display:flex;margin-top:7px;padding:0 12px}
+.tabs{display:flex;margin-top:7px;padding:0 12px;max-width:560px;margin-left:auto;margin-right:auto}
 .tab{flex:1;padding:9px 4px;text-align:center;font-size:13px;font-weight:600;color:var(--dim);
   background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit}
 .tab.on{color:var(--tx);border-bottom-color:var(--acc)}
@@ -73,6 +74,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .srow{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--line);
   cursor:pointer;font-variant-numeric:tabular-nums}
 .srow.nolink{cursor:default}
+.srow .map{margin-left:2px}
 .srow:last-child{border-bottom:0}
 .sbadge{flex:0 0 30px;height:30px;border-radius:9px;display:flex;align-items:center;
   justify-content:center;font-weight:800;font-size:14px}
@@ -91,10 +93,11 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .cname{flex:1;min-width:0}
 .cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px;
   display:flex;align-items:center;gap:6px}
-.map{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
-  border-radius:50%;border:1px solid var(--line);color:var(--dim2);text-decoration:none;
-  font-size:11px;line-height:1;flex:0 0 auto}
-.map:hover{color:var(--acc);border-color:var(--acc)}
+.map{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:6px;border:1px solid var(--line);background:var(--card2);text-decoration:none;
+  line-height:1;flex:0 0 auto}
+.map:hover{border-color:var(--acc)}
+.map svg{display:block}
 .cname p{margin:5px 0 0;font-size:12px;color:var(--dim);line-height:1.3;
   display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
 .cname p b{color:var(--tx);font-weight:650}
@@ -262,8 +265,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   <div class="wxbar" id="wxbar"></div>
   <div class="tabs">
     <button class="tab on" data-t="now"></button>
-    <button class="tab" data-t="island"></button>
     <button class="tab" data-t="d7"></button>
+    <button class="tab" data-t="island"></button>
   </div>
 </header>
 
@@ -828,6 +831,13 @@ function nowIdx(rows){
   return i<0?0:i;
 }
 
+/* Кнопка «открыть на карте» — узнаваемый пин Google Maps */
+function mapLink(sp){
+  return `<a class="map" target="_blank" rel="noopener" title="Google Maps"
+    onclick="event.stopPropagation()"
+    href="https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lon}"><svg viewBox="0 0 24 24"
+    width="13" height="13" aria-hidden="true"><path fill="#EA4335" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></a>`;
+}
 function camBlock(sp){
   // всё с первоисточника: играет само, кликом никуда не уводит
   const view=(c,tag)=>{
@@ -981,9 +991,7 @@ function card(sp,rows,pinned){
     <div class="chead">
       <div class="score" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
         color:${scoreColor(s)}"><b>${s.toFixed(0)}</b><i>${t('outOf')}</i></div>
-      <div class="cname"><h3>${nameOf(sp)}<a class="map" target="_blank" rel="noopener"
-        title="Google Maps" onclick="event.stopPropagation()"
-        href="https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lon}">◎</a></h3><p>${sub}</p></div>
+      <div class="cname"><h3>${nameOf(sp)}${mapLink(sp)}</h3><p>${sub}</p></div>
       ${pinned?'':'<div class="chev">›</div>'}
     </div>
     <div class="cbody">${body}</div></div>`;
@@ -1164,11 +1172,11 @@ function render(){
   const when=bi.t.slice(0,10)===today?t('today'):t('tomorrow');
 
   // сводка: три главных пляжа целиком, без скролла
-  const allSorted=SPOTS.map(sp=>{
+  const restSorted=rest.map(sp=>{
     const rows=DATA[sp.id], i=nowIdx(rows);
     return {sp,rows,i,pick:(dark?bestDaylight(rows,i,30):rows[i])||rows[i]};
   }).sort((a,b)=>(b.pick.score??0)-(a.pick.score??0));
-  const rowsHtml=allSorted.map(x=>{
+  const rowsHtml=tops.map(x=>{
     const s=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0];
     const hasCam=!!x.sp.cam;
     return `<div class="srow${hasCam?'':' nolink'}" ${hasCam?`data-go="${x.sp.id}"`:''}>
@@ -1194,9 +1202,19 @@ function render(){
     document.getElementById('restlbl').textContent='';
   }else{
   document.getElementById('main').innerHTML=tops.map(x=>card(x.sp,x.rows,true)).join('');
-  document.getElementById('rest').innerHTML=rest.map(sp=>({sp,rows:DATA[sp.id]}))
-    .sort((a,b)=>(b.rows[nowIdx(b.rows)].score??0)-(a.rows[nowIdx(a.rows)].score??0))
-    .map(x=>card(x.sp,x.rows,false)).join('');
+  document.getElementById('rest').innerHTML = TAB==='now'
+    ? `<div class="sum">${restSorted.map(x=>{
+        const sc=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0];
+        return `<div class="srow nolink">
+          <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(sc)} 14%,transparent);
+            color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
+          <div class="sname">${nameOf(x.sp)}</div>
+          <div class="sdat">${fmt(x.pick.swell,1)} ${t('uM')} · ${fmt(x.pick.period,1)} ${t('uS')} · ${
+            dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)}</div>
+          ${mapLink(x.sp)}
+          <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>—</b>'}</div>
+        </div>`}).join('')}</div>`
+    : restSorted.map(x=>card(x.sp,x.rows,false)).join('');
   }
 
   document.querySelectorAll('#rest .chead').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
