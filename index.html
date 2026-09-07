@@ -16,13 +16,13 @@
 /* Light is the base theme; dark is toggled and stored. */
 :root{
   --bg:#f2f5f9; --card:#fff; --card2:#f7f9fc; --line:#e3e9f0;
-  --tx:#0f1b2d; --dim:#5b6b80; --dim2:#93a2b5;
+  --tx:#0f1b2d; --dim:#4a5a6e; --dim2:#697a8e;
   --go:#00996b; --ok:#5f9e12; --mid:#d98207; --bad:#d9432c; --no:#9aa8b8;
   --acc:#0b7fc7; --shadow:0 1px 2px rgba(15,27,45,.05),0 2px 10px rgba(15,27,45,.05);
 }
 :root[data-theme="dark"]{
   --bg:#0a0e14; --card:#121822; --card2:#0e141d; --line:#1e2836;
-  --tx:#e8eef6; --dim:#7d8da3; --dim2:#56657a;
+  --tx:#e8eef6; --dim:#94a3b8; --dim2:#8494a8;
   --go:#2ee6a8; --ok:#8fd94a; --mid:#f5c542; --bad:#e8734a; --no:#4a5568;
   --acc:#38b6ff; --shadow:none;
 }
@@ -32,8 +32,8 @@ body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-
 .wrap{max-width:560px;margin:0 auto;padding:0 12px}
 
 header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 92%,transparent);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:9px 0 0}
-.hrow{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 12px;
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:7px 0 0}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 12px 2px;
   max-width:560px;margin:0 auto}
 .logo{font-size:15px;font-weight:750;letter-spacing:-.3px;white-space:nowrap;flex:0 0 auto;
   display:flex;align-items:baseline;gap:6px}
@@ -42,17 +42,17 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .upd{font-size:10px;color:var(--dim2);font-variant-numeric:tabular-nums;white-space:nowrap;
   display:flex;align-items:center;gap:3px}
 .lang{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--card)}
-.lang button{font:inherit;font-size:10px;font-weight:700;letter-spacing:.2px;padding:4px 6px;
-  border:0;background:none;color:var(--dim2);cursor:pointer;line-height:1.1}
+.lang button{font:inherit;font-size:11px;font-weight:700;letter-spacing:.2px;padding:8px 9px;
+  border:0;background:none;color:var(--dim);cursor:pointer;line-height:1}
 .lang button+button{border-left:1px solid var(--line)}
 .lang button.on{background:var(--acc);color:#fff}
 .tgl{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;
-  width:28px;height:26px;font-size:13px;cursor:pointer;line-height:1;padding:0}
+  width:34px;height:34px;font-size:14px;cursor:pointer;line-height:1;padding:0}
 /* Top bar. */
-.wxbar{padding:7px 12px 3px;font-variant-numeric:tabular-nums;
+.wxbar{padding:3px 12px 1px;font-variant-numeric:tabular-nums;
   max-width:560px;margin:0 auto}
 .wxline{display:flex;align-items:baseline;justify-content:space-between;
-  flex-wrap:nowrap;gap:4px;line-height:1.6}
+  flex-wrap:nowrap;gap:4px;line-height:1.45}
 .wxline+.wxline{margin-top:1px}
 .wx{display:inline-flex;align-items:baseline;gap:4px;font-size:11.5px;color:var(--dim);
   white-space:nowrap;text-align:center}
@@ -60,8 +60,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .wx .mut{color:var(--dim2);font-size:10.5px}
 .wx .ico{font-size:12.5px;font-style:normal;line-height:1}
 @media (max-width:359px){.wx{font-size:10.5px;padding:0 5px}}
-.tabs{display:flex;margin-top:7px;padding:0 12px;max-width:560px;margin-left:auto;margin-right:auto}
-.tab{flex:1;padding:9px 4px;text-align:center;font-size:13px;font-weight:600;color:var(--dim);
+.tabs{display:flex;margin-top:5px;padding:0 12px;max-width:560px;margin-left:auto;margin-right:auto}
+.tab{flex:1;padding:7px 4px;text-align:center;font-size:13px;font-weight:600;color:var(--dim);
   background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit}
 .tab.on{color:var(--tx);border-bottom-color:var(--acc)}
 
@@ -97,9 +97,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .cname{flex:1;min-width:0}
 .cname h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px;
   display:flex;align-items:center;gap:6px}
-.map{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
-  border-radius:5px;border:1px solid var(--line);background:var(--card2);text-decoration:none;
-  line-height:1;flex:0 0 auto}
+.map{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:var(--card2);
+  text-decoration:none;line-height:1;flex:0 0 auto}
+.map::after{content:'';position:absolute;inset:-11px}
 .map:hover{border-color:var(--acc)}
 .map svg{display:block}
 .cname p{margin:5px 0 0;font-size:12px;color:var(--dim);line-height:1.3;
@@ -157,7 +158,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .stab td{padding:4px 13px;text-align:right;color:var(--dim);border-top:1px solid var(--line)}
 .stab td:first-child{text-align:left;color:var(--tx);font-size:11.5px}
 .stab .avgrow td{font-weight:700;color:var(--tx);background:var(--card2)}
-.snote{padding:7px 13px 10px;font-size:11px;color:var(--dim2);line-height:1.5}
+.snote{padding:7px 13px 10px;font-size:11.5px;color:var(--dim);line-height:1.5}
 .snote b{color:var(--dim)}
 .stab .rngrow td{color:var(--dim2);font-size:11px;border-top:0;padding-top:0}
 .stab .xrow td{color:var(--dim);border-top:1px dashed var(--line)}
@@ -191,7 +192,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .hc.now.gh{color:var(--acc);font-weight:700}
 .hc u{position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-size:7.5px;
   text-decoration:none;color:var(--go);font-weight:700;letter-spacing:0}
-.glegend{padding:2px 13px 10px;font-size:10.5px;color:var(--dim2);line-height:1.4}
+.glegend{padding:2px 13px 10px;font-size:11.5px;color:var(--dim);line-height:1.45}
 /* Details disclosure. */
 .more{border-top:1px solid var(--line)}
 .more summary{padding:9px 13px;color:var(--acc);cursor:pointer;font-size:12.5px;
@@ -234,16 +235,28 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .ocbody b{color:var(--tx);font-weight:650}
 .ocsub{font-size:11.5px;color:var(--dim2)}
 .inote{padding:11px 13px;font-size:12.5px;color:var(--dim);line-height:1.55}
-.inote2{padding:8px 13px 11px;font-size:11px;color:var(--dim2);line-height:1.5}
+.inote2{padding:8px 13px 11px;font-size:11.5px;color:var(--dim);line-height:1.5}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 2px 4px;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;
+  font-weight:600;padding:8px 11px;border-radius:9px;border:1px solid var(--line);
+  background:var(--card);color:var(--dim);cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chip i{font-style:normal;font-weight:800;font-size:12px}
+.chip.on i{color:#fff!important;opacity:.9}
 .sect{margin:18px 0 7px;font-size:11px;font-weight:700;color:var(--dim2);
   text-transform:uppercase;letter-spacing:1.2px;padding:0 2px}
 .src{margin:20px 0 0;padding:12px 13px;border-radius:12px;background:var(--card2);
-  border:1px solid var(--line);font-size:11px;color:var(--dim2);line-height:1.6}
+  border:1px solid var(--line);font-size:11.5px;color:var(--dim);line-height:1.6}
 .src b{color:var(--dim)}
-.lic{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:10.5px;line-height:1.5}
+.lic{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:11px;line-height:1.5;color:var(--dim)}
 .lic a{color:var(--dim);text-decoration:underline}
 .hits{display:flex;justify-content:center;padding:14px 0 4px;opacity:.65}
 .hits img{height:18px}
+.stale{margin:10px 0 0;padding:9px 12px;border-radius:11px;font-size:12.5px;line-height:1.45;
+  background:color-mix(in srgb,var(--bad) 10%,var(--card));
+  border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);color:var(--bad)}
 .err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
   color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
 .skel{height:70px;border-radius:14px;background:linear-gradient(90deg,var(--card),var(--card2),var(--card));
@@ -273,6 +286,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 </header>
 
 <div class="wrap">
+  <div id="stale"></div>
   <div id="summary"></div>
   <div id="main"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
   <div class="sect" id="restlbl"></div>
@@ -339,7 +353,7 @@ const OCEAN=[
 ];
 const WAVE_MODELS=['gwam','meteofrance_wave','ecmwf_wam025'];
 const WIND_MODELS=['icon_seamless','gfs_seamless','ecmwf_ifs025','meteofrance_seamless','jma_seamless'];
-let TAB='now', DATA=null, WEATHER=null, OCEANDATA=null;
+let TAB='now', PICK=null, DATA=null, WEATHER=null, OCEANDATA=null, LAST_OK=null, STALE=false, STALE_REASON='noConnection';
 
 /* localStorage throws in private mode — degrade to no persistence. */
 const LS={
@@ -405,6 +419,12 @@ const I18N={
   iSeasonText:'Surf season on the west coast runs May to October, driven by the southwest monsoon. Waves here are mostly built by local wind rather than distant swell, so wind matters more than anywhere with an open coastline. November to April is flat and glassy.',
   iTyphoonText:'Phuket sits outside the typhoon belt — cyclones form in the Bay of Bengal and the western Pacific, not in the Andaman Sea. A Bay of Bengal cyclone can still push extra swell down, and that shows up in the ocean watchpoints above as a jump in wind and wave height. A dedicated cyclone feed is not wired in: the open ones (GDACS, JTWC) do not allow browser access, and inventing an alert would be worse than none.',
   licence:"Data: Open-Meteo and MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III via PacIOOS, public domain. Camera streams belong to their operators. Forecasts can be wrong — not a safety service.",
+  noConnection:'No connection — cannot load data.',
+  staleData:'No connection. Data below is from {0} and may be out of date.',
+  offline:'offline',
+  rateLimit:'Request limit reached — try again in a few minutes.',
+  staleLimit:'Request limit reached. Data below is from {0}.',
+  limited:'limit',
   srcWave:'Waves · Open-Meteo (3 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
@@ -464,6 +484,12 @@ const I18N={
   iSeasonText:'Сезон на западном побережье — с мая по октябрь, его гонит юго-западный муссон. Волна здесь в основном рождается местным ветром, а не приходит дальним свеллом, поэтому ветер важнее, чем на открытом побережье. С ноября по апрель — штиль и гладкая вода.',
   iTyphoonText:'Пхукет лежит вне тайфунного пояса: циклоны рождаются в Бенгальском заливе и западной части Тихого океана, а не в Андаманском море. Циклон в Бенгальском заливе всё же может подогнать сюда лишний свелл — и это видно в океанских точках выше как скачок ветра и высоты волны. Отдельной ленты по циклонам здесь нет: открытые источники (GDACS, JTWC) не пускают браузер напрямую, а выдумывать предупреждение хуже, чем не показывать его вовсе.',
   licence:"Данные: Open-Meteo и MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III через PacIOOS, общественное достояние. Камеры принадлежат их владельцам. Прогноз может ошибаться — не полагайтесь на него как на единственный источник.",
+  noConnection:'Нет связи — данные не загрузились.',
+  staleData:'Нет связи. Данные ниже — от {0}, они могли устареть.',
+  offline:'нет связи',
+  rateLimit:'Лимит запросов исчерпан — попробуй через несколько минут.',
+  staleLimit:'Лимит запросов исчерпан. Данные ниже — от {0}.',
+  limited:'лимит',
   srcWave:'Волна · Open-Meteo (3 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
@@ -523,6 +549,12 @@ const I18N={
   iSeasonText:'ฤดูเซิร์ฟฝั่งตะวันตกคือพฤษภาคมถึงตุลาคม ขับด้วยมรสุมตะวันตกเฉียงใต้ คลื่นที่นี่เกิดจากลมท้องถิ่นเป็นหลัก ลมจึงสำคัญกว่าที่อื่น ช่วงพฤศจิกายนถึงเมษายนน้ำนิ่ง',
   iTyphoonText:'ภูเก็ตอยู่นอกแนวไต้ฝุ่น พายุหมุนก่อตัวในอ่าวเบงกอลและแปซิฟิกตะวันตก ไม่ใช่ทะเลอันดามัน พายุในอ่าวเบงกอลอาจส่งคลื่นเพิ่มมาได้ ซึ่งจะเห็นได้จากจุดสังเกตด้านบน ที่นี่ไม่มีฟีดพายุโดยตรง เพราะแหล่งข้อมูลเปิด (GDACS, JTWC) ไม่อนุญาตให้เบราว์เซอร์เข้าถึง',
   licence:"ข้อมูล: Open-Meteo และ MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III ผ่าน PacIOOS สาธารณสมบัติ กล้องเป็นของเจ้าของแต่ละราย พยากรณ์อาจคลาดเคลื่อน",
+  noConnection:'ไม่มีการเชื่อมต่อ — โหลดข้อมูลไม่ได้',
+  staleData:'ไม่มีการเชื่อมต่อ ข้อมูลด้านล่างจาก {0} อาจไม่เป็นปัจจุบัน',
+  offline:'ออฟไลน์',
+  rateLimit:'ใช้โควตาคำขอหมดแล้ว — ลองใหม่ในอีกไม่กี่นาที',
+  staleLimit:'ใช้โควตาคำขอหมดแล้ว ข้อมูลด้านล่างจาก {0}',
+  limited:'เกินโควตา',
   srcWave:'คลื่น · Open-Meteo (3 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -704,7 +736,10 @@ async function load(){
       '&longitude='+OCEAN.map(o=>o.lon).join(',')+
       '&hourly=wind_speed_10m&timezone=Asia%2FBangkok&forecast_days=10&wind_speed_unit=ms'))
   ]);
-  if(!m||!w) throw new Error('основные источники недоступны');
+  if(!m||!w){
+    const errs=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.err||'').join(' ');
+    throw new Error(/429/.test(errs)?'HTTP 429':'sources unavailable');
+  }
   const M=[].concat(m), W=[].concat(w), T=tSea?[].concat(tSea):null;
   WEATHER=g;
   OCEANDATA=(oc&&ocw)?{wave:[].concat(oc),wind:[].concat(ocw)}:null;
@@ -772,7 +807,7 @@ function mapLink(sp){
   return `<a class="map" target="_blank" rel="noopener" title="Google Maps"
     onclick="event.stopPropagation()"
     href="https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lon}"><svg viewBox="0 0 24 24"
-    width="11" height="11" aria-hidden="true"><path fill="#EA4335" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></a>`;
+    width="12" height="12" aria-hidden="true"><path fill="#EA4335" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></a>`;
 }
 function camBlock(sp){
   // original streams: autoplay, no redirect
@@ -786,7 +821,7 @@ function camBlock(sp){
       : `https://rtsp.me/embed/${c.id}/`;
     return `<div class="cam">
       <iframe src="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
-        allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
   };
   if(sp.cam) return view(sp.cam,'live · '+sp.cam.by);
@@ -975,6 +1010,7 @@ function statusBlock(){
   </div>`;
 }
 function statusPill(){
+  if(STALE) return `<span class="pill bad">${t(STALE_REASON==='rateLimit'?'limited':'offline')}</span>`;
   const all=Object.values(STATUS).filter(s=>!(s.optional&&!s.ok));
   const bad=all.filter(s=>!s.ok);
   if(!all.length) return '';
@@ -985,6 +1021,7 @@ function statusPill(){
 
 /* Every model separately, so the median can be checked by hand. */
 function sources(r){
+  if(!r.raw) return '';
   const NAME={gwam:'DWD GWAM',meteofrance_wave:'MeteoFrance WAM',ecmwf_wam025:'ECMWF WAM',
     icon_seamless:'ICON (DWD)',gfs_seamless:'GFS (NOAA)',ecmwf_ifs025:'ECMWF IFS',
     meteofrance_seamless:'ARPEGE (MF)',jma_seamless:'JMA',metno:'MET Norway ⧉'};
@@ -1086,6 +1123,12 @@ function islandReport(){
 function render(){
   if(!DATA) return;
   wxbar();
+  const sb=document.getElementById('stale');
+  if(STALE){
+    const age=LAST_OK?new Date(LAST_OK).toLocaleTimeString(LOCALE[LANG],
+      {timeZone:REG().tz,hour:'2-digit',minute:'2-digit'}):'—';
+    sb.innerHTML=`<div class="stale">${t(STALE_REASON==='rateLimit'?'staleLimit':'staleData',age)}</div>`;
+  } else sb.innerHTML='';
   const pinned=SPOTS.filter(s=>s.pin), rest=SPOTS.filter(s=>!s.pin);
   const ref=DATA[pinned[0].id], dark=!isDay(ref[nowIdx(ref)]);
 
@@ -1117,7 +1160,7 @@ function render(){
       <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>—</b>'}</div>
     </div>`}).join('');
 
-  document.getElementById('summary').innerHTML=TAB==='island'?'':`<div class="sum">
+  document.getElementById('summary').innerHTML=(TAB==='island'||TAB==='d7')?'':`<div class="sum">
     <div class="sumtop"><div class="vbig" style="color:${scoreColor(sc)}">${word}</div>
       <div class="vtx">${dark?t('darkNow'):''}${t('bestIs','<b>'+nameOf(top.sp)+'</b>')}<br>
       ${t('windowAt',when,'<b>'+bi.t.slice(11,16)+'</b>')} · ${fmt(bi.swell,1)} ${t('uM')} · ${fmt(bi.wind,0)} ${t('uMs')}</div></div>
@@ -1129,6 +1172,23 @@ function render(){
     document.getElementById('main').innerHTML=islandReport();
     document.getElementById('rest').innerHTML='';
     document.getElementById('restlbl').textContent='';
+  }else if(TAB==='d7'){
+    // один пляж вместо четырёх одинаковых простыней
+    if(!PICK||!SPOTS.some(s=>s.id===PICK)) PICK=tops[0].sp.id;
+    const sp=SPOTS.find(s=>s.id===PICK);
+    const chips=SPOTS.map(x=>{
+      const rows=DATA[x.id], i=nowIdx(rows);
+      const best=bestDaylight(rows,i,240);
+      return `<button class="chip${x.id===PICK?' on':''}" data-pick="${x.id}">${nameOf(x)}
+        <i style="color:${scoreColor(best?best.score:0)}">${best?best.score.toFixed(0):'—'}</i></button>`;
+    }).join('');
+    document.getElementById('main').innerHTML=
+      `<div class="chips">${chips}</div>`+card(sp,DATA[sp.id],true);
+    document.getElementById('rest').innerHTML='';
+    document.getElementById('restlbl').textContent='';
+    document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
+      PICK=b.dataset.pick; render(); window.scrollTo({top:0,behavior:'smooth'});
+    });
   }else{
   document.getElementById('main').innerHTML=tops.map(x=>card(x.sp,x.rows,true)).join('');
   document.getElementById('rest').innerHTML = TAB==='now'
@@ -1155,12 +1215,41 @@ function render(){
   document.getElementById('src').innerHTML=t('footer')+`<div class="lic">${t('licence')}</div>`;
 }
 
+/* Кэш последнего удачного ответа. Модели пересчитываются дважды в сутки,
+   поэтому переиспользовать данные 10 минут безопасно — а заодно это спасает
+   от лимита запросов при перезагрузках и от потери связи.               */
+const CACHE_TTL=10*60*1000;
+function cacheSave(d){
+  try{
+    // raw — сырые значения каждой модели по каждому часу, это 90% веса.
+    // В кэш они не нужны: таблица источников всё равно требует свежих данных.
+    const slim={};
+    for(const k in d) slim[k]=d[k].map(({raw,...rest})=>rest);
+    LS.set('data_cache',JSON.stringify({at:Date.now(),weather:WEATHER,ocean:OCEANDATA,data:slim}));
+  }catch{ /* не влезло в квоту — работаем без кэша */ }
+}
+function cacheLoad(){
+  try{ return JSON.parse(LS.get('data_cache')||'null') }catch{ return null }
+}
+
 async function boot(){
-  try{DATA=await load(); render()}
-  catch(e){
-    document.getElementById('main').innerHTML=
-      `<div class="err">${e.message}</div>`;
-    setTimeout(boot,60000);
+  const cached=cacheLoad();
+  // свежий кэш — не дёргаем API лишний раз
+  if(cached && Date.now()-cached.at<CACHE_TTL && !DATA){
+    DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean;
+    LAST_OK=cached.at; STALE=false; render();
+  }
+  try{
+    DATA=await load(); LAST_OK=Date.now(); STALE=false; cacheSave(DATA); render();
+  }catch(e){
+    STALE=true;
+    STALE_REASON = /429/.test(e.message) ? 'rateLimit' : 'noConnection';
+    if(!DATA && cached){
+      DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean; LAST_OK=cached.at;
+    }
+    if(DATA) render(); else
+      document.getElementById('main').innerHTML=`<div class="err">${t(STALE_REASON)}</div>`;
+    setTimeout(boot,120000);
   }
 }
 /* Language-dependent labels. */
