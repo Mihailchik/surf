@@ -83,6 +83,17 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .srow{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--line);
   cursor:pointer;font-variant-numeric:tabular-nums}
 .srow.nolink{cursor:default}
+.rowx{border-bottom:1px solid var(--line)}
+.rowx:last-child{border-bottom:0}
+.rowx summary{list-style:none}
+.rowx summary::-webkit-details-marker{display:none}
+.rowx .srow{border-bottom:0}
+.rowx[open] .srow{background:var(--card2)}
+.rowx[open] .chev{transform:rotate(90deg)}
+.rowx .chev{transition:transform .2s;font-size:13px;color:var(--dim2);flex:0 0 auto;margin-left:2px}
+.rowbody{border-top:1px solid var(--line);background:var(--card2)}
+.rowbody .grid,.rowbody .tim,.rowbody .why,.rowbody .srcbox,.rowbody .nocam{background:var(--card)}
+.rowmap{display:flex;justify-content:flex-end;padding:8px 13px;background:var(--card)}
 .srow .map{margin-left:4px}
 /* На узком экране цифры важнее времени пика: пик прячем, чтобы
    волна/период/ветер помещались рядом с пином. */
@@ -101,7 +112,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .speak b{color:var(--tx);font-size:12.5px;font-weight:700}
 
 .card{margin:10px 0;border-radius:14px;background:var(--card);border:1px solid var(--line);
-  overflow:hidden;box-shadow:var(--shadow)}
+  overflow:hidden;box-shadow:var(--shadow);scroll-margin-top:calc(var(--stickH,150px) + 6px)}
 .chead{display:flex;align-items:center;gap:10px;padding:10px 13px;cursor:pointer}
 .chead .map{align-self:center}
 .score{flex:0 0 38px;height:38px;border-radius:10px;display:flex;align-items:center;
@@ -253,8 +264,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .ocsub{font-size:11.5px;color:var(--dim2)}
 .inote{padding:11px 13px;font-size:12.5px;color:var(--dim);line-height:1.55}
 .inote2{padding:8px 13px 11px;font-size:11.5px;color:var(--dim);line-height:1.5}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 2px 4px;scrollbar-width:none;
-  -webkit-overflow-scrolling:touch}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:9px 2px;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;position:sticky;top:var(--headH,110px);z-index:20;
+  background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(10px);
+  margin:0 -12px;padding-left:12px;padding-right:12px}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;
   font-weight:600;padding:8px 11px;border-radius:9px;border:1px solid var(--line);
@@ -269,7 +282,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .src b{color:var(--dim)}
 .lic{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:11px;line-height:1.5;color:var(--dim)}
 .lic a{color:var(--dim);text-decoration:underline}
-.hits{display:flex;justify-content:center;padding:14px 0 4px;opacity:.65}
+.made{text-align:center;padding:16px 0 2px;font-size:12px;color:var(--dim2)}
+.made a{color:var(--acc);text-decoration:none;font-weight:650}
+.made a:hover{text-decoration:underline}
+.hits{display:flex;justify-content:center;padding:8px 0 4px;opacity:.65}
 .hits img{height:18px}
 .stale{margin:10px 0 0;padding:9px 12px;border-radius:11px;font-size:12.5px;line-height:1.45;
   background:color-mix(in srgb,var(--bad) 10%,var(--card));
@@ -309,16 +325,17 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
   <div class="src" id="src"></div>
+  <div class="made">made by <a href="https://voidstudio.top" target="_blank" rel="noopener">voidstudio.top</a></div>
   <div class="hits"><img alt="" width="56" height="20"
     src="https://hits.sh/surf.voidstudio.top.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
 
 </div>
 
 <script>
-/* facing  — direction the beach faces, degrees
-   swellMin/Max — working swell range, metres
-   shelter — how much headlands block the swell, 0..1
-   tide    — tide state the break prefers                          */
+/* facing  : direction the beach faces, degrees
+   swellMin/Max : working swell range, metres
+   shelter : how much headlands block the swell, 0..1
+   tide    : tide state the break prefers                          */
 /* Location-dependent settings. Region comes from the URL hash, /#phuket. */
 const REGIONS={
   phuket:{ name:{en:'Phuket',ru:'Пхукет',th:'ภูเก็ต'}, tz:'Asia/Bangkok',
@@ -372,7 +389,7 @@ const WAVE_MODELS=['gwam','meteofrance_wave','ecmwf_wam025'];
 const WIND_MODELS=['icon_seamless','gfs_seamless','ecmwf_ifs025','meteofrance_seamless','jma_seamless'];
 let TAB='now', PICK=null, DATA=null, WEATHER=null, OCEANDATA=null, LAST_OK=null, STALE=false, STALE_REASON='noConnection';
 
-/* localStorage throws in private mode — degrade to no persistence. */
+/* localStorage throws in private mode, so degrade to no persistence. */
 const LS={
   get(k){ try{ return localStorage.getItem(k) }catch{ return null } },
   set(k,v){ try{ localStorage.setItem(k,v) }catch{} },
@@ -384,64 +401,65 @@ const I18N={
  en:{
   title:'Surf', now:'Now', island:'Phuket', d7:'10 days',
   go:'GO', ok:'WORTH IT', weak:'WEAK', no:'SKIP',
-  darkNow:'dark now · ', bestIs:'best is {0}', windowAt:'window {0} {1}',
+  darkNow:'dark now. ', bestIs:'best is {0}', windowAt:'window {0} {1}',
   today:'today', tomorrow:'tomorrow', peak:'peak', outOf:'of 10',
   wave:'wave', period:'period', wind:'wind', water:'water',
   noCam:'no camera', camNone:'no public camera',
   tPeak:'peak', tTide:'tide', tNow:'now',
   tideHigh:'max', tideLow:'min',
   rising:'conditions improving', falling:'conditions worsening', atPeak:'best right now', flat:'holding steady',
-  darkUntil:'dark · next window {0}', dark:'dark',
+  darkUntil:'dark. next window {0}', dark:'dark',
   noPeak:'flat all day, no peak',
-  more:'details', showSources:'show every source separately',
+  more:'details', showSources:'every source separately',
   hHour:'hour', hScore:'score', hWave:'wave', hWind:'wind',
-  legend:'Bar height and colour — how good that hour is. Wave in metres, wind in m/s. Grey hours are night.',
+  legend:'Bar height and colour: how good that hour is. Wave in metres, wind in m/s. Grey hours are night.',
   restBeaches:'Other beaches', restForecast:'Other beaches · forecast',
   colSwell:'swell m', colPeriod:'period s', colDir:'dir', colSpeed:'m/s', colGust:'gust',
-  median:'median', spread:'spread', sumWave:'↑ total wave, not swell — for comparison, not in the median',
-  srcNote:'Result is the <b>median</b>, not the mean: one outlier model cannot drag it. Directions are averaged as vectors (otherwise 350° and 10° would give 180°).<br>⧉ marks providers independent of Open-Meteo. ECMWF WAM publishes only total height, hence the dashes.',
+  median:'median', spread:'spread', sumWave:'these models publish only total wave height, not swell. For comparison, not in the median',
+  srcNote:'We take the median, not the mean, so one bad model cannot drag the result. Directions are added as vectors.<br>⧉ independent of Open-Meteo. ECMWF WAM only gives total height, hence the dashes.',
   srcCount:'sources {0}', srcSome:'sources {0}/{1}', updAt:'{0}',
-  noData:'no data · ', timeout:'timeout',
-  wxUnavailable:'weather unavailable — source did not respond',
+  noData:'no data. ', timeout:'timeout',
+  wxUnavailable:'weather did not load',
   feels:'feels', uv:'UV', gustShort:'↗{0} m/s',
-  swellShort:'not enough swell — <b>{0} m</b> against {1} needed',
-  swellOver:'too big — <b>{0} m</b>, it will close out',
-  swellOk:'swell in the working range — <b>{0} m</b>',
+  swellShort:'not enough swell: <b>{0} m</b> against {1} needed',
+  swellOver:'too big: <b>{0} m</b>, it will close out',
+  swellOk:'swell is workable: <b>{0} m</b>',
   perShort:'period <b>{0} s</b>, choppy', perMid:'period <b>{0} s</b>',
-  perLong:'long period <b>{0} s</b>, clean lines',
-  windOff:'offshore wind <b>{0} {1} m/s</b> — holds the face',
-  windSide:'cross wind <b>{0} {1} m/s</b>',
-  windOn:'onshore wind <b>{0} {1} m/s</b> — tears the wave apart',
-  agreeBad:'sources disagree by {0}× — do not trust the forecast here, look at the camera',
-  agreeMid:'sources disagree by {0}×', agreeOk:'sources agree — forecast is reliable',
-  bySource:'by source: wave {0}–{1} m · wind {2}–{3} m/s',
-  bestWindow:'best window {0} {1} · {2}/10',
-  footer:'<b>Wave:</b> DWD GWAM · MeteoFrance WAM · ECMWF WAM, plus NOAA WaveWatch III for comparison.<br><b>Wind:</b> ICON · GFS · ECMWF · ARPEGE · JMA · MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br><b>Cameras:</b> Kata — SSS Dive & Surf · Patong — Patong Tower · Karon — Marina Phuket Resort.<br>Wave model grid is ~9 km, so neighbouring beaches share a node — the difference comes from each spot\'s profile. Forecast horizon 10 days.',
+  perLong:'period <b>{0} s</b>, clean lines',
+  windOff:'wind off the beach, <b>{0} {1} m/s</b>, holds the face',
+  windSide:'cross wind, <b>{0} {1} m/s</b>',
+  windOn:'wind straight in, <b>{0} {1} m/s</b>, tears the wave apart',
+  agreeBad:'sources disagree by {0}×. Do not trust the forecast here, check the camera',
+  agreeMid:'sources disagree by {0}×', agreeOk:'sources agree',
+  bySource:'by source: wave {0}–{1} m, wind {2}–{3} m/s',
+  bestWindow:'best window {0} {1}, {2}/10',
+  footer:'<b>Wave:</b> DWD GWAM, MeteoFrance WAM, ECMWF WAM. Plus NOAA WaveWatch III for comparison.<br><b>Wind:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br><b>Cameras:</b> Kata SSS Dive &amp; Surf, Patong Patong Tower, Karon Marina Phuket Resort.<br>The wave model grid is about 9 km, so neighbouring beaches share a node. The difference comes from each spot profile. Forecast runs 10 days.',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'clear',1:'mostly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',
    51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'heavy rain',66:'rain',67:'heavy rain',
    80:'showers',81:'showers',82:'heavy showers',95:'thunderstorm',96:'thunderstorm',99:'thunderstorm'},
   uM:'m', uMs:'m/s', uS:'s', uMm:'mm',
-  hRain:'rain', chop:'of it <b>{0} m</b> is local wind chop',
+  hRain:'rain', chop:'of that <b>{0} m</b> is local wind chop',
   srcOcean:'Ocean watchpoints · Open-Meteo', srcOceanWind:'Ocean wind · Open-Meteo',
   uKm:'km',
   iEvents:'Bigger-than-usual days', iOcean:'What is out in the ocean',
   iSeason:'Season', iTyphoon:'Typhoons',
-  noEvents:'Nothing standing out in the next 10 days — the swell holds around {0} m.',
-  iEventsNote:'A day is listed when its peak is at least 25% above the 10-day median of {0} m. The bar shows how much bigger.',
+  noEvents:'The next 10 days are flat, swell holds around {0} m.',
+  iEventsNote:'A day lands here if its peak is at least a quarter above the 10 day median ({0} m). The bar shows by how much.',
   oc_nicobar:'West of the Nicobars', oc_bengal:'Bay of Bengal', oc_open:'Open ocean',
-  ocPeak:'peak {0} on {1}', ocArrive:'reaches the coast as about {0} around {1}',
+  ocPeak:'peak {0}, {1}', ocArrive:'reaches the coast at about {0} by {1}',
   ocWind:'strongest wind {0}', ocStorm:'storm-force',
-  iOceanNote:'Only about 41% of ocean swell gets past the Andaman and Nicobar islands, and the period drops from 10 s to 5–6 s. The arrival figure already accounts for that — measured, not guessed.',
-  iSeasonText:'Surf season on the west coast runs May to October, driven by the southwest monsoon. Waves here are mostly built by local wind rather than distant swell, so wind matters more than anywhere with an open coastline. November to April is flat and glassy.',
-  iTyphoonText:'Phuket sits outside the typhoon belt — cyclones form in the Bay of Bengal and the western Pacific, not in the Andaman Sea. A Bay of Bengal cyclone can still push extra swell down, and that shows up in the ocean watchpoints above as a jump in wind and wave height. A dedicated cyclone feed is not wired in: the open ones (GDACS, JTWC) do not allow browser access, and inventing an alert would be worse than none.',
-  licence:"Data: Open-Meteo and MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III via PacIOOS, public domain. Camera streams belong to their operators. Forecasts can be wrong — not a safety service.",
-  noConnection:'No connection — cannot load data.',
+  iOceanNote:'About 41% of ocean swell gets past the Andaman and Nicobar islands, and the period drops from 10 to 5–6 seconds. The arrival figure accounts for that, the ratio was measured.',
+  iSeasonText:'The season on the west coast runs May to October, driven by the southwest monsoon. Waves here are built by local wind rather than distant swell, so wind matters most. November to April is flat.',
+  iTyphoonText:'Phuket sits outside the typhoon belt. Cyclones form in the Bay of Bengal and the western Pacific, not in the Andaman Sea. A cyclone in the bay can still push extra swell here, and that shows up in the ocean points above as a jump in wind and wave. There is no cyclone feed here: the open sources GDACS and JTWC block browsers, and inventing a warning is worse than showing none.',
+  licence:"Data: Open-Meteo and MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a>. NOAA WaveWatch III via PacIOOS, public domain. Camera streams belong to their owners. Forecasts can be wrong, do not rely on this alone.",
+  noConnection:'No connection, data did not load.',
   staleData:'No connection. Data below is from {0} and may be out of date.',
   offline:'offline',
-  rateLimit:'Request limit reached — try again in a few minutes.',
+  rateLimit:'Request limit reached, try again in a couple of minutes.',
   staleLimit:'Request limit reached. Data below is from {0}.',
   limited:'limit',
+  totalWave:'total wave',
   srcWave:'Waves · Open-Meteo (3 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
@@ -449,64 +467,65 @@ const I18N={
  ru:{
   title:'Surf', now:'Сейчас', island:'Пхукет', d7:'10 дней',
   go:'ЕХАТЬ', ok:'МОЖНО', weak:'СЛАБО', no:'НЕ СТОИТ',
-  darkNow:'сейчас темно · ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
+  darkNow:'сейчас темно. ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
   today:'сегодня', tomorrow:'завтра', peak:'пик', outOf:'из 10',
   wave:'волна', period:'период', wind:'ветер', water:'вода',
   noCam:'камеры нет', camNone:'публичных камер нет',
   tPeak:'пик', tTide:'прилив', tNow:'сейчас',
   tideHigh:'макс', tideLow:'мин',
   rising:'условия улучшаются', falling:'условия ухудшаются', atPeak:'сейчас лучший момент', flat:'без изменений',
-  darkUntil:'темно · ближайшее окно {0}', dark:'темно',
+  darkUntil:'темно. ближайшее окно {0}', dark:'темно',
   noPeak:'ровно весь день, пика нет',
-  more:'подробнее', showSources:'показать все источники по отдельности',
+  more:'подробнее', showSources:'все источники по отдельности',
   hHour:'час', hScore:'балл', hWave:'волна', hWind:'ветер',
-  legend:'Столбик — оценка условий в этот час: выше и зеленее — лучше. Волна в метрах, ветер в м/с. Серые часы — ночь.',
+  legend:'Столбик: оценка часа. Выше и зеленее лучше. Волна в метрах, ветер в м/с. Серые часы ночные.',
   restBeaches:'Остальные пляжи', restForecast:'Остальные пляжи · прогноз',
   colSwell:'свелл м', colPeriod:'период с', colDir:'напр.', colSpeed:'м/с', colGust:'порывы',
-  median:'медиана', spread:'разброс', sumWave:'↑ это суммарная волна, не свелл — для сверки, в медиану не входит',
-  srcNote:'Итог — <b>медиана</b>, а не среднее: одна модель-выброс не тянет результат на себя. Направления усредняются векторно (иначе 350° и 10° дали бы 180°).<br>⧉ — источники, независимые от Open-Meteo. ECMWF WAM отдаёт только суммарную высоту, отсюда прочерки.',
+  median:'медиана', spread:'разброс', sumWave:'эти модели дают только суммарную высоту, без свелла. Для сверки, в медиану не идут',
+  srcNote:'Берём медиану, а не среднее: одна кривая модель не утянет результат. Направления складываем векторно.<br>⧉ независимые от Open-Meteo. ECMWF WAM даёт только суммарную высоту, поэтому прочерки.',
   srcCount:'источников {0}', srcSome:'источники {0}/{1}', updAt:'{0}',
-  noData:'нет данных · ', timeout:'таймаут',
-  wxUnavailable:'погода недоступна — источник не ответил',
+  noData:'нет данных. ', timeout:'таймаут',
+  wxUnavailable:'погода не загрузилась',
   feels:'ощущ', uv:'УФ', gustShort:'↗{0} м/с',
-  swellShort:'свелла не хватает — <b>{0} м</b> при нужных {1}',
-  swellOver:'перебор — <b>{0} м</b>, будет закрывать',
-  swellOk:'свелл в рабочем окне — <b>{0} м</b>',
+  swellShort:'свелла мало: <b>{0} м</b> при нужных {1}',
+  swellOver:'перебор: <b>{0} м</b>, будет закрывать',
+  swellOk:'свелл рабочий: <b>{0} м</b>',
   perShort:'период <b>{0} с</b>, рубленая мелочь', perMid:'период <b>{0} с</b>',
-  perLong:'длинный период <b>{0} с</b>, ровные линии',
-  windOff:'ветер offshore <b>{0} {1} м/с</b> — держит стенку',
-  windSide:'ветер боковой <b>{0} {1} м/с</b>',
-  windOn:'ветер в лоб <b>{0} {1} м/с</b> — рвёт волну',
-  agreeBad:'источники расходятся в {0} раза — прогнозу тут верить нельзя, смотри камеру',
-  agreeMid:'источники расходятся в {0} раза', agreeOk:'источники сходятся — прогнозу можно верить',
-  bySource:'по источникам: волна {0}–{1} м · ветер {2}–{3} м/с',
-  bestWindow:'лучшее окно {0} {1} · {2}/10',
-  footer:'<b>Волна:</b> DWD GWAM · MeteoFrance WAM · ECMWF WAM, плюс NOAA WaveWatch III для сверки.<br><b>Ветер:</b> ICON · GFS · ECMWF · ARPEGE · JMA · MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br><b>Камеры:</b> Ката — SSS Dive & Surf · Патонг — Patong Tower · Карон — Marina Phuket Resort.<br>Сетка волновой модели ~9 км: соседние пляжи берут один узел, разницу даёт профиль спота. Горизонт прогноза 10 дней.',
+  perLong:'период <b>{0} с</b>, ровные линии',
+  windOff:'ветер с берега, <b>{0} {1} м/с</b>, держит стенку',
+  windSide:'ветер боковой, <b>{0} {1} м/с</b>',
+  windOn:'ветер в лоб, <b>{0} {1} м/с</b>, рвёт волну',
+  agreeBad:'источники расходятся в {0} раза. Прогнозу тут не верь, смотри камеру',
+  agreeMid:'источники расходятся в {0} раза', agreeOk:'источники сходятся',
+  bySource:'по источникам: волна {0}–{1} м, ветер {2}–{3} м/с',
+  bestWindow:'лучшее окно {0} {1}, {2}/10',
+  footer:'<b>Волна:</b> DWD GWAM, MeteoFrance WAM, ECMWF WAM. Плюс NOAA WaveWatch III для сверки.<br><b>Ветер:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br><b>Камеры:</b> Ката SSS Dive &amp; Surf, Патонг Patong Tower, Карон Marina Phuket Resort.<br>Сетка волновой модели около 9 км, поэтому соседние пляжи берут один узел. Разницу даёт профиль спота. Прогноз на 10 дней.',
   dirs:['С','ССВ','СВ','ВСВ','В','ВЮВ','ЮВ','ЮЮВ','Ю','ЮЮЗ','ЮЗ','ЗЮЗ','З','ЗСЗ','СЗ','ССЗ'],
   wmo:{0:'ясно',1:'почти ясно',2:'переменная',3:'пасмурно',45:'туман',48:'туман',
    51:'морось',53:'морось',55:'морось',61:'дождь',63:'дождь',65:'ливень',66:'дождь',67:'ливень',
    80:'ливни',81:'ливни',82:'сильный ливень',95:'гроза',96:'гроза',99:'гроза'},
   uM:'м', uMs:'м/с', uS:'с', uMm:'мм',
-  hRain:'дождь', chop:'из них <b>{0} м</b> — ветровое месиво',
+  hRain:'дождь', chop:'из них <b>{0} м</b> ветровое месиво',
   srcOcean:'Океанские точки · Open-Meteo', srcOceanWind:'Ветер в океане · Open-Meteo',
   uKm:'км',
-  iEvents:'Дни выше обычного', iOcean:'Что происходит в океане',
+  iEvents:'Дни выше обычного', iOcean:'Что в океане',
   iSeason:'Сезон', iTyphoon:'Тайфуны',
-  noEvents:'В ближайшие 10 дней ничего выдающегося — свелл держится около {0} м.',
-  iEventsNote:'День попадает сюда, если его пик минимум на 25% выше десятидневной медианы в {0} м. Полоса показывает, насколько выше.',
+  noEvents:'Ближайшие 10 дней ровные, свелл держится около {0} м.',
+  iEventsNote:'День попадает сюда, если пик минимум на четверть выше медианы за 10 дней ({0} м). Полоса показывает насколько.',
   oc_nicobar:'Западнее Никобар', oc_bengal:'Бенгальский залив', oc_open:'Открытый океан',
-  ocPeak:'пик {0} — {1}', ocArrive:'до берега дойдёт примерно {0} к {1}',
+  ocPeak:'пик {0}, {1}', ocArrive:'до берега дойдёт около {0} к {1}',
   ocWind:'сильнейший ветер {0}', ocStorm:'штормовой',
-  iOceanNote:'Через Андаманские и Никобарские острова к берегу проходит около 41% океанского свелла, а период падает с 10 с до 5–6 с. Цифра прихода это уже учитывает — коэффициент измерен, а не придуман.',
-  iSeasonText:'Сезон на западном побережье — с мая по октябрь, его гонит юго-западный муссон. Волна здесь в основном рождается местным ветром, а не приходит дальним свеллом, поэтому ветер важнее, чем на открытом побережье. С ноября по апрель — штиль и гладкая вода.',
-  iTyphoonText:'Пхукет лежит вне тайфунного пояса: циклоны рождаются в Бенгальском заливе и западной части Тихого океана, а не в Андаманском море. Циклон в Бенгальском заливе всё же может подогнать сюда лишний свелл — и это видно в океанских точках выше как скачок ветра и высоты волны. Отдельной ленты по циклонам здесь нет: открытые источники (GDACS, JTWC) не пускают браузер напрямую, а выдумывать предупреждение хуже, чем не показывать его вовсе.',
-  licence:"Данные: Open-Meteo и MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III через PacIOOS, общественное достояние. Камеры принадлежат их владельцам. Прогноз может ошибаться — не полагайтесь на него как на единственный источник.",
-  noConnection:'Нет связи — данные не загрузились.',
-  staleData:'Нет связи. Данные ниже — от {0}, они могли устареть.',
+  iOceanNote:'Через Андаманские и Никобарские острова проходит около 41% океанского свелла, период падает с 10 до 5–6 секунд. Цифра прихода это учитывает, коэффициент измерен.',
+  iSeasonText:'Сезон на западном побережье с мая по октябрь, его гонит юго-западный муссон. Волна тут рождается местным ветром, а не приходит дальним свеллом, поэтому ветер важнее всего. С ноября по апрель штиль.',
+  iTyphoonText:'Пхукет вне тайфунного пояса. Циклоны рождаются в Бенгальском заливе и западной части Тихого океана, а не в Андаманском море. Циклон в заливе может подогнать лишний свелл, и это видно в океанских точках выше как скачок ветра и волны. Своей ленты по циклонам тут нет: открытые источники GDACS и JTWC не пускают браузер, а выдумывать предупреждение хуже, чем не показывать его.',
+  licence:"Данные: Open-Meteo и MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a>. NOAA WaveWatch III через PacIOOS, общественное достояние. Камеры принадлежат владельцам. Прогноз может врать, не полагайся на него одного.",
+  noConnection:'Нет связи, данные не загрузились.',
+  staleData:'Нет связи. Данные ниже от {0}, могли устареть.',
   offline:'нет связи',
-  rateLimit:'Лимит запросов исчерпан — попробуй через несколько минут.',
-  staleLimit:'Лимит запросов исчерпан. Данные ниже — от {0}.',
+  rateLimit:'Лимит запросов исчерпан, попробуй через пару минут.',
+  staleLimit:'Лимит запросов исчерпан. Данные ниже от {0}.',
   limited:'лимит',
+  totalWave:'сумм. волна',
   srcWave:'Волна · Open-Meteo (3 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
@@ -525,28 +544,28 @@ const I18N={
   noPeak:'คงที่ทั้งวัน ไม่มีช่วงพีค',
   more:'รายละเอียด', showSources:'ดูแหล่งข้อมูลทั้งหมด',
   hHour:'ชม.', hScore:'คะแนน', hWave:'คลื่น', hWind:'ลม',
-  legend:'ความสูงและสีของแท่ง — คะแนนสภาพคลื่นในชั่วโมงนั้น คลื่นเป็นเมตร ลมเป็น m/s ชั่วโมงสีเทาคือกลางคืน',
+  legend:'ความสูงและสีของแท่ง คือคะแนนของชั่วโมงนั้น สูงและเขียวคือดี คลื่นเป็นเมตร ลมเป็น m/s ชั่วโมงสีเทาคือกลางคืน',
   restBeaches:'หาดอื่น ๆ', restForecast:'หาดอื่น ๆ · พยากรณ์',
   colSwell:'คลื่น ม.', colPeriod:'คาบ วิ.', colDir:'ทิศ', colSpeed:'m/s', colGust:'ลมกระโชก',
-  median:'ค่ากลาง', spread:'ช่วงค่า', sumWave:'↑ คลื่นรวม ไม่ใช่ swell — ใช้เทียบเท่านั้น ไม่รวมในค่ากลาง',
+  median:'ค่ากลาง', spread:'ช่วงค่า', sumWave:'โมเดลเหล่านี้ให้เฉพาะความสูงรวม ไม่แยก swell ใช้เทียบเท่านั้น',
   srcNote:'ผลลัพธ์ใช้ <b>ค่ากลาง</b> ไม่ใช่ค่าเฉลี่ย เพื่อไม่ให้โมเดลที่ผิดปกติดึงผลลัพธ์ ทิศทางคำนวณแบบเวกเตอร์<br>⧉ คือแหล่งข้อมูลที่เป็นอิสระจาก Open-Meteo',
   srcCount:'แหล่งข้อมูล {0}', srcSome:'แหล่งข้อมูล {0}/{1}', updAt:'{0}',
   noData:'ไม่มีข้อมูล · ', timeout:'หมดเวลา',
-  wxUnavailable:'ไม่มีข้อมูลอากาศ — แหล่งข้อมูลไม่ตอบสนอง',
+  wxUnavailable:'โหลดข้อมูลอากาศไม่ได้',
   feels:'รู้สึก', uv:'UV', gustShort:'↗{0} m/s',
-  swellShort:'คลื่นเล็กเกินไป — <b>{0} ม.</b> ต้องการ {1}',
-  swellOver:'คลื่นใหญ่เกินไป — <b>{0} ม.</b> จะม้วนปิด',
-  swellOk:'คลื่นอยู่ในช่วงที่ใช้ได้ — <b>{0} ม.</b>',
+  swellShort:'คลื่นเล็กเกินไป <b>{0} ม.</b> ต้องการ {1}',
+  swellOver:'คลื่นใหญ่เกินไป <b>{0} ม.</b> จะม้วนปิด',
+  swellOk:'คลื่นใช้ได้ <b>{0} ม.</b>',
   perShort:'คาบ <b>{0} วิ.</b> คลื่นสับ', perMid:'คาบ <b>{0} วิ.</b>',
   perLong:'คาบยาว <b>{0} วิ.</b> คลื่นเป็นแนวสวย',
-  windOff:'ลมออกจากฝั่ง <b>{0} {1} m/s</b> — คลื่นตั้งสวย',
+  windOff:'ลมออกจากฝั่ง <b>{0} {1} m/s</b> คลื่นตั้งสวย',
   windSide:'ลมข้าง <b>{0} {1} m/s</b>',
-  windOn:'ลมเข้าฝั่ง <b>{0} {1} m/s</b> — คลื่นแตกเละ',
-  agreeBad:'แหล่งข้อมูลต่างกัน {0} เท่า — อย่าเชื่อพยากรณ์ ดูกล้องเอา',
-  agreeMid:'แหล่งข้อมูลต่างกัน {0} เท่า', agreeOk:'แหล่งข้อมูลตรงกัน — เชื่อถือได้',
+  windOn:'ลมเข้าฝั่ง <b>{0} {1} m/s</b> คลื่นแตกเละ',
+  agreeBad:'แหล่งข้อมูลต่างกัน {0} เท่า อย่าเชื่อพยากรณ์ ดูกล้องเอา',
+  agreeMid:'แหล่งข้อมูลต่างกัน {0} เท่า', agreeOk:'แหล่งข้อมูลตรงกัน',
   bySource:'ตามแหล่งข้อมูล: คลื่น {0}–{1} ม. · ลม {2}–{3} m/s',
   bestWindow:'ช่วงที่ดีที่สุด {0} {1} · {2}/10',
-  footer:'<b>คลื่น:</b> DWD GWAM · MeteoFrance WAM · ECMWF WAM และ NOAA WaveWatch III สำหรับเทียบ<br><b>ลม:</b> ICON · GFS · ECMWF · ARPEGE · JMA · MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br><b>กล้อง:</b> กะตะ — SSS Dive & Surf · ป่าตอง — Patong Tower · กะรน — Marina Phuket Resort<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่อยู่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะของแต่ละหาด พยากรณ์ล่วงหน้า 10 วัน',
+  footer:'<b>คลื่น:</b> DWD GWAM, MeteoFrance WAM, ECMWF WAM และ NOAA WaveWatch III สำหรับเทียบ<br><b>ลม:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br><b>กล้อง:</b> กะตะ SSS Dive &amp; Surf, ป่าตอง Patong Tower, กะรน Marina Phuket Resort<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะหาด พยากรณ์ 10 วัน',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'ท้องฟ้าแจ่มใส',1:'แจ่มใสเป็นส่วนใหญ่',2:'มีเมฆบางส่วน',3:'เมฆมาก',45:'หมอก',48:'หมอก',
    51:'ฝนละออง',53:'ฝนละออง',55:'ฝนละออง',61:'ฝนตก',63:'ฝนตก',65:'ฝนตกหนัก',66:'ฝนตก',67:'ฝนตกหนัก',
@@ -566,12 +585,13 @@ const I18N={
   iSeasonText:'ฤดูเซิร์ฟฝั่งตะวันตกคือพฤษภาคมถึงตุลาคม ขับด้วยมรสุมตะวันตกเฉียงใต้ คลื่นที่นี่เกิดจากลมท้องถิ่นเป็นหลัก ลมจึงสำคัญกว่าที่อื่น ช่วงพฤศจิกายนถึงเมษายนน้ำนิ่ง',
   iTyphoonText:'ภูเก็ตอยู่นอกแนวไต้ฝุ่น พายุหมุนก่อตัวในอ่าวเบงกอลและแปซิฟิกตะวันตก ไม่ใช่ทะเลอันดามัน พายุในอ่าวเบงกอลอาจส่งคลื่นเพิ่มมาได้ ซึ่งจะเห็นได้จากจุดสังเกตด้านบน ที่นี่ไม่มีฟีดพายุโดยตรง เพราะแหล่งข้อมูลเปิด (GDACS, JTWC) ไม่อนุญาตให้เบราว์เซอร์เข้าถึง',
   licence:"ข้อมูล: Open-Meteo และ MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III ผ่าน PacIOOS สาธารณสมบัติ กล้องเป็นของเจ้าของแต่ละราย พยากรณ์อาจคลาดเคลื่อน",
-  noConnection:'ไม่มีการเชื่อมต่อ — โหลดข้อมูลไม่ได้',
+  noConnection:'ไม่มีการเชื่อมต่อ โหลดข้อมูลไม่ได้',
   staleData:'ไม่มีการเชื่อมต่อ ข้อมูลด้านล่างจาก {0} อาจไม่เป็นปัจจุบัน',
   offline:'ออฟไลน์',
-  rateLimit:'ใช้โควตาคำขอหมดแล้ว — ลองใหม่ในอีกไม่กี่นาที',
+  rateLimit:'ใช้โควตาคำขอหมดแล้ว ลองใหม่ในอีกสองสามนาที',
   staleLimit:'ใช้โควตาคำขอหมดแล้ว ข้อมูลด้านล่างจาก {0}',
   limited:'เกินโควตา',
+  totalWave:'คลื่นรวม',
   srcWave:'คลื่น · Open-Meteo (3 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -625,8 +645,8 @@ const spread=a=>{a=a.filter(x=>x!=null&&!isNaN(x));if(a.length<2)return 0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const angDiff=(a,b)=>{let d=Math.abs(a-b)%360;return d>180?360-d:d};
 const dirRu=d=>t('dirs')[Math.round(d/22.5)%16];
-const fmt=(v,d=1,dash='—')=>v==null||isNaN(v)?dash:v.toFixed(d);
-const scoreColor=s=>s>=7?'var(--go)':s>=5?'var(--ok)':s>=3?'var(--mid)':s>=1.5?'var(--bad)':'var(--no)';
+const fmt=(v,d=1,dash='–')=>v==null||isNaN(v)?dash:v.toFixed(d);
+const scoreColor=s=>s>=8?'var(--go)':s>=6?'var(--ok)':s>=4?'var(--mid)':s>=2?'var(--bad)':'var(--no)';
 
 /* Tropics: sunrise ~06:15, sunset ~18:35 year round. */
 const DAY_FROM=6, DAY_TO=18;   
@@ -636,7 +656,7 @@ function bestDaylight(rows,from,limit){
   return w.length?w.reduce((a,b)=>(b.score??0)>(a.score??0)?b:a):null;
 }
 /* Local extrema. Data is hourly, so the peak is refined with a
-   three-point parabola — otherwise tides always land on :00.       */
+   three-point parabola, otherwise tides always land on :00.       */
 function extrema(rows,key,from,to){
   const out=[];
   for(let i=Math.max(from,1);i<Math.min(to,rows.length-1);i++){
@@ -692,7 +712,7 @@ const STATUS={};
 /* NOAA WaveWatch III via PacIOOS ERDDAP. Independent of Open-Meteo,
    no key. Publishes total wave for 6 days but the swell component only
    for 8 hours, so it is shown for comparison and kept out of the median.
-   0.5° grid — the whole island falls into one node, one request.    */
+   0.5° grid, so the whole island falls into one node, one request.    */
 async function loadWW3(){
   const pad=n=>String(n).padStart(2,'0');
   const iso=d=>`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:00:00Z`;
@@ -779,7 +799,7 @@ async function load(){
 
       const sRaw=WAVE_MODELS.map(md=>({m:md,
         h:mh['swell_wave_height_'+md]?.[k], p:mh['swell_wave_period_'+md]?.[k],
-        d:mh['swell_wave_direction_'+md]?.[k]}));
+        d:mh['swell_wave_direction_'+md]?.[k], hs:mh['wave_height_'+md]?.[k]}));
       const sH=sRaw.map(x=>x.h);
 
       const wRaw=WIND_MODELS.map(md=>({m:md,
@@ -813,7 +833,7 @@ async function load(){
 }
 
 function nowIdx(rows){
-  // sv-SE uses a space, the API uses 'T' — normalise
+  // sv-SE uses a space, the API uses 'T', so normalise
   const s=new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,13).replace(' ','T');
   const i=rows.findIndex(r=>r.t.slice(0,13)===s);
   return i<0?0:i;
@@ -842,7 +862,7 @@ function camBlock(sp){
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
   };
   if(sp.cam) return view(sp.cam,'live · '+sp.cam.by);
-  // no camera — plain notice
+  // no camera, plain notice
   
   return `<div class="nocam"><b>${t('noCam')}</b><span>${t('camNone')}</span></div>`;
 }
@@ -854,7 +874,7 @@ function hourStrip(rows,i0){
     const s=r.score??0, night=!isDay(r), h=Math.max(3,Math.round(s/10*30));
     const isNow=rows.indexOf(r)===i0;
     return {hh:r.t.slice(11,13), s, night, h, isNow, rain:r.rain,
-      top:(!night&&s===best&&s>4), sw:fmt(r.swell,1), wd:fmt(r.wind,0)};
+      top:(!night&&s===best&&s>5), sw:fmt(r.swell,1), wd:fmt(r.wind,0)};
   });
   // rain row only when rain is expected
   const wet=cells.some(c=>(c.rain??0)>=0.1);
@@ -904,7 +924,7 @@ function timing(sp,rows,i0){
     <div class="trow"><span>${t('tPeak')}</span><div>${pk}</div></div>
     <div class="trow"><span>${t('tTide')}</span><div class="tides">${
       tides.slice(0,3).map(td=>`<span class="td"><em>${
-        td.type==='high'?t('tideHigh'):t('tideLow')}</em><b>${td.hhmm}</b></span>`).join('')||'—'}
+        td.type==='high'?t('tideHigh'):t('tideLow')}</em><b>${td.hhmm}</b></span>`).join('')||'–'}
       </div></div>
     <div class="trow"><span>${t('tNow')}</span><div style="color:${pcol};font-weight:650">${phase}</div></div>
   </div>`;
@@ -979,7 +999,7 @@ function card(sp,rows,pinned){
       ><span class="q"><i>${t('period')}</i><b>${fmt(r.period,1)} ${t('uS')}</b></span
       ><span class="q"><i>${t('wind')}</i><b>${dirRu(r.wdir??0)} ${fmt(r.wind,0)}</b></span
       ><span class="q"><i>${t('water')}</i><b>${fmt(r.sst,0)}°</b></span>`
-    : best?t('bestWindow',best.t.slice(5,10).split('-').reverse().join('.'),best.t.slice(11,16),best.score.toFixed(0)):'—';
+    : best?t('bestWindow',best.t.slice(5,10).split('-').reverse().join('.'),best.t.slice(11,16),best.score.toFixed(0)):'–';
   return `<div class="card ${pinned?'pin':''}" data-id="${sp.id}" id="c-${sp.id}">
     <div class="chead">
       <div class="score" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
@@ -998,7 +1018,7 @@ function wxbar(){
     return;
   }
   const c=WEATHER.current, d=WEATHER.daily;
-  const [ico]=WMO[c.weather_code]||['·']; const txt=t('wmo')[c.weather_code]||'—';
+  const [ico]=WMO[c.weather_code]||['·']; const txt=t('wmo')[c.weather_code]||'–';
   const now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
   const date=now.toLocaleDateString(LOCALE[LANG],{weekday:'short',day:'numeric',month:'short'});
   // exactly two lines, no horizontal scroll
@@ -1043,26 +1063,31 @@ function sources(r){
   if(!r.raw) return '';
   const NAME={gwam:'DWD GWAM',meteofrance_wave:'MeteoFrance WAM',ecmwf_wam025:'ECMWF WAM',
     icon_seamless:'ICON (DWD)',gfs_seamless:'GFS (NOAA)',ecmwf_ifs025:'ECMWF IFS',
-    meteofrance_seamless:'ARPEGE (MF)',jma_seamless:'JMA',metno:'MET Norway ⧉'};
-  const wave=r.raw.wave.map(x=>`<tr><td>${NAME[x.m]}</td>
-      <td>${fmt(x.h,2)}</td><td>${fmt(x.p,1)}</td><td>${x.d==null?'—':Math.round(x.d)+'°'}</td></tr>`).join('');
+    meteofrance_seamless:'ARPEGE (MF)',jma_seamless:'JMA',metno:'MET Norway ⧉', ww3:'NOAA WW3 ⧉'};
+  const wave=r.raw.wave.filter(x=>x.h!=null).map(x=>`<tr><td>${NAME[x.m]}</td>
+      <td>${fmt(x.h,2)}</td><td>${fmt(x.p,1)}</td><td>${x.d==null?'–':Math.round(x.d)+'°'}</td></tr>`).join('');
+  // модели, которые дают только суммарную высоту, показываем отдельно
+  const totals=[
+    ...r.raw.wave.filter(x=>x.h==null&&x.hs!=null).map(x=>({n:NAME[x.m],v:x.hs})),
+    ...(r.ww3?[{n:NAME['ww3'],v:r.ww3.h}]:[])
+  ];
   const wind=r.raw.wind.map(x=>`<tr><td>${NAME[x.m]}</td>
-      <td>${fmt(x.s,1)}</td><td>${x.d==null?'—':dirRu(x.d)}</td><td>${fmt(x.g,1)}</td></tr>`).join('');
+      <td>${fmt(x.s,1)}</td><td>${x.d==null?'–':dirRu(x.d)}</td><td>${fmt(x.g,1)}</td></tr>`).join('');
   return `<details class="srcbox"><summary>${t('showSources')}</summary>
     <table class="stab"><thead><tr><th>${t('wave')}</th><th>${t('colSwell')}</th><th>${t('colPeriod')}</th><th>${t('colDir')}</th></tr></thead>
       <tbody>${wave}
       <tr class="avgrow"><td>${t('median')}</td><td>${fmt(r.swell,2)}</td><td>${fmt(r.period,1)}</td>
-        <td>${r.sdir==null?'—':Math.round(r.sdir)+'°'}</td></tr>
+        <td>${r.sdir==null?'–':Math.round(r.sdir)+'°'}</td></tr>
       ${r.swellRange?`<tr class="rngrow"><td>${t('spread')}</td>
         <td colspan="3">${fmt(r.swellRange.lo,2)}–${fmt(r.swellRange.hi,2)}</td></tr>`:''}
-      ${r.ww3?`<tr class="xrow"><td>NOAA WW3 ⧉</td><td>${fmt(r.ww3.h,2)}</td>
-        <td>${fmt(r.ww3.p,1)}</td><td>${r.ww3.d==null?'—':Math.round(r.ww3.d)+'°'}</td></tr>
+      ${totals.length?`<tr class="xrow"><td>${t('totalWave')}</td>
+        <td colspan="3">${totals.map(x=>`${x.n} <b>${fmt(x.v,2)}</b>`).join(' · ')}</td></tr>
       <tr class="rngrow"><td></td><td colspan="3">${t('sumWave')}</td></tr>`:''}
       </tbody></table>
     <table class="stab"><thead><tr><th>${t('wind')}</th><th>${t('colSpeed')}</th><th>${t('colDir')}</th><th>${t('colGust')}</th></tr></thead>
       <tbody>${wind}
       <tr class="avgrow"><td>${t('median')}</td><td>${fmt(r.wind,1)}</td>
-        <td>${r.wdir==null?'—':dirRu(r.wdir)}</td><td>${fmt(r.gust,1)}</td></tr>
+        <td>${r.wdir==null?'–':dirRu(r.wdir)}</td><td>${fmt(r.gust,1)}</td></tr>
       ${r.windRange?`<tr class="rngrow"><td>${t('spread')}</td>
         <td colspan="3">${fmt(r.windRange.lo,1)}–${fmt(r.windRange.hi,1)}</td></tr>`:''}
       </tbody></table>
@@ -1131,7 +1156,7 @@ function islandReport(){
 
   return `<div class="card"><div class="ihead">${t('iEvents')}</div>${ev}
       <div class="inote2">${t('iEventsNote',fmt(base,1))}</div></div>
-    <div class="card"><div class="ihead">${t('iOcean')}</div>${ocean||'<div class="inote">—</div>'}
+    <div class="card"><div class="ihead">${t('iOcean')}</div>${ocean||'<div class="inote">–</div>'}
       <div class="inote2">${t('iOceanNote')}</div></div>
     <div class="card"><div class="ihead">${t('iSeason')}</div>
       <div class="inote">${t('iSeasonText')}</div></div>
@@ -1139,7 +1164,7 @@ function islandReport(){
       <div class="inote">${t('iTyphoonText')}</div></div>`;
 }
 
-/* Одинаковые баллы встречаются часто — модельная сетка грубее, чем
+/* Одинаковые баллы встречаются часто: модельная сетка грубее, чем
    расстояние между пляжами. Чтобы порядок не прыгал между обновлениями,
    при равенстве сортируем по названию.                              */
 function byScoreThenName(a,b){
@@ -1150,13 +1175,33 @@ function byScoreThenName(a,b){
   return nameOf(a.sp).localeCompare(nameOf(b.sp),LOCALE[LANG]);
 }
 
+/* Полоса пляжей подсвечивает тот, что сейчас на экране. */
+let chipObserver=null;
+function markVisibleChip(){
+  chipObserver?.disconnect();
+  const chips=document.getElementById('chips'); if(!chips) return;
+  const cards=[...document.querySelectorAll('#main .card[data-id]')];
+  chipObserver=new IntersectionObserver(es=>{
+    const vis=es.filter(e=>e.isIntersecting)
+      .sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];
+    if(!vis) return;
+    const id=vis.target.dataset.id;
+    chips.querySelectorAll('.chip').forEach(c=>{
+      const on=c.dataset.pick===id;
+      c.classList.toggle('on',on);
+      if(on) c.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+    });
+  },{rootMargin:'-140px 0px -70% 0px'});
+  cards.forEach(c=>chipObserver.observe(c));
+}
+
 function render(){
   if(!DATA) return;
   wxbar();
   const sb=document.getElementById('stale');
   if(STALE){
     const age=LAST_OK?new Date(LAST_OK).toLocaleTimeString(LOCALE[LANG],
-      {timeZone:REG().tz,hour:'2-digit',minute:'2-digit'}):'—';
+      {timeZone:REG().tz,hour:'2-digit',minute:'2-digit'}):'–';
     sb.innerHTML=`<div class="stale">${t(STALE_REASON==='rateLimit'?'staleLimit':'staleData',age)}</div>`;
   } else sb.innerHTML='';
   const pinned=SPOTS.filter(s=>s.pin), rest=SPOTS.filter(s=>!s.pin);
@@ -1169,7 +1214,7 @@ function render(){
 
   const top=tops[0], sc=top.pick.score??0;
   const bi=bestDaylight(top.rows,top.i,30)||top.pick;
-  const word=sc>=7?t('go'):sc>=5?t('ok'):sc>=3?t('weak'):t('no');
+  const word=sc>=8?t('go'):sc>=6?t('ok'):sc>=4?t('weak'):t('no');
   const today=new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,10);
   const when=bi.t.slice(0,10)===today?t('today'):t('tomorrow');
 
@@ -1187,7 +1232,7 @@ function render(){
       <div class="sname">${nameOf(x.sp)}</div>
       <div class="sdat">${fmt(x.pick.swell,1)} ${t('uM')} · ${fmt(x.pick.period,1)} ${t('uS')} · ${
         dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)}</div>
-      <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>—</b>'}</div>
+      <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>–</b>'}</div>
       ${mapLink(x.sp)}
     </div>`}).join('');
 
@@ -1204,36 +1249,42 @@ function render(){
     document.getElementById('rest').innerHTML='';
     document.getElementById('restlbl').textContent='';
   }else if(TAB==='d7'){
-    // один пляж вместо четырёх одинаковых простыней
-    if(!PICK||!SPOTS.some(s=>s.id===PICK)) PICK=tops[0].sp.id;
-    const sp=SPOTS.find(s=>s.id===PICK);
-    const chips=SPOTS.map(x=>{
+    // лента: все пляжи подряд, полоса сверху прокручивает к нужному
+    const order=[...tops.map(x=>x.sp), ...restSorted.map(x=>x.sp)];
+    const chips=order.map(x=>{
       const rows=DATA[x.id], i=nowIdx(rows);
       const best=bestDaylight(rows,i,240);
-      return `<button class="chip${x.id===PICK?' on':''}" data-pick="${x.id}">${nameOf(x)}
-        <i style="color:${scoreColor(best?best.score:0)}">${best?best.score.toFixed(0):'—'}</i></button>`;
+      return `<button class="chip" data-pick="${x.id}">${nameOf(x)}
+        <i style="color:${scoreColor(best?best.score:0)}">${best?best.score.toFixed(0):'–'}</i></button>`;
     }).join('');
     document.getElementById('main').innerHTML=
-      `<div class="chips">${chips}</div>`+card(sp,DATA[sp.id],true);
+      `<div class="chips" id="chips">${chips}</div>`+
+      order.map(sp=>card(sp,DATA[sp.id],true)).join('');
     document.getElementById('rest').innerHTML='';
     document.getElementById('restlbl').textContent='';
     document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
-      PICK=b.dataset.pick; render(); window.scrollTo({top:0,behavior:'smooth'});
+      document.getElementById('c-'+b.dataset.pick)
+        ?.scrollIntoView({behavior:'smooth',block:'start'});
     });
+    syncHeights(); markVisibleChip();
   }else{
   document.getElementById('main').innerHTML=tops.map(x=>card(x.sp,x.rows,true)).join('');
   document.getElementById('rest').innerHTML = TAB==='now'
     ? `<div class="sum">${restSorted.map(x=>{
-        const sc=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0];
-        return `<div class="srow nolink">
+        const sc=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0], r=x.rows[x.i];
+        return `<details class="rowx" id="c-${x.sp.id}"><summary class="srow">
           <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(sc)} 14%,transparent);
             color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
           <div class="sname">${nameOf(x.sp)}</div>
           <div class="sdat">${fmt(x.pick.swell,1)} ${t('uM')} · ${fmt(x.pick.period,1)} ${t('uS')} · ${
             dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)}</div>
-          <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>—</b>'}</div>
-          ${mapLink(x.sp)}
-        </div>`}).join('')}</div>`
+          <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>–</b>'}</div>
+          <span class="chev">›</span>
+          </summary>
+          <div class="rowbody">${camBlock(x.sp)}${timing(x.sp,x.rows,x.i)}${
+            hourStrip(x.rows,x.i)}${why(x.sp,r)}${sources(r)}
+            <div class="rowmap">${mapLink(x.sp)}</div>
+          </div></details>`}).join('')}</div>`
     : restSorted.map(x=>card(x.sp,x.rows,false)).join('');
   }
 
@@ -1247,17 +1298,17 @@ function render(){
 }
 
 /* Кэш последнего удачного ответа. Модели пересчитываются дважды в сутки,
-   поэтому переиспользовать данные 10 минут безопасно — а заодно это спасает
+   поэтому переиспользовать данные 10 минут безопасно. Заодно это спасает
    от лимита запросов при перезагрузках и от потери связи.               */
 const CACHE_TTL=10*60*1000;
 function cacheSave(d){
   try{
-    // raw — сырые значения каждой модели по каждому часу, это 90% веса.
+    // raw: сырые значения каждой модели по каждому часу, это 90% веса.
     // В кэш они не нужны: таблица источников всё равно требует свежих данных.
     const slim={};
     for(const k in d) slim[k]=d[k].map(({raw,...rest})=>rest);
     LS.set('data_cache',JSON.stringify({at:Date.now(),weather:WEATHER,ocean:OCEANDATA,data:slim}));
-  }catch{ /* не влезло в квоту — работаем без кэша */ }
+  }catch{ /* не влезло в квоту, работаем без кэша */ }
 }
 function cacheLoad(){
   try{ return JSON.parse(LS.get('data_cache')||'null') }catch{ return null }
@@ -1265,7 +1316,7 @@ function cacheLoad(){
 
 async function boot(){
   const cached=cacheLoad();
-  // свежий кэш — не дёргаем API лишний раз
+  // свежий кэш, не дёргаем API лишний раз
   if(cached && Date.now()-cached.at<CACHE_TTL && !DATA){
     DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean;
     LAST_OK=cached.at; STALE=false; render();
@@ -1284,6 +1335,14 @@ async function boot(){
   }
 }
 /* Language-dependent labels. */
+function syncHeights(){
+  const h=document.querySelector('header')?.offsetHeight||0;
+  const c=document.querySelector('.chips')?.offsetHeight||0;
+  document.documentElement.style.setProperty('--headH',h+'px');
+  document.documentElement.style.setProperty('--stickH',(h+c)+'px');
+}
+addEventListener('resize',syncHeights);
+
 function applyLang(){
   document.documentElement.lang=LANG;
   document.getElementById('logo').innerHTML=
