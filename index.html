@@ -1073,7 +1073,7 @@ function sources(r){
   const wave=r.raw.wave.filter(x=>x.h!=null).map(x=>`<tr><td>${NAME[x.m]}</td>
       <td>${fmt(x.h,2)}</td><td>${fmt(x.p,1)}</td><td>${x.d==null?'–':Math.round(x.d)+'°'}</td></tr>`).join('');
   const totals=r.ww3?[{n:NAME['ww3'],v:r.ww3.h}]:[];
-  // как каждая модель делит волну на свелл и ветровую — величины несравнимые
+  // как каждая модель делит волну на свелл и ветровую: величины несравнимые
   const splits=r.raw.wave.filter(x=>x.sw!=null).map(x=>`${NAME[x.m]} <b>${fmt(x.sw,2)}</b>/${fmt(x.swp,0)}с`);
   const wind=r.raw.wind.map(x=>`<tr><td>${NAME[x.m]}</td>
       <td>${fmt(x.s,1)}</td><td>${x.d==null?'–':dirRu(x.d)}</td><td>${fmt(x.g,1)}</td></tr>`).join('');
