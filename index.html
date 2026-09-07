@@ -350,31 +350,31 @@ const REG=()=>REGIONS[REGION];
 const regName=()=>REG().name[LANG]||REG().name.en;
 
 const SPOTS=[
- {id:'naiharn',nm:{en:'Nai Harn',ru:'Най Харн',th:'หาดในหาน'},lat:7.7756,lon:98.3035,facing:250,swellMin:0.9,swellMax:2.6,
+ {id:'naiharn',nm:{en:'Nai Harn',ru:'Най Харн',th:'หาดในหาน'},lat:7.7756,lon:98.3035,facing:250,swellMin:1.35,swellMax:3.64,
   shelter:.45,tide:'mid',pin:1,cam:null},
- {id:'kata',nm:{en:'Kata',ru:'Ката',th:'หาดกะตะ'},lat:7.8206,lon:98.2967,facing:270,swellMin:0.4,swellMax:2.2,
+ {id:'kata',nm:{en:'Kata',ru:'Ката',th:'หาดกะตะ'},lat:7.8206,lon:98.2967,facing:270,swellMin:0.6,swellMax:3.08,
   shelter:.2,tide:'mid',pin:1,cam:{type:'rtsp',id:'2F8DfBS5',by:'SSS Dive & Surf'}},
- {id:'patong',nm:{en:'Patong',ru:'Патонг',th:'หาดป่าตอง'},lat:7.8950,lon:98.2830,facing:265,swellMin:0.6,swellMax:2.0,
+ {id:'patong',nm:{en:'Patong',ru:'Патонг',th:'หาดป่าตอง'},lat:7.8950,lon:98.2830,facing:265,swellMin:0.9,swellMax:2.8,
   // Patong stream is CSP-locked to phuket101.net,
   // so a self-refreshing frame is used instead
   shelter:.4,tide:'mid',pin:1,cam:{type:'img',id:'1613136596',by:'Patong Tower, 15F'}},
- {id:'karon',nm:{en:'Karon',ru:'Карон',th:'หาดกะรน'},lat:7.8480,lon:98.2930,facing:270,swellMin:0.5,swellMax:2.4,
+ {id:'karon',nm:{en:'Karon',ru:'Карон',th:'หาดกะรน'},lat:7.8480,lon:98.2930,facing:270,swellMin:0.75,swellMax:3.36,
   shelter:.15,tide:'high',pin:1,cam:{type:'ipcam',id:'69241c73d3f52',by:'Marina Phuket Resort'}},
- {id:'katanoi',nm:{en:'Kata Noi',ru:'Ката Ной',th:'หาดกะตะน้อย'},lat:7.8080,lon:98.2960,facing:270,swellMin:0.6,swellMax:2.0,
+ {id:'katanoi',nm:{en:'Kata Noi',ru:'Ката Ной',th:'หาดกะตะน้อย'},lat:7.8080,lon:98.2960,facing:270,swellMin:0.9,swellMax:2.8,
   shelter:.3,tide:'high',cam:null},
- {id:'kalim',nm:{en:'Kalim',ru:'Калим',th:'หาดกะหลิม'},lat:7.9130,lon:98.2790,facing:270,swellMin:1.3,swellMax:3.5,
+ {id:'kalim',nm:{en:'Kalim',ru:'Калим',th:'หาดกะหลิม'},lat:7.9130,lon:98.2790,facing:270,swellMin:1.95,swellMax:4.9,
   shelter:.1,tide:'mid',cam:null},
- {id:'kamala',nm:{en:'Kamala',ru:'Камала',th:'หาดกมลา'},lat:7.9540,lon:98.2790,facing:272,swellMin:0.6,swellMax:2.2,
+ {id:'kamala',nm:{en:'Kamala',ru:'Камала',th:'หาดกมลา'},lat:7.9540,lon:98.2790,facing:272,swellMin:0.9,swellMax:3.08,
   shelter:.25,tide:'any',cam:null},
- {id:'surin',nm:{en:'Surin',ru:'Сурин',th:'หาดสุรินทร์'},lat:7.9770,lon:98.2780,facing:270,swellMin:0.8,swellMax:2.6,
+ {id:'surin',nm:{en:'Surin',ru:'Сурин',th:'หาดสุรินทร์'},lat:7.9770,lon:98.2780,facing:270,swellMin:1.2,swellMax:3.64,
   shelter:.1,tide:'mid',cam:null},
- {id:'bangtao',nm:{en:'Bang Tao',ru:'Банг Тао',th:'หาดบางเทา'},lat:8.0000,lon:98.2930,facing:275,swellMin:0.5,swellMax:2.2,
+ {id:'bangtao',nm:{en:'Bang Tao',ru:'Банг Тао',th:'หาดบางเทา'},lat:8.0000,lon:98.2930,facing:275,swellMin:0.75,swellMax:3.08,
   shelter:.2,tide:'any',cam:null},
- {id:'layan',nm:{en:'Layan',ru:'Лайан',th:'หาดลายัน'},lat:8.0330,lon:98.2890,facing:272,swellMin:0.5,swellMax:1.8,
+ {id:'layan',nm:{en:'Layan',ru:'Лайан',th:'หาดลายัน'},lat:8.0330,lon:98.2890,facing:272,swellMin:0.75,swellMax:2.52,
   shelter:.35,tide:'any',cam:null},
- {id:'naithon',nm:{en:'Nai Thon',ru:'Найтон',th:'หาดในทอน'},lat:8.0800,lon:98.2600,facing:270,swellMin:0.5,swellMax:2.0,
+ {id:'naithon',nm:{en:'Nai Thon',ru:'Найтон',th:'หาดในทอน'},lat:8.0800,lon:98.2600,facing:270,swellMin:0.75,swellMax:2.8,
   shelter:.3,tide:'mid',cam:null},
- {id:'naiyang',nm:{en:'Nai Yang',ru:'Най Янг',th:'หาดในยาง'},lat:8.0930,lon:98.2960,facing:270,swellMin:0.4,swellMax:1.5,
+ {id:'naiyang',nm:{en:'Nai Yang',ru:'Най Янг',th:'หาดในยาง'},lat:8.0930,lon:98.2960,facing:270,swellMin:0.6,swellMax:2.1,
   shelter:.55,tide:'high',cam:null}
 ];
 
@@ -414,7 +414,7 @@ const I18N={
   hHour:'hour', hScore:'score', hWave:'wave', hWind:'wind',
   legend:'Bar height and colour: how good that hour is. Wave in metres, wind in m/s. Grey hours are night.',
   restBeaches:'Other beaches', restForecast:'Other beaches · forecast',
-  colSwell:'swell m', colPeriod:'period s', colDir:'dir', colSpeed:'m/s', colGust:'gust',
+  colSwell:'height m', colPeriod:'period s', colDir:'dir', colSpeed:'m/s', colGust:'gust',
   median:'median', spread:'spread', sumWave:'these models publish only total wave height, not swell. For comparison, not in the median',
   srcNote:'We take the median, not the mean, so one bad model cannot drag the result. Directions are added as vectors.<br>⧉ independent of Open-Meteo. ECMWF WAM only gives total height, hence the dashes.',
   srcCount:'sources {0}', srcSome:'sources {0}/{1}', updAt:'{0}',
@@ -460,6 +460,7 @@ const I18N={
   staleLimit:'Request limit reached. Data below is from {0}.',
   limited:'limit',
   totalWave:'total wave',
+  swellPart:'swell part', swellNote:'Models disagree on what counts as swell: NOAA calls only a 12 s groundswell a swell, DWD counts a 5 s wave as one. Those numbers are not comparable, so the median above uses total wave height, where the models agree within 22%.',
   srcWave:'Waves · Open-Meteo (4 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
@@ -480,7 +481,7 @@ const I18N={
   hHour:'час', hScore:'балл', hWave:'волна', hWind:'ветер',
   legend:'Столбик: оценка часа. Выше и зеленее лучше. Волна в метрах, ветер в м/с. Серые часы ночные.',
   restBeaches:'Остальные пляжи', restForecast:'Остальные пляжи · прогноз',
-  colSwell:'свелл м', colPeriod:'период с', colDir:'напр.', colSpeed:'м/с', colGust:'порывы',
+  colSwell:'высота м', colPeriod:'период с', colDir:'напр.', colSpeed:'м/с', colGust:'порывы',
   median:'медиана', spread:'разброс', sumWave:'эти модели дают только суммарную высоту, без свелла. Для сверки, в медиану не идут',
   srcNote:'Берём медиану, а не среднее: одна кривая модель не утянет результат. Направления складываем векторно.<br>⧉ независимые от Open-Meteo. ECMWF WAM даёт только суммарную высоту, поэтому прочерки.',
   srcCount:'источников {0}', srcSome:'источники {0}/{1}', updAt:'{0}',
@@ -525,7 +526,8 @@ const I18N={
   rateLimit:'Лимит запросов исчерпан, попробуй через пару минут.',
   staleLimit:'Лимит запросов исчерпан. Данные ниже от {0}.',
   limited:'лимит',
-  totalWave:'сумм. волна',
+  totalWave:'волна всего',
+  swellPart:'доля свелла', swellNote:'Модели по-разному делят волну: NOAA зовёт свеллом только накат с периодом 12 с, DWD считает свеллом волну с периодом 5 с. Эти числа несравнимы, поэтому медиана выше берётся по суммарной волне, где модели сходятся в пределах 22%.',
   srcWave:'Волна · Open-Meteo (4 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
@@ -546,7 +548,7 @@ const I18N={
   hHour:'ชม.', hScore:'คะแนน', hWave:'คลื่น', hWind:'ลม',
   legend:'ความสูงและสีของแท่ง คือคะแนนของชั่วโมงนั้น สูงและเขียวคือดี คลื่นเป็นเมตร ลมเป็น m/s ชั่วโมงสีเทาคือกลางคืน',
   restBeaches:'หาดอื่น ๆ', restForecast:'หาดอื่น ๆ · พยากรณ์',
-  colSwell:'คลื่น ม.', colPeriod:'คาบ วิ.', colDir:'ทิศ', colSpeed:'m/s', colGust:'ลมกระโชก',
+  colSwell:'ความสูง ม.', colPeriod:'คาบ วิ.', colDir:'ทิศ', colSpeed:'m/s', colGust:'ลมกระโชก',
   median:'ค่ากลาง', spread:'ช่วงค่า', sumWave:'โมเดลเหล่านี้ให้เฉพาะความสูงรวม ไม่แยก swell ใช้เทียบเท่านั้น',
   srcNote:'ผลลัพธ์ใช้ <b>ค่ากลาง</b> ไม่ใช่ค่าเฉลี่ย เพื่อไม่ให้โมเดลที่ผิดปกติดึงผลลัพธ์ ทิศทางคำนวณแบบเวกเตอร์<br>⧉ คือแหล่งข้อมูลที่เป็นอิสระจาก Open-Meteo',
   srcCount:'แหล่งข้อมูล {0}', srcSome:'แหล่งข้อมูล {0}/{1}', updAt:'{0}',
@@ -592,6 +594,7 @@ const I18N={
   staleLimit:'ใช้โควตาคำขอหมดแล้ว ข้อมูลด้านล่างจาก {0}',
   limited:'เกินโควตา',
   totalWave:'คลื่นรวม',
+  swellPart:'ส่วน swell', swellNote:'โมเดลแบ่งคลื่นต่างกัน NOAA นับเฉพาะคลื่นคาบ 12 วิ. เป็น swell ส่วน DWD นับคลื่นคาบ 5 วิ. ด้วย ตัวเลขจึงเทียบกันไม่ได้ ค่ากลางด้านบนจึงใช้ความสูงคลื่นรวม ซึ่งโมเดลตรงกันในระยะ 22%',
   srcWave:'คลื่น · Open-Meteo (4 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -745,7 +748,7 @@ async function load(){
   const [m,w,tSea,g,mn,ww3,oc,ocw]=await Promise.all([
     safe('wave',t('srcWave'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
-        '&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height,wind_wave_height&models='+WAVE_MODELS.join(','))),
+        '&hourly=wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,wind_wave_height&models='+WAVE_MODELS.join(','))),
     safe('wind',t('srcWind'),()=>
       jget('https://api.open-meteo.com/v1/forecast?'+base+
         '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&wind_speed_unit=ms&models='+WIND_MODELS.join(','))),
@@ -798,8 +801,9 @@ async function load(){
       const met=MET[hourKey]||null;
 
       const sRaw=WAVE_MODELS.map(md=>({m:md,
-        h:mh['swell_wave_height_'+md]?.[k], p:mh['swell_wave_period_'+md]?.[k],
-        d:mh['swell_wave_direction_'+md]?.[k], hs:mh['wave_height_'+md]?.[k]}));
+        h:mh['wave_height_'+md]?.[k], p:mh['wave_period_'+md]?.[k],
+        d:mh['wave_direction_'+md]?.[k],
+        sw:mh['swell_wave_height_'+md]?.[k], swp:mh['swell_wave_period_'+md]?.[k]}));
       const sH=sRaw.map(x=>x.h);
 
       const wRaw=WIND_MODELS.map(md=>({m:md,
@@ -812,6 +816,7 @@ async function load(){
       rows.push({t:time,
         swell:median(sH), period:median(sRaw.map(x=>x.p)),
         sdir:circMean(sRaw.map(x=>x.d)),
+        swellOnly:median(sRaw.map(x=>x.sw)),
         swellRange:range(sH), windRange:range(wS),
         sst:th.sea_surface_temperature?.[k],
         tideRaw:th.sea_level_height_msl?.[k],
@@ -1067,11 +1072,9 @@ function sources(r){
     meteofrance_seamless:'ARPEGE (MF)',jma_seamless:'JMA',metno:'MET Norway ⧉', ww3:'NOAA WW3 ⧉'};
   const wave=r.raw.wave.filter(x=>x.h!=null).map(x=>`<tr><td>${NAME[x.m]}</td>
       <td>${fmt(x.h,2)}</td><td>${fmt(x.p,1)}</td><td>${x.d==null?'–':Math.round(x.d)+'°'}</td></tr>`).join('');
-  // модели, которые дают только суммарную высоту, показываем отдельно
-  const totals=[
-    ...r.raw.wave.filter(x=>x.h==null&&x.hs!=null).map(x=>({n:NAME[x.m],v:x.hs})),
-    ...(r.ww3?[{n:NAME['ww3'],v:r.ww3.h}]:[])
-  ];
+  const totals=r.ww3?[{n:NAME['ww3'],v:r.ww3.h}]:[];
+  // как каждая модель делит волну на свелл и ветровую — величины несравнимые
+  const splits=r.raw.wave.filter(x=>x.sw!=null).map(x=>`${NAME[x.m]} <b>${fmt(x.sw,2)}</b>/${fmt(x.swp,0)}с`);
   const wind=r.raw.wind.map(x=>`<tr><td>${NAME[x.m]}</td>
       <td>${fmt(x.s,1)}</td><td>${x.d==null?'–':dirRu(x.d)}</td><td>${fmt(x.g,1)}</td></tr>`).join('');
   return `<details class="srcbox"><summary>${t('showSources')}</summary>
@@ -1082,8 +1085,10 @@ function sources(r){
       ${r.swellRange?`<tr class="rngrow"><td>${t('spread')}</td>
         <td colspan="3">${fmt(r.swellRange.lo,2)}–${fmt(r.swellRange.hi,2)}</td></tr>`:''}
       ${totals.length?`<tr class="xrow"><td>${t('totalWave')}</td>
-        <td colspan="3">${totals.map(x=>`${x.n} <b>${fmt(x.v,2)}</b>`).join(' · ')}</td></tr>
-      <tr class="rngrow"><td></td><td colspan="3">${t('sumWave')}</td></tr>`:''}
+        <td colspan="3">${totals.map(x=>`${x.n} <b>${fmt(x.v,2)}</b>`).join(' · ')}</td></tr>`:''}
+      ${splits.length?`<tr class="xrow"><td>${t('swellPart')}</td>
+        <td colspan="3">${splits.join(' · ')}</td></tr>
+      <tr class="rngrow"><td></td><td colspan="3">${t('swellNote')}</td></tr>`:''}
       </tbody></table>
     <table class="stab"><thead><tr><th>${t('wind')}</th><th>${t('colSpeed')}</th><th>${t('colDir')}</th><th>${t('colGust')}</th></tr></thead>
       <tbody>${wind}
