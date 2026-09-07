@@ -1,81 +1,62 @@
 # Surf
 
-https://mihailchik.github.io/surf/
+Wave, wind, tide and live cams for west-coast beaches. One page, one question:
+is it worth going right now?
 
-Одностраничный дашборд: волны, ветер, приливы и живые камеры по пляжам западного
-побережья Пхукета. Отвечает на один вопрос — ехать сейчас на море или нет.
+**https://surf.voidstudio.top**
 
-## Регионы
+## How it works
 
-Регион берётся из адреса: `/#phuket`. По умолчанию Пхукет — пока он единственный.
-Всё, что зависит от места (координаты для общей погоды, часовой пояс, границы
-светлого времени), собрано в объекте `REGIONS`, а споты — в `SPOTS`. Чтобы
-добавить второй регион, нужно дописать запись в `REGIONS` и споты с его `region`.
+A single static HTML file. No build step, no backend, no API keys — every
+source is fetched straight from the browser and works without registration.
 
-## Как устроено
+### Sources
 
-Статический HTML без сборки и бэкенда. Все данные тянутся из браузера.
+| Source | Provides |
+|---|---|
+| Open-Meteo Marine | swell height, period, direction, wind wave — DWD GWAM, MeteoFrance WAM, ECMWF WAM |
+| Open-Meteo Forecast | wind, gusts, precipitation — ICON, GFS, ECMWF, ARPEGE, JMA |
+| Open-Meteo Marine | tide and sea temperature |
+| Open-Meteo Forecast | general weather, sunrise, UV |
+| MET Norway | wind, independent of Open-Meteo |
+| NOAA WaveWatch III (PacIOOS ERDDAP) | total wave height, independent |
+| Open-Meteo | wave and wind at three ocean watchpoints |
 
-**Источники (6):**
+Each value is the **median** across models, not the mean — a single outlier
+cannot drag the result. Directions are averaged as vectors. The spread between
+sources is shown next to the result; when it is wide, the forecast is unreliable
+and the page says so.
 
-| источник | что даёт | ключ |
-|---|---|---|
-| Open-Meteo Marine | свелл, период, направление, ветровая волна — 3 модели (DWD GWAM, MeteoFrance WAM, ECMWF WAM) | не нужен |
-| Open-Meteo Forecast | ветер, порывы и осадки — 5 моделей (ICON, GFS, ECMWF, ARPEGE, JMA) | не нужен |
-| Open-Meteo Marine | прилив и температура воды | не нужен |
-| Open-Meteo Forecast | общая погода, восход/закат, УФ | не нужен |
-| MET Norway | ветер, независимый провайдер | не нужен |
-| NOAA WaveWatch III (PacIOOS ERDDAP) | независимая волновая модель, для сверки | не нужен |
+Sources load independently with a 15 s timeout. A failed one does not break the
+page — it is marked in the header (`sources 7/8`) and drops out of the median.
 
-Итог по каждому параметру — **медиана** по всем моделям (не среднее: одна модель-выброс
-не должна тянуть результат). Направления усредняются векторно. Рядом показывается
-разброс между источниками — когда он большой, прогнозу верить нельзя.
+### Cameras
 
-Каждый источник грузится независимо с таймаутом 15 с: упавший не роняет остальные,
-а помечается в шапке (`источники 4/6`).
+Kata (SSS Dive & Surf), Patong (Patong Tower), Karon (Marina Phuket Resort) —
+direct links to the original streams, no keys. Other beaches have no public
+camera pointing at the water.
 
-**Камеры:** Ката (SSS Dive & Surf), Патонг (Patong Tower), Карон (Marina Phuket Resort) —
-прямые ссылки на первоисточники, без ключей.
+## Regions
 
-## Языки
+The region comes from the URL hash: `/#phuket`. Phuket is the default and
+currently the only one. Everything location-dependent lives in `REGIONS`
+(coordinates, timezone, daylight hours); beaches live in `SPOTS`.
 
-Английский по умолчанию, плюс русский и тайский. При первом входе язык берётся
-из настроек браузера, дальше — выбор пользователя, он сохраняется в localStorage.
+## Scoring
 
+0–10 per hour, weighted: swell size against the spot's working range (34%),
+wind direction and strength (30%), period (20%), swell direction relative to
+the shore (16%), plus a tide adjustment.
 
-## Оценка 0–10
+## Known limits
 
-Считается из размера свелла относительно рабочего диапазона спота, периода,
-направления волны, ветра (offshore/onshore) и фазы прилива.
-
-Пороги каждого спота (с какой волны работает, на каком приливе лучше) заданы
-вручную в массиве `SPOTS` и требуют калибровки по факту — данные объективны,
-их интерпретация пока нет.
-
-
-## Вкладка «Пхукет»
-
-Общая картина по острову на измеримых величинах, без домыслов:
-
-- **Дни выше обычного** — дни, чей пик минимум на 25% выше десятидневной медианы.
-- **Что в океане** — три точки-наблюдателя (западнее Никобар, Бенгальский залив,
-  открытый океан). Для каждой: пик волны, сильнейший ветер и пересчёт в береговую
-  волну по измеренному коэффициенту прохождения (~41%) и задержке (~11–24 ч).
-- **Сезон** и **тайфуны** — справочно.
-
-Ленты по тропическим циклонам нет намеренно: GDACS и JTWC не отдают CORS,
-то есть из браузера их не прочитать, а выдуманное предупреждение хуже отсутствия.
-
-## Ограничения, которые стоит знать
-
-- **Горизонт 10 дней.** Дальше прогноза волн не существует ни у кого — атмосферу
-  за этим пределом не считают. Всё, что предлагают «на месяц», это климатология.
-- **Пхукет закрыт островами.** Андаманско-Никобарская гряда пропускает к берегу
-  около 40% океанского свелла и срезает период с 10 с до 5–6 с. Поэтому длинных
-  ровных линий здесь почти не бывает, и низкие цифры — это не ошибка модели.
-- **Ансамбля для волн в регионе нет** — Open-Meteo отдаёт по нему пустые узлы.
-- **Пороги спотов не откалиброваны** — см. массив `SPOTS`.
-
-
-Все источники работают **без ключей и регистрации** — сайт открывается
-на любом устройстве и сразу показывает данные.
+- **10-day horizon.** No wave forecast exists beyond that anywhere — the
+  atmosphere is not modelled that far out.
+- **Phuket is shielded by islands.** The Andaman and Nicobar chain lets through
+  roughly 40% of ocean swell and cuts the period from 10 s to 5–6 s. Low numbers
+  here are geography, not a broken model.
+- **No wave ensemble** for this region — Open-Meteo returns empty nodes.
+- **No cyclone feed.** GDACS and JTWC do not allow browser access, and a made-up
+  warning would be worse than none.
+- **Spot thresholds are not calibrated.** The working swell range and preferred
+  tide for each break in `SPOTS` are estimates and need real sessions to verify.
