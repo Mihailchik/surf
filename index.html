@@ -248,11 +248,13 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .daybody .grid,.daybody .tim,.daybody .why,.daybody .srcbox{background:var(--card)}
 .day .dn{flex:0 0 54px;color:var(--dim);font-size:11.5px}
 .day .dn b{display:block;color:var(--tx);font-size:12.5px;font-weight:650;text-transform:capitalize}
-.dbar{flex:0 0 52px;height:8px;border-radius:4px;background:var(--card2);position:relative;overflow:hidden}
-.dbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;font-style:normal}
-.dinfo{flex:1;min-width:0;font-size:11.5px;color:var(--tx);font-variant-numeric:tabular-nums;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dinfo span{color:var(--dim2);margin-left:5px}
+.dbar{flex:1;height:22px;border-radius:6px;position:relative;overflow:hidden}
+.dbar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;font-style:normal;opacity:.42}
+/* Полоса залита светлым оттенком своего цвета по всей длине, заполнение
+   поверх приглушено. Текст поэтому везде лежит на светлом и читается
+   без обводки, где бы ни кончалась цветная часть. */
+.dbar em{position:absolute;left:8px;top:0;bottom:0;display:flex;align-items:center;font-style:normal;
+  font-size:11px;font-weight:650;color:var(--tx);font-variant-numeric:tabular-nums}
 .dsc{flex:0 0 26px;text-align:right;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
 
 .ihead{padding:11px 13px 8px;font-size:11px;font-weight:700;color:var(--dim2);
@@ -1071,9 +1073,9 @@ function dayRows(sp,rows,n){
     return `<details class="dayx"><summary class="day">
       <div class="dn"><b>${dt.toLocaleDateString(LOCALE[LANG],{weekday:'short'})}</b>${
         dt.toLocaleDateString(LOCALE[LANG],{day:'numeric',month:'short'})}</div>
-      <div class="dbar"><i style="width:${Math.max(8,sc*10)}%;background:${scoreColor(sc)}"></i></div>
-      <div class="dinfo">${fmt(avg(rs.map(r=>r.swell)),1)} ${t('uM')} · ${fmt(avg(rs.map(r=>r.wind)),0)} ${t('uMs')}
-        <span>${t('peak')} ${bi.t.slice(11,16)}</span></div>
+      <div class="dbar" style="background:color-mix(in srgb,${scoreColor(sc)} 13%,var(--card))">
+        <i style="width:${Math.max(6,sc*10)}%;background:${scoreColor(sc)}"></i>
+        <em>${fmt(avg(rs.map(r=>r.swell)),1)} ${t('uM')} · ${fmt(avg(rs.map(r=>r.wind)),0)} ${t('uMs')} · ${t('peak')} ${bi.t.slice(11,16)}</em></div>
       <div class="dsc" style="color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
       </summary>${detail}</details>`}).join('')+'</div>';
 }
