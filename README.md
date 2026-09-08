@@ -44,9 +44,30 @@ currently the only one. Everything location-dependent lives in `REGIONS`
 
 ## Scoring
 
-0–10 per hour, weighted: swell size against the spot's working range (34%),
-wind direction and strength (30%), period (20%), swell direction relative to
-the shore (16%), plus a tide adjustment.
+Each hour gets a number 0–10 and a word from a six-step scale:
+
+| score | grade | meaning |
+|---|---|---|
+| 8.2+ | EPIC | best it gets here |
+| 6.5+ | GOOD | what you come here for |
+| 4.5+ | FAIR | most waves are rideable |
+| 3.0+ | POOR | rare rideable waves, you have to hunt |
+| 1.5+ | VERY POOR | you can paddle, you will not ride |
+| below | FLAT | nothing to catch |
+
+The number is a weighted sum: wave size against the spot's working range (34%),
+wind direction and strength (30%), period (20%), wave direction relative to the
+shore (16%), plus a tide adjustment.
+
+**Size also acts as a ceiling.** Without waves, good wind and a favourable
+direction cannot add up to a passing score — there is still nothing to ride.
+
+**Danger is separate.** Too much size for the break or storm gusts raise their
+own red banner instead of being folded into the quality score, because a wave
+that is too big and a wave that is too small are different problems.
+
+Thresholds were shifted on 8 Sep 2026 after a session at Nai Harn where
+conditions read as "very poor to poor" — the scale now reproduces that.
 
 ## Known limits
 

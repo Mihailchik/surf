@@ -357,8 +357,8 @@ const REG=()=>REGIONS[REGION];
 const regName=()=>REG().name[LANG]||REG().name.en;
 
 const SPOTS=[
- {id:'naiharn',nm:{en:'Nai Harn',ru:'Най Харн',th:'หาดในหาน'},lat:7.7756,lon:98.3035,facing:250,swellMin:1.35,swellMax:3.64,
-  shelter:.45,tide:'mid',pin:1,cam:null},
+ {id:'naiharn',nm:{en:'Nai Harn',ru:'Най Харн',th:'หาดในหาน'},lat:7.7756,lon:98.3035,facing:250,swellMin:1.05,swellMax:3.64,
+  shelter:.4,tide:'mid',pin:1,cam:null},
  {id:'kata',nm:{en:'Kata',ru:'Ката',th:'หาดกะตะ'},lat:7.8206,lon:98.2967,facing:270,swellMin:0.6,swellMax:3.08,
   shelter:.2,tide:'mid',pin:1,cam:{type:'rtsp',id:'2F8DfBS5',by:'SSS Dive & Surf'}},
  {id:'patong',nm:{en:'Patong',ru:'Патонг',th:'หาดป่าตอง'},lat:7.8950,lon:98.2830,facing:265,swellMin:0.9,swellMax:2.8,
@@ -708,11 +708,11 @@ const fmt=(v,d=1,dash='–')=>v==null||isNaN(v)?dash:v.toFixed(d);
    берутся от него. Порог берём от округлённого балла, иначе 5.6
    показывается как «6», но красится в цвет пятёрки. */
 const GRADES=[
-  {min:8.5, key:'gEpic',  color:'var(--go)'},
-  {min:7.0, key:'gGood',  color:'var(--ok)'},
-  {min:5.5, key:'gFair',  color:'var(--fair)'},
-  {min:4.0, key:'gWeak',  color:'var(--mid)'},
-  {min:2.0, key:'gPoor',  color:'var(--bad)'},
+  {min:8.2, key:'gEpic',  color:'var(--go)'},
+  {min:6.5, key:'gGood',  color:'var(--ok)'},
+  {min:4.5, key:'gFair',  color:'var(--fair)'},
+  {min:3.0, key:'gWeak',  color:'var(--mid)'},
+  {min:1.5, key:'gPoor',  color:'var(--bad)'},
   {min:-1,  key:'gFlat',  color:'var(--no)'}
 ];
 const gradeOf=v=>GRADES.find(g=>Math.round((v??0)*10)/10>=g.min)||GRADES[GRADES.length-1];
