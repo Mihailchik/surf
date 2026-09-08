@@ -100,7 +100,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .rowx .chev{transition:transform .2s;font-size:13px;color:var(--dim2);flex:0 0 auto;margin-left:2px}
 .rowbody{border-top:1px solid var(--line);background:var(--card2)}
 .rowbody .grid,.rowbody .tim,.rowbody .why,.rowbody .srcbox,.rowbody .nocam{background:var(--card)}
-.rowmap{display:flex;justify-content:flex-end;padding:8px 13px;background:var(--card)}
+.rowmap{display:none}
 .srow .map{margin-left:4px}
 /* На узком экране цифры важнее времени пика: пик прячем, чтобы
    волна/период/ветер помещались рядом с пином. */
@@ -197,6 +197,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .snote b{color:var(--dim)}
 .stab .rngrow td{color:var(--dim2);font-size:11px;border-top:0;padding-top:0}
 .stab .xrow td{color:var(--dim);border-top:1px dashed var(--line)}
+.spl{display:block;white-space:nowrap;line-height:1.5}
 .stab .xrow td:first-child{color:var(--tx)}
 .stat{border-top:1px solid var(--line);padding:8px 13px 10px}
 .stline{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--dim);padding:2.5px 0}
@@ -247,11 +248,11 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .daybody .grid,.daybody .tim,.daybody .why,.daybody .srcbox{background:var(--card)}
 .day .dn{flex:0 0 54px;color:var(--dim);font-size:11.5px}
 .day .dn b{display:block;color:var(--tx);font-size:12.5px;font-weight:650;text-transform:capitalize}
-.dbar{flex:1;height:22px;border-radius:6px;background:var(--card2);position:relative;overflow:hidden}
-.dbar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;font-style:normal;opacity:.85}
-.dbar em{position:absolute;left:7px;top:0;bottom:0;display:flex;align-items:center;font-style:normal;
-  font-size:10.5px;font-weight:650;color:#fff;font-variant-numeric:tabular-nums;
-  text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.dbar{flex:0 0 52px;height:8px;border-radius:4px;background:var(--card2);position:relative;overflow:hidden}
+.dbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;font-style:normal}
+.dinfo{flex:1;min-width:0;font-size:11.5px;color:var(--tx);font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dinfo span{color:var(--dim2);margin-left:5px}
 .dsc{flex:0 0 26px;text-align:right;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
 
 .ihead{padding:11px 13px 8px;font-size:11px;font-weight:700;color:var(--dim2);
@@ -1070,8 +1071,9 @@ function dayRows(sp,rows,n){
     return `<details class="dayx"><summary class="day">
       <div class="dn"><b>${dt.toLocaleDateString(LOCALE[LANG],{weekday:'short'})}</b>${
         dt.toLocaleDateString(LOCALE[LANG],{day:'numeric',month:'short'})}</div>
-      <div class="dbar"><i style="width:${Math.max(6,sc*10)}%;background:${scoreColor(sc)}"></i>
-        <em>${fmt(avg(rs.map(r=>r.swell)),1)} ${t('uM')} · ${fmt(avg(rs.map(r=>r.wind)),0)} ${t('uMs')} · ${t('peak')} ${bi.t.slice(11,16)}</em></div>
+      <div class="dbar"><i style="width:${Math.max(8,sc*10)}%;background:${scoreColor(sc)}"></i></div>
+      <div class="dinfo">${fmt(avg(rs.map(r=>r.swell)),1)} ${t('uM')} · ${fmt(avg(rs.map(r=>r.wind)),0)} ${t('uMs')}
+        <span>${t('peak')} ${bi.t.slice(11,16)}</span></div>
       <div class="dsc" style="color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
       </summary>${detail}</details>`}).join('')+'</div>';
 }
@@ -1166,7 +1168,8 @@ function sources(r){
       <td>${fmt(x.h,2)}</td><td>${fmt(x.p,1)}</td><td>${x.d==null?'–':Math.round(x.d)+'°'}</td></tr>`).join('');
   const totals=r.ww3?[{n:NAME['ww3'],v:r.ww3.h}]:[];
   // как каждая модель делит волну на свелл и ветровую: величины несравнимые
-  const splits=r.raw.wave.filter(x=>x.sw!=null).map(x=>`${NAME[x.m]} <b>${fmt(x.sw,2)}</b>/${fmt(x.swp,0)}с`);
+  const splits=r.raw.wave.filter(x=>x.sw!=null&&x.sw>0.01)
+    .map(x=>`<span class="spl">${NAME[x.m]} <b>${fmt(x.sw,2)}</b> / ${fmt(x.swp,0)} ${t('uS')}</span>`);
   const wind=r.raw.wind.map(x=>`<tr><td>${NAME[x.m]}</td>
       <td>${fmt(x.s,1)}</td><td>${x.d==null?'–':dirRu(x.d)}</td><td>${fmt(x.g,1)}</td></tr>`).join('');
   return `<details class="srcbox"><summary>${t('showSources')}</summary>
@@ -1179,7 +1182,7 @@ function sources(r){
       ${totals.length?`<tr class="xrow"><td>${t('totalWave')}</td>
         <td colspan="3">${totals.map(x=>`${x.n} <b>${fmt(x.v,2)}</b>`).join(' · ')}</td></tr>`:''}
       ${splits.length?`<tr class="xrow"><td>${t('swellPart')}</td>
-        <td colspan="3">${splits.join(' · ')}</td></tr>
+        <td colspan="3">${splits.join('')}</td></tr>
       <tr class="rngrow"><td></td><td colspan="3">${t('swellNote')}</td></tr>`:''}
       </tbody></table>
     <table class="stab"><thead><tr><th>${t('wind')}</th><th>${t('colSpeed')}</th><th>${t('colDir')}</th><th>${t('colGust')}</th></tr></thead>
@@ -1391,7 +1394,6 @@ function render(){
           </summary>
           <div class="rowbody">${camBlock(x.sp)}${timing(x.sp,x.rows,x.i)}${
             hourStrip(x.rows,x.i)}${why(x.sp,r)}${sources(r)}
-            <div class="rowmap">${mapLink(x.sp)}</div>
           </div></details>`}).join('')}</div>`
     : restSorted.map(x=>card(x.sp,x.rows,false)).join('');
   }
