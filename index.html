@@ -17,13 +17,13 @@
 :root{
   --bg:#f2f5f9; --card:#fff; --card2:#f7f9fc; --line:#e3e9f0;
   --tx:#0f1b2d; --dim:#4a5a6e; --dim2:#697a8e;
-  --go:#00996b; --ok:#5f9e12; --mid:#d98207; --bad:#d9432c; --no:#9aa8b8;
+  --go:#00a5a5; --ok:#3d9b2f; --fair:#9d7c05; --mid:#e07a12; --bad:#d43a26; --no:#9aa8b8;
   --acc:#0b7fc7; --shadow:0 1px 2px rgba(15,27,45,.05),0 2px 10px rgba(15,27,45,.05);
 }
 :root[data-theme="dark"]{
   --bg:#0a0e14; --card:#121822; --card2:#0e141d; --line:#1e2836;
   --tx:#e8eef6; --dim:#94a3b8; --dim2:#8494a8;
-  --go:#2ee6a8; --ok:#8fd94a; --mid:#f5c542; --bad:#e8734a; --no:#4a5568;
+  --go:#2fd8d8; --ok:#7ede4a; --fair:#f2d43a; --mid:#f79b3c; --bad:#f0604a; --no:#4a5568;
   --acc:#38b6ff; --shadow:none;
 }
 html,body{margin:0;padding:0;background:var(--bg);color:var(--tx)}
@@ -74,11 +74,18 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 /* Summary block. */
 .sum{margin:11px 0 4px;border-radius:14px;background:var(--card);border:1px solid var(--line);
   overflow:hidden;box-shadow:var(--shadow)}
-.sumtop{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:1px solid var(--line)}
-.vbig{font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1.05;
-  white-space:nowrap;flex:0 0 auto}
-@media (max-width:400px){.vbig{font-size:19px}}
-.vtx{font-size:12.5px;color:var(--dim);line-height:1.35}
+.sumtop{padding:11px 13px;border-bottom:1px solid var(--line)}
+.vhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.vscore{flex:0 0 auto;min-width:30px;height:30px;border-radius:9px;display:inline-flex;
+  align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.gsub{font-size:12.5px;color:var(--tx);line-height:1.3;margin:5px 0 2px}
+.gwhen{font-size:10.5px;color:var(--dim2);margin-left:auto;white-space:nowrap}
+.danger{margin:0;padding:9px 13px;font-size:12.5px;font-weight:600;
+  background:color-mix(in srgb,var(--bad) 12%,var(--card));color:var(--bad);
+  border-top:1px solid color-mix(in srgb,var(--bad) 30%,transparent)}
+.vbig{font-size:19px;font-weight:800;letter-spacing:-.4px;line-height:1.1;white-space:nowrap}
+@media (max-width:360px){.vbig{font-size:17px}}
+.vtx{font-size:12px;color:var(--dim);line-height:1.4}
 .vtx b{color:var(--tx);font-weight:650}
 .srow{display:flex;align-items:center;gap:8px;padding:7px 13px;border-bottom:1px solid var(--line);
   cursor:pointer;font-variant-numeric:tabular-nums}
@@ -461,6 +468,22 @@ const I18N={
   limited:'limit',
   totalWave:'total wave',
   swellPart:'swell part', swellNote:'Models disagree on what counts as swell: NOAA calls only a 12 s groundswell a swell, DWD counts a 5 s wave as one. Those numbers are not comparable, so the median above uses total wave height, where the models agree within 22%.',
+  gFlat:'FLAT',
+  gPoor:'VERY POOR',
+  gWeak:'POOR',
+  gFair:'FAIR',
+  gGood:'GOOD',
+  gEpic:'EPIC',
+  gFlatSub:'nothing to catch',
+  gPoorSub:'you can paddle, you will not ride',
+  gWeakSub:'rare rideable waves, you have to hunt',
+  gFairSub:'most waves are rideable',
+  gGoodSub:'what you come here for',
+  gEpicSub:'best it gets here',
+  dBig:'too big for this break, {0} m',
+  dWind:'storm gusts, {0} m/s',
+  danger:'careful',
+  scoreNow:'right now', scoreFor:'for {0}',
   srcWave:'Waves · Open-Meteo (4 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
@@ -528,6 +551,22 @@ const I18N={
   limited:'лимит',
   totalWave:'волна всего',
   swellPart:'доля свелла', swellNote:'Модели по-разному делят волну: NOAA зовёт свеллом только накат с периодом 12 с, DWD считает свеллом волну с периодом 5 с. Эти числа несравнимы, поэтому медиана выше берётся по суммарной волне, где модели сходятся в пределах 22%.',
+  gFlat:'ПЛОСКО',
+  gPoor:'ОЧЕНЬ СЛАБО',
+  gWeak:'СЛАБО',
+  gFair:'СРЕДНЕ',
+  gGood:'ХОРОШО',
+  gEpic:'ОТЛИЧНО',
+  gFlatSub:'ловить нечего',
+  gPoorSub:'грести можно, проехать нет',
+  gWeakSub:'редкие рабочие волны, надо охотиться',
+  gFairSub:'большинство волн едут',
+  gGoodSub:'то, ради чего сюда едут',
+  gEpicSub:'лучшее, что тут бывает',
+  dBig:'для этого спота слишком много, {0} м',
+  dWind:'штормовые порывы, {0} м/с',
+  danger:'осторожно',
+  scoreNow:'сейчас', scoreFor:'на {0}',
   srcWave:'Волна · Open-Meteo (4 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
@@ -595,6 +634,22 @@ const I18N={
   limited:'เกินโควตา',
   totalWave:'คลื่นรวม',
   swellPart:'ส่วน swell', swellNote:'โมเดลแบ่งคลื่นต่างกัน NOAA นับเฉพาะคลื่นคาบ 12 วิ. เป็น swell ส่วน DWD นับคลื่นคาบ 5 วิ. ด้วย ตัวเลขจึงเทียบกันไม่ได้ ค่ากลางด้านบนจึงใช้ความสูงคลื่นรวม ซึ่งโมเดลตรงกันในระยะ 22%',
+  gFlat:'ราบเรียบ',
+  gPoor:'แย่มาก',
+  gWeak:'คลื่นน้อย',
+  gFair:'พอใช้',
+  gGood:'ดี',
+  gEpic:'ดีเยี่ยม',
+  gFlatSub:'ไม่มีคลื่นให้เล่น',
+  gPoorSub:'พายได้ แต่ขี่ไม่ได้',
+  gWeakSub:'มีคลื่นใช้ได้บ้าง ต้องรอ',
+  gFairSub:'คลื่นส่วนใหญ่เล่นได้',
+  gGoodSub:'คุ้มค่าที่จะมา',
+  gEpicSub:'ดีที่สุดเท่าที่นี่จะมีได้',
+  dBig:'ใหญ่เกินไปสำหรับหาดนี้ {0} ม.',
+  dWind:'ลมกระโชกแรง {0} m/s',
+  danger:'ระวัง',
+  scoreNow:'ตอนนี้', scoreFor:'เวลา {0}',
   srcWave:'คลื่น · Open-Meteo (4 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -649,10 +704,30 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const angDiff=(a,b)=>{let d=Math.abs(a-b)%360;return d>180?360-d:d};
 const dirRu=d=>t('dirs')[Math.round(d/22.5)%16];
 const fmt=(v,d=1,dash='–')=>v==null||isNaN(v)?dash:v.toFixed(d);
-// цвет считаем от округлённого балла: иначе 5.6 показывается как «6»,
-// но красится в цвет пятёрки
-const scoreColor=v=>{const s=Math.round(v??0);
-  return s>=8?'var(--go)':s>=6?'var(--ok)':s>=4?'var(--mid)':s>=2?'var(--bad)':'var(--no)';};
+/* Шесть ступеней качества. Балл считается как раньше, слово и цвет
+   берутся от него. Порог берём от округлённого балла, иначе 5.6
+   показывается как «6», но красится в цвет пятёрки. */
+const GRADES=[
+  {min:8.5, key:'gEpic',  color:'var(--go)'},
+  {min:7.0, key:'gGood',  color:'var(--ok)'},
+  {min:5.5, key:'gFair',  color:'var(--fair)'},
+  {min:4.0, key:'gWeak',  color:'var(--mid)'},
+  {min:2.0, key:'gPoor',  color:'var(--bad)'},
+  {min:-1,  key:'gFlat',  color:'var(--no)'}
+];
+const gradeOf=v=>GRADES.find(g=>Math.round((v??0)*10)/10>=g.min)||GRADES[GRADES.length-1];
+const scoreColor=v=>gradeOf(v).color;
+const gradeWord=v=>t(gradeOf(v).key);
+
+/* Опасность считается отдельно от качества: слишком большая волна
+   для спота или штормовые порывы. Это не низкий балл, а отдельный флаг. */
+function dangerOf(sp,r){
+  if(!r) return null;
+  const eff=r.swell==null?null:r.swell*(1-sp.shelter*0.55);
+  if(eff!=null && eff>sp.swellMax) return {key:'dBig', v:fmt(eff,1)};
+  if(r.gust!=null && r.gust>=14) return {key:'dWind', v:fmt(r.gust,0)};
+  return null;
+}
 
 /* Tropics: sunrise ~06:15, sunset ~18:35 year round. */
 const DAY_FROM=6, DAY_TO=18;   
@@ -683,10 +758,17 @@ function scoreHour(sp,h){
   const {swell:sw,period:per,sdir,wind:wsp,wdir,tide}=h;
   if(sw==null) return null;
   const eff=sw*(1-sp.shelter*0.55);            // how much gets past the headlands
+  /* Размер. Прежняя версия давала 7+ уже на нижней границе диапазона,
+     из-за чего еле живая волна выглядела приличной. Теперь у минимума
+     это двойка, десятка только около оптимума. */
+  const OPT=0.45;
   let size;
-  if(eff<sp.swellMin) size=clamp(eff/sp.swellMin,0,1)*4;
-  else if(eff>sp.swellMax) size=clamp(1-(eff-sp.swellMax)/1.2,0,1)*7+3;
-  else{const rel=(eff-sp.swellMin)/(sp.swellMax-sp.swellMin); size=10-Math.abs(rel-0.55)*5}
+  if(eff<sp.swellMin) size=clamp(eff/sp.swellMin,0,1)*2;
+  else if(eff>sp.swellMax) size=clamp(1-(eff-sp.swellMax)/1.2,0,1)*4;
+  else{
+    const rel=(eff-sp.swellMin)/(sp.swellMax-sp.swellMin);
+    size = rel<=OPT ? 2+8*(rel/OPT) : 10-6*((rel-OPT)/(1-OPT));
+  }
   const period=per==null?5:clamp((per-3.5)/8,0,1)*10;
   const dirS=clamp(1-(sdir==null?45:angDiff(sdir,sp.facing))/95,0,1)*10;
   const wOff=angDiff(wdir==null?sp.facing:wdir,(sp.facing+180)%360);
@@ -701,7 +783,11 @@ function scoreHour(sp,h){
     else if(sp.tide==='low') tideAdj=(0.55-tide)*1.7;
     else if(sp.tide==='mid') tideAdj=(0.5-Math.abs(tide-0.55))*1.6;
   }
-  return clamp(size*0.34+period*0.20+dirS*0.16+wind*0.30+tideAdj,0,10);
+  const raw=size*0.34+period*0.20+dirS*0.16+wind*0.30+tideAdj;
+  /* Размер работает и как потолок. Без волны хороший ветер и удачное
+     направление не должны давать четвёрку: кататься всё равно не на чем. */
+  const cap = eff>=sp.swellMin ? 10 : clamp(eff/sp.swellMin,0,1)*5+0.4;
+  return clamp(Math.min(raw,cap),0,10);
 }
 
 async function jget(u,opt){
@@ -1226,7 +1312,8 @@ function render(){
 
   const top=tops[0], sc=top.pick.score??0;
   const bi=bestDaylight(top.rows,top.i,30)||top.pick;
-  const word=sc>=8?t('go'):sc>=6?t('ok'):sc>=4?t('weak'):t('no');
+  const word=gradeWord(sc);
+  const dng=dangerOf(top.sp,top.pick);
   const today=new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,10);
   const when=bi.t.slice(0,10)===today?t('today'):t('tomorrow');
 
@@ -1249,9 +1336,18 @@ function render(){
     </div>`}).join('');
 
   document.getElementById('summary').innerHTML=(TAB==='island'||TAB==='d7')?'':`<div class="sum">
-    <div class="sumtop"><div class="vbig" style="color:${scoreColor(sc)}">${word}</div>
-      <div class="vtx">${dark?t('darkNow'):''}${t('bestIs','<b>'+nameOf(top.sp)+'</b>')}<br>
-      ${t('windowAt',when,'<b>'+bi.t.slice(11,16)+'</b>')} · ${fmt(bi.swell,1)} ${t('uM')} · ${fmt(bi.wind,0)} ${t('uMs')}</div></div>
+    <div class="sumtop">
+      <div class="vhead">
+        <span class="vscore" style="background:color-mix(in srgb,${scoreColor(sc)} 15%,transparent);
+          color:${scoreColor(sc)}">${sc.toFixed(0)}</span>
+        <span class="vbig" style="color:${scoreColor(sc)}">${word}</span>
+        <span class="gwhen">${dark?t('scoreFor',bi.t.slice(11,16)):t('scoreNow')}</span>
+      </div>
+      <div class="gsub">${t(gradeOf(sc).key+'Sub')}</div>
+      <div class="vtx">${dark?t('darkNow'):''}${t('bestIs','<b>'+nameOf(top.sp)+'</b>')},
+        ${t('windowAt',when,'<b>'+bi.t.slice(11,16)+'</b>')} · ${fmt(bi.swell,1)} ${t('uM')} · ${fmt(bi.wind,0)} ${t('uMs')}</div>
+    </div>
+    ${dng?`<div class="danger">⚠ ${t('danger')}: ${t(dng.key,dng.v)}</div>`:''}
     ${rowsHtml}</div>`;
 
   if(TAB!=='island') document.getElementById('restlbl').textContent=
