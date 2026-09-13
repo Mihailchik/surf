@@ -1,7 +1,7 @@
 # Surf
 
-Wave, wind, tide and live cams for west-coast beaches. One page, one question:
-is it worth going right now?
+Wave, wind, tide and live cams for Andaman Sea beaches in Phuket and Khao Lak.
+One page, one question: is it worth going right now?
 
 **https://surf.voidstudio.top**
 
@@ -38,9 +38,17 @@ camera pointing at the water.
 
 ## Regions
 
-The region comes from the URL hash: `/#phuket`. Phuket is the default and
-currently the only one. Everything location-dependent lives in `REGIONS`
-(coordinates, timezone, daylight hours); beaches live in `SPOTS`.
+Two regions, switched from the header or by URL hash: `/#phuket` (default) and
+`/#khaolak`. Everything location-dependent lives in `REGIONS` (coordinates for
+the weather bar and point sources, timezone, daylight hours). Beaches live in
+`ALL_SPOTS` with a `region` field; spots without one belong to Phuket. Each
+region keeps its own data cache.
+
+**Khao Lak** spots: Khuk Khak (Memories Beach Bar, the main learner break),
+Cape Pakarang (reef breaks that need more size), Bang Niang, Nang Thong, Pak
+Weep and Bang Sak. Coordinates come from OpenStreetMap; profiles are first
+estimates from local surf guides and have not been checked against sessions.
+No public webcam points at the water there.
 
 ## Scoring
 

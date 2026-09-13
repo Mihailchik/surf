@@ -43,7 +43,13 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   max-width:560px;margin:0 auto}
 .logo{font-size:15px;font-weight:750;letter-spacing:-.3px;white-space:nowrap;flex:0 0 auto;
   display:flex;align-items:baseline;gap:6px}
-.logo .reg{font-size:11px;font-weight:600;color:var(--acc);letter-spacing:0}
+.logo{position:relative}
+.logo .reg{font:inherit;font-size:11px;font-weight:650;color:var(--acc);letter-spacing:0;background:none;border:0;
+  padding:4px 2px;cursor:pointer}
+.regmenu{position:absolute;top:100%;left:40px;z-index:60;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;box-shadow:0 6px 24px rgba(15,27,45,.14);padding:4px;min-width:130px}
+.regmenu a{display:block;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:600;color:var(--tx);text-decoration:none}
+.regmenu a.on{background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc)}
 .hr2{display:flex;align-items:center;gap:6px;flex:0 0 auto}
 .upd{font-size:10px;color:var(--dim2);font-variant-numeric:tabular-nums;white-space:nowrap;
   display:flex;align-items:center;gap:3px}
@@ -350,7 +356,9 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 /* Location-dependent settings. Region comes from the URL hash, /#phuket. */
 const REGIONS={
   phuket:{ name:{en:'Phuket',ru:'Пхукет',th:'ภูเก็ต'}, tz:'Asia/Bangkok',
-    dayFrom:6, dayTo:18, wxLat:7.89, wxLon:98.30 }
+    dayFrom:6, dayTo:18, wxLat:7.89, wxLon:98.30 },
+  khaolak:{ name:{en:'Khao Lak',ru:'Као Лак',th:'เขาหลัก'}, tz:'Asia/Bangkok',
+    dayFrom:6, dayTo:18, wxLat:8.70, wxLon:98.24 }
 };
 let REGION='phuket';
 {
@@ -360,7 +368,7 @@ let REGION='phuket';
 const REG=()=>REGIONS[REGION];
 const regName=()=>REG().name[LANG]||REG().name.en;
 
-const SPOTS=[
+const ALL_SPOTS=[
  {id:'naiharn',nm:{en:'Nai Harn',ru:'Най Харн',th:'หาดในหาน'},lat:7.7756,lon:98.3035,facing:250,swellMin:1.05,swellMax:3.64,
   shelter:.4,tide:'mid',pin:1,cam:null},
  {id:'kata',nm:{en:'Kata',ru:'Ката',th:'หาดกะตะ'},lat:7.8206,lon:98.2967,facing:270,swellMin:0.6,swellMax:3.08,
@@ -386,8 +394,25 @@ const SPOTS=[
  {id:'naithon',nm:{en:'Nai Thon',ru:'Найтон',th:'หาดในทอน'},lat:8.0800,lon:98.2600,facing:270,swellMin:0.75,swellMax:2.8,
   shelter:.3,tide:'mid',cam:null},
  {id:'naiyang',nm:{en:'Nai Yang',ru:'Най Янг',th:'หาดในยาง'},lat:8.0930,lon:98.2960,facing:270,swellMin:0.6,swellMax:2.1,
-  shelter:.55,tide:'high',cam:null}
+  shelter:.55,tide:'high',cam:null},
+ /* Khao Lak. Coordinates from OpenStreetMap. Profiles are first estimates
+    from local surf guides: long, gently sloping sand beaches for learners,
+    reef breaks around Cape Pakarang that need more size. */
+ {id:'khukkhak',region:'khaolak',nm:{en:'Khuk Khak (Memories)',ru:'Кук Как (Memories)',th:'หาดคึกคัก'},lat:8.7135,lon:98.2363,facing:265,swellMin:0.6,swellMax:2.8,
+  shelter:.15,tide:'mid',pin:1,cam:null},
+ {id:'pakarang',region:'khaolak',nm:{en:'Cape Pakarang',ru:'Мыс Пакаранг',th:'แหลมปะการัง'},lat:8.7290,lon:98.2223,facing:250,swellMin:1.0,swellMax:3.2,
+  shelter:.1,tide:'mid',pin:1,cam:null},
+ {id:'bangniang',region:'khaolak',nm:{en:'Bang Niang',ru:'Банг Ньянг',th:'หาดบางเนียง'},lat:8.6668,lon:98.2435,facing:265,swellMin:0.6,swellMax:2.8,
+  shelter:.15,tide:'any',pin:1,cam:null},
+ {id:'nangthong',region:'khaolak',nm:{en:'Nang Thong',ru:'Нанг Тонг',th:'หาดนางทอง'},lat:8.6490,lon:98.2463,facing:262,swellMin:0.7,swellMax:2.5,
+  shelter:.3,tide:'mid',cam:null},
+ {id:'pakweep',region:'khaolak',nm:{en:'Pak Weep',ru:'Пак Вип',th:'หาดปากวีป'},lat:8.7384,lon:98.2422,facing:268,swellMin:0.7,swellMax:2.8,
+  shelter:.2,tide:'any',cam:null},
+ {id:'bangsak',region:'khaolak',nm:{en:'Bang Sak',ru:'Банг Сак',th:'หาดบางสัก'},lat:8.7688,lon:98.2623,facing:272,swellMin:0.7,swellMax:2.8,
+  shelter:.15,tide:'any',cam:null}
 ];
+const spotsOf=r=>ALL_SPOTS.filter(x=>(x.region||'phuket')===r);
+let SPOTS=spotsOf(REGION);
 
 /* Ocean watchpoints. pass/lag measured by comparing the forecast
    behind the Nicobars with the forecast at the shore.             */
@@ -444,7 +469,7 @@ const I18N={
   agreeMid:'sources disagree by {0}×', agreeOk:'sources agree',
   bySource:'by source: wave {0}–{1} m, wind {2}–{3} m/s',
   bestWindow:'best window {0} {1}, {2}/10',
-  footer:'<b>Wave:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Plus NOAA WaveWatch III for comparison.<br><b>Wind:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br><b>Cameras:</b> Kata SSS Dive &amp; Surf, Patong Patong Tower, Karon Marina Phuket Resort.<br>The wave model grid is about 9 km, so neighbouring beaches share a node. The difference comes from each spot profile. Forecast runs 10 days.',
+  footer:'<b>Wave:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Plus NOAA WaveWatch III for comparison.<br><b>Wind:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br>The wave model grid is about 9 km, so neighbouring beaches share a node. The difference comes from each spot profile. Forecast runs 10 days.',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'clear',1:'mostly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',
    51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'heavy rain',66:'rain',67:'heavy rain',
@@ -462,7 +487,7 @@ const I18N={
   ocWind:'strongest wind {0}', ocStorm:'storm-force',
   iOceanNote:'About 41% of ocean swell gets past the Andaman and Nicobar islands, and the period drops from 10 to 5–6 seconds. The arrival figure accounts for that, the ratio was measured.',
   iSeasonText:'The season on the west coast runs May to October, driven by the southwest monsoon. Waves here are built by local wind rather than distant swell, so wind matters most. November to April is flat.',
-  iTyphoonText:'Phuket sits outside the typhoon belt. Cyclones form in the Bay of Bengal and the western Pacific, not in the Andaman Sea. A cyclone in the bay can still push extra swell here, and that shows up in the ocean points above as a jump in wind and wave. There is no cyclone feed here: the open sources GDACS and JTWC block browsers, and inventing a warning is worse than showing none.',
+  iTyphoonText:'This coast sits outside the typhoon belt. Cyclones form in the Bay of Bengal and the western Pacific, not in the Andaman Sea. A cyclone in the bay can still push extra swell here, and that shows up in the ocean points above as a jump in wind and wave. There is no cyclone feed here: the open sources GDACS and JTWC block browsers, and inventing a warning is worse than showing none.',
   licence:"Data: Open-Meteo and MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a>. NOAA WaveWatch III via PacIOOS, public domain. Camera streams belong to their owners. Forecasts can be wrong, do not rely on this alone.",
   noConnection:'No connection, data did not load.',
   staleData:'No connection. Data below is from {0} and may be out of date.',
@@ -488,6 +513,7 @@ const I18N={
   dWind:'storm gusts, {0} m/s',
   danger:'careful',
   scoreNow:'right now', scoreFor:'for {0}',
+  camsLabel:'Cameras',
   srcWave:'Waves · Open-Meteo (4 models)', srcWind:'Wind · Open-Meteo (5 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
@@ -527,7 +553,7 @@ const I18N={
   agreeMid:'источники расходятся в {0} раза', agreeOk:'источники сходятся',
   bySource:'по источникам: волна {0}–{1} м, ветер {2}–{3} м/с',
   bestWindow:'лучшее окно {0} {1}, {2}/10',
-  footer:'<b>Волна:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Плюс NOAA WaveWatch III для сверки.<br><b>Ветер:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br><b>Камеры:</b> Ката SSS Dive &amp; Surf, Патонг Patong Tower, Карон Marina Phuket Resort.<br>Сетка волновой модели около 9 км, поэтому соседние пляжи берут один узел. Разницу даёт профиль спота. Прогноз на 10 дней.',
+  footer:'<b>Волна:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Плюс NOAA WaveWatch III для сверки.<br><b>Ветер:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br>Сетка волновой модели около 9 км, поэтому соседние пляжи берут один узел. Разницу даёт профиль спота. Прогноз на 10 дней.',
   dirs:['С','ССВ','СВ','ВСВ','В','ВЮВ','ЮВ','ЮЮВ','Ю','ЮЮЗ','ЮЗ','ЗЮЗ','З','ЗСЗ','СЗ','ССЗ'],
   wmo:{0:'ясно',1:'почти ясно',2:'переменная',3:'пасмурно',45:'туман',48:'туман',
    51:'морось',53:'морось',55:'морось',61:'дождь',63:'дождь',65:'ливень',66:'дождь',67:'ливень',
@@ -545,7 +571,7 @@ const I18N={
   ocWind:'сильнейший ветер {0}', ocStorm:'штормовой',
   iOceanNote:'Через Андаманские и Никобарские острова проходит около 41% океанского свелла, период падает с 10 до 5–6 секунд. Цифра прихода это учитывает, коэффициент измерен.',
   iSeasonText:'Сезон на западном побережье с мая по октябрь, его гонит юго-западный муссон. Волна тут рождается местным ветром, а не приходит дальним свеллом, поэтому ветер важнее всего. С ноября по апрель штиль.',
-  iTyphoonText:'Пхукет вне тайфунного пояса. Циклоны рождаются в Бенгальском заливе и западной части Тихого океана, а не в Андаманском море. Циклон в заливе может подогнать лишний свелл, и это видно в океанских точках выше как скачок ветра и волны. Своей ленты по циклонам тут нет: открытые источники GDACS и JTWC не пускают браузер, а выдумывать предупреждение хуже, чем не показывать его.',
+  iTyphoonText:'Это побережье вне тайфунного пояса. Циклоны рождаются в Бенгальском заливе и западной части Тихого океана, а не в Андаманском море. Циклон в заливе может подогнать лишний свелл, и это видно в океанских точках выше как скачок ветра и волны. Своей ленты по циклонам тут нет: открытые источники GDACS и JTWC не пускают браузер, а выдумывать предупреждение хуже, чем не показывать его.',
   licence:"Данные: Open-Meteo и MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a>. NOAA WaveWatch III через PacIOOS, общественное достояние. Камеры принадлежат владельцам. Прогноз может врать, не полагайся на него одного.",
   noConnection:'Нет связи, данные не загрузились.',
   staleData:'Нет связи. Данные ниже от {0}, могли устареть.',
@@ -571,6 +597,7 @@ const I18N={
   dWind:'штормовые порывы, {0} м/с',
   danger:'осторожно',
   scoreNow:'сейчас', scoreFor:'на {0}',
+  camsLabel:'Камеры',
   srcWave:'Волна · Open-Meteo (4 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
@@ -610,7 +637,7 @@ const I18N={
   agreeMid:'แหล่งข้อมูลต่างกัน {0} เท่า', agreeOk:'แหล่งข้อมูลตรงกัน',
   bySource:'ตามแหล่งข้อมูล: คลื่น {0}–{1} ม. · ลม {2}–{3} m/s',
   bestWindow:'ช่วงที่ดีที่สุด {0} {1} · {2}/10',
-  footer:'<b>คลื่น:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM และ NOAA WaveWatch III สำหรับเทียบ<br><b>ลม:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br><b>กล้อง:</b> กะตะ SSS Dive &amp; Surf, ป่าตอง Patong Tower, กะรน Marina Phuket Resort<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะหาด พยากรณ์ 10 วัน',
+  footer:'<b>คลื่น:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM และ NOAA WaveWatch III สำหรับเทียบ<br><b>ลม:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะหาด พยากรณ์ 10 วัน',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'ท้องฟ้าแจ่มใส',1:'แจ่มใสเป็นส่วนใหญ่',2:'มีเมฆบางส่วน',3:'เมฆมาก',45:'หมอก',48:'หมอก',
    51:'ฝนละออง',53:'ฝนละออง',55:'ฝนละออง',61:'ฝนตก',63:'ฝนตก',65:'ฝนตกหนัก',66:'ฝนตก',67:'ฝนตกหนัก',
@@ -628,7 +655,7 @@ const I18N={
   ocWind:'ลมแรงสุด {0}', ocStorm:'ระดับพายุ',
   iOceanNote:'คลื่นจากมหาสมุทรผ่านหมู่เกาะอันดามันและนิโคบาร์มาถึงชายฝั่งราว 41% และคาบลดจาก 10 วิ. เหลือ 5–6 วิ. ตัวเลขที่แสดงคำนวณจากค่านี้แล้ว',
   iSeasonText:'ฤดูเซิร์ฟฝั่งตะวันตกคือพฤษภาคมถึงตุลาคม ขับด้วยมรสุมตะวันตกเฉียงใต้ คลื่นที่นี่เกิดจากลมท้องถิ่นเป็นหลัก ลมจึงสำคัญกว่าที่อื่น ช่วงพฤศจิกายนถึงเมษายนน้ำนิ่ง',
-  iTyphoonText:'ภูเก็ตอยู่นอกแนวไต้ฝุ่น พายุหมุนก่อตัวในอ่าวเบงกอลและแปซิฟิกตะวันตก ไม่ใช่ทะเลอันดามัน พายุในอ่าวเบงกอลอาจส่งคลื่นเพิ่มมาได้ ซึ่งจะเห็นได้จากจุดสังเกตด้านบน ที่นี่ไม่มีฟีดพายุโดยตรง เพราะแหล่งข้อมูลเปิด (GDACS, JTWC) ไม่อนุญาตให้เบราว์เซอร์เข้าถึง',
+  iTyphoonText:'ชายฝั่งนี้อยู่นอกแนวไต้ฝุ่น พายุหมุนก่อตัวในอ่าวเบงกอลและแปซิฟิกตะวันตก ไม่ใช่ทะเลอันดามัน พายุในอ่าวเบงกอลอาจส่งคลื่นเพิ่มมาได้ ซึ่งจะเห็นได้จากจุดสังเกตด้านบน ที่นี่ไม่มีฟีดพายุโดยตรง เพราะแหล่งข้อมูลเปิด (GDACS, JTWC) ไม่อนุญาตให้เบราว์เซอร์เข้าถึง',
   licence:"ข้อมูล: Open-Meteo และ MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III ผ่าน PacIOOS สาธารณสมบัติ กล้องเป็นของเจ้าของแต่ละราย พยากรณ์อาจคลาดเคลื่อน",
   noConnection:'ไม่มีการเชื่อมต่อ โหลดข้อมูลไม่ได้',
   staleData:'ไม่มีการเชื่อมต่อ ข้อมูลด้านล่างจาก {0} อาจไม่เป็นปัจจุบัน',
@@ -654,6 +681,7 @@ const I18N={
   dWind:'ลมกระโชกแรง {0} m/s',
   danger:'ระวัง',
   scoreNow:'ตอนนี้', scoreFor:'เวลา {0}',
+  camsLabel:'กล้อง',
   srcWave:'คลื่น · Open-Meteo (4 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
@@ -813,7 +841,7 @@ async function loadWW3(){
   const pad=n=>String(n).padStart(2,'0');
   const iso=d=>`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:00:00Z`;
   const t0=iso(new Date()), t1=iso(new Date(Date.now()+6*864e5));
-  const idx=`%5B(${t0}):1:(${t1})%5D%5B(0.0)%5D%5B(7.9)%5D%5B(98.3)%5D`;
+  const idx=`%5B(${t0}):1:(${t1})%5D%5B(0.0)%5D%5B(${REG().wxLat})%5D%5B(${REG().wxLon})%5D`;
   const url='https://pae-paha.pacioos.hawaii.edu/erddap/griddap/ww3_global.json?'+
     ['Thgt','Tper','Tdir'].map(v=>v+idx).join(',');
   const j=await jget(url);
@@ -872,7 +900,7 @@ async function fetchExtra(){
         'wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,is_day'+
         '&daily=sunrise,sunset,uv_index_max,temperature_2m_max,temperature_2m_min')),
     safe('metno',t('srcMet'),()=>
-      jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=7.87&lon=98.29')),
+      jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+REG().wxLat.toFixed(2)+'&lon='+REG().wxLon.toFixed(2))),
     safe('ww3',t('srcWW3'),loadWW3),
     safe('ocean',t('srcOcean'),()=>jget(
       'https://marine-api.open-meteo.com/v1/marine?latitude='+OCEAN.map(o=>o.lat).join(',')+
@@ -1218,7 +1246,8 @@ function sources(r){
 /* Island overview. Built only on measurable values: wave anomaly
    against its own 10-day median, and the ocean watchpoints.        */
 function islandReport(){
-  const ref=DATA.kata;
+  // reference beach for the region: first pinned one
+  const ref=DATA[(SPOTS.find(x=>x.pin)||SPOTS[0]).id];
   const days={};
   ref.forEach(r=>{ if(isDay(r)&&r.swell!=null) (days[r.t.slice(0,10)]=days[r.t.slice(0,10)]||[]).push(r); });
   const keys=Object.keys(days).sort();
@@ -1420,7 +1449,9 @@ function render(){
 
   document.getElementById('upd').innerHTML=statusPill()+' '+t('updAt',
     new Date().toLocaleTimeString(LOCALE[LANG],{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit'}));
-  document.getElementById('src').innerHTML=t('footer')+`<div class="lic">${t('licence')}</div>`;
+  const cams=SPOTS.filter(x=>x.cam).map(x=>`${nameOf(x)} ${x.cam.by}`).join(', ');
+  document.getElementById('src').innerHTML=t('footer')+
+    (cams?`<br><b>${t('camsLabel')}:</b> ${cams}.`:'')+`<div class="lic">${t('licence')}</div>`;
 }
 
 /* Last good response is cached. Models update twice a day, so reusing data
@@ -1433,11 +1464,11 @@ function cacheSave(d){
     // raw per-model values are ~90% of the weight and are rebuilt on refresh
     const slim={};
     for(const k in d) slim[k]=d[k].map(({raw,...rest})=>rest);
-    LS.set('data_cache',JSON.stringify({at:Date.now(),weather:WEATHER,ocean:OCEANDATA,data:slim}));
+    LS.set('data_cache_'+REGION,JSON.stringify({at:Date.now(),weather:WEATHER,ocean:OCEANDATA,data:slim}));
   }catch{ /* over quota, run without cache */ }
 }
 function cacheLoad(){
-  try{ return JSON.parse(LS.get('data_cache')||'null') }catch{ return null }
+  try{ return JSON.parse(LS.get('data_cache_'+REGION)||'null') }catch{ return null }
 }
 
 async function boot(force){
@@ -1531,10 +1562,14 @@ addEventListener('resize',syncHeights);
 function applyLang(){
   document.documentElement.lang=LANG;
   document.getElementById('logo').innerHTML=
-    `Surf<span class="reg">${regName()}</span>`;
+    `Surf<button class="reg" id="regbtn" aria-haspopup="true">${regName()} ▾</button>
+     <div class="regmenu" id="regmenu" hidden>${Object.keys(REGIONS).map(k=>
+       `<a href="#${k}" class="${k===REGION?'on':''}">${REGIONS[k].name[LANG]||REGIONS[k].name.en}</a>`).join('')}</div>`;
+  document.getElementById('regbtn').onclick=e=>{e.stopPropagation();
+    const m=document.getElementById('regmenu'); m.hidden=!m.hidden;};
   document.title='Surf · '+regName();
   const map={now:'now',island:'island',d7:'d7'};
-  document.querySelectorAll('.tab').forEach(b=>b.textContent=t(map[b.dataset.t]));
+  document.querySelectorAll('.tab').forEach(b=>b.textContent=b.dataset.t==='island'?regName():t(map[b.dataset.t]));
   document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
 applyLang();
@@ -1552,9 +1587,11 @@ setInterval(()=>boot(true),1800000);
 setInterval(()=>document.querySelectorAll('.camimg').forEach(img=>{
   img.src=`https://imgproxy.windy.com/_/preview/plain/current/${img.dataset.cam}/original.jpg?v=${Date.now()}`;
 }),45000);
+document.addEventListener('click',()=>{const m=document.getElementById('regmenu'); if(m) m.hidden=true;});
 addEventListener('hashchange',()=>{
   const h=(location.hash||'').replace('#','').toLowerCase();
-  if(REGIONS[h]&&h!==REGION){ REGION=h; DATA=null; applyLang(); boot(true); }
+  if(REGIONS[h]&&h!==REGION){ REGION=h; SPOTS=spotsOf(REGION); DATA=null; WEATHER=null; OCEANDATA=null;
+    PICK=null; document.getElementById('main').innerHTML=''; applyLang(); boot(true); }
 });
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)boot()});
 </script>
