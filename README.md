@@ -131,6 +131,10 @@ remove it.
 **Visit counter** — hits.sh, a third-party service. It sees visitors' IP
 addresses, as any external analytics does. Remove the `.hits` block to drop it.
 
+**Google Analytics** — tag `G-72CS4WJ571` in `<head>`, page views only. Google
+sets cookies and sees visitors' IP addresses. There is no consent banner; one
+would be needed before targeting EU visitors.
+
 ### What could actually go wrong
 
 Not fines — none of these providers issue them. The realistic outcomes are:
