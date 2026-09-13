@@ -30,10 +30,12 @@ and the page says so.
 Sources load independently with a 15 s timeout. A failed one does not break the
 page — it is marked in the header (`sources 7/8`) and drops out of the median.
 
-The slowest part is not traffic but Open-Meteo's compute time: a 10-day,
-four-model wave request for all spots takes about 2.4 s, a 3-day one about
-0.8 s. So a 3-day request runs alongside the full one and the page is drawn on
-whichever arrives first, then redrawn with 10 days and the secondary sources.
+The slowest part is not traffic but Open-Meteo's compute time: 1.4-2.2 s per
+request, whatever the size. The page shows what arrives, as it arrives: the
+weather bar as soon as its request answers, then beaches from a 2-day request
+(now and the next daylight window), then the full 10 days and the secondary
+sources. Camera players start only after the data is on screen, so they do not
+compete with it on a phone connection.
 Results are cached in the browser for 10 minutes.
 
 ### Cameras

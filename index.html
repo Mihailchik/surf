@@ -878,8 +878,8 @@ function spotPoints(days=10){
   return {pts, base:'latitude='+pts.map(p=>p.split(',')[0]).join(',')+
     '&longitude='+pts.map(p=>p.split(',')[1]).join(',')+'&timezone=Asia%2FBangkok&forecast_days='+days};
 }
-/* Open-Meteo takes ~2.4s to compute the 10-day wave run for all points and
-   models, but ~0.8s for 3 days. The first paint only needs today, so a short
+/* Open-Meteo needs ~1.8-2.2s for the 10-day run and ~1.4s for 2 days. The
+   first screen only needs now and the next daylight window, so a 2-day
    request goes first and the full 10 days replaces it when it arrives. */
 async function fetchCore(days=10){
   const {base}=spotPoints(days);
@@ -902,13 +902,16 @@ async function fetchCore(days=10){
   return {m,w,tSea};
 }
 async function fetchExtra(){
+  const reg=REGION;
   const [g,mn,ww3,oc,ocw]=await Promise.all([
+    // the weather bar does not wait for the slower extras
     safe('wx',t('srcWx'),()=>
       jget('https://api.open-meteo.com/v1/forecast?latitude='+REG().wxLat+'&longitude='+REG().wxLon+
         '&timezone=Asia%2FBangkok&forecast_days=2&wind_speed_unit=ms'+
         '&current=temperature_2m,apparent_temperature,weather_code,cloud_cover,'+
         'wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,is_day'+
-        '&daily=sunrise,sunset,uv_index_max,temperature_2m_max,temperature_2m_min')),
+        '&daily=sunrise,sunset,uv_index_max,temperature_2m_max,temperature_2m_min')
+        .then(v=>{ if(reg===REGION&&v){ WEATHER=v; wxbar(); } return v; })),
     safe('metno',t('srcMet'),()=>
       jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+REG().wxLat.toFixed(2)+'&lon='+REG().wxLon.toFixed(2))),
     safe('ww3',t('srcWW3'),loadWW3),
@@ -1000,15 +1003,17 @@ function mapLink(sp){
 function camBlock(sp){
   // original streams: autoplay, no redirect
   const view=(c,tag)=>{
+    // players are heavy on phones: markup first, src once the data is on screen
+    const at=CAMS_ON?'src':'data-live';
     if(c.type==='img') return `<div class="cam" data-src="img:${c.id}">
       <img class="camimg" data-cam="${c.id}" alt="${tag}"
-        src="https://imgproxy.windy.com/_/preview/plain/current/${c.id}/original.jpg?v=${Date.now()}">
+        ${at}="https://imgproxy.windy.com/_/preview/plain/current/${c.id}/original.jpg?v=${Date.now()}">
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
     const src=c.type==='ipcam'
       ? `https://g3.ipcamlive.com/player/player.php?alias=${c.id}&autoplay=1&mute=1`
       : `https://rtsp.me/embed/${c.id}/`;
     return `<div class="cam" data-src="${src}">
-      <iframe src="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
+      <iframe ${at}="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
         referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
   };
@@ -1468,7 +1473,13 @@ function render(){
    for 10 minutes is safe, and it spares the rate limit on reloads and covers
    a lost connection. */
 const CACHE_TTL=10*60*1000;
-let LOADING=false, EXTRA_PENDING=false;
+let LOADING=false, EXTRA_PENDING=false, CAMS_ON=false;
+function startCams(){
+  CAMS_ON=true;
+  document.querySelectorAll('.cam [data-live]').forEach(el=>{
+    el.src=el.dataset.live; el.removeAttribute('data-live');
+  });
+}
 function cacheSave(d){
   try{
     // raw per-model values are ~90% of the weight and are rebuilt on refresh
@@ -1487,7 +1498,7 @@ async function boot(force){
   const fresh=cached && Date.now()-cached.at<CACHE_TTL;
   if(fresh && !DATA){
     DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean;
-    LAST_OK=cached.at; STALE=false; render();
+    LAST_OK=cached.at; STALE=false; render(); startCams();
   }
   // fresh cache and nothing forcing a refresh: no network at all
   if(fresh && !force) return;
@@ -1498,7 +1509,7 @@ async function boot(force){
     EXTRA_PENDING=true;
     const extraP=fetchExtra();
     const fullP=fetchCore(10);
-    const quickP=fetchCore(3);
+    const quickP=fetchCore(2);
     quickP.catch(()=>{}); extraP.catch(()=>{});
     // paint the first core answer that succeeds; a failed short request must
     // not abort the load while the full one is still on its way
@@ -1510,10 +1521,11 @@ async function boot(force){
     });
     if(moved()) return;
     DATA=build(first.c,null); LAST_OK=Date.now(); STALE=false; render();
+    if(!CAMS_ON) setTimeout(startCams,1500);
     const [core,extra]=await Promise.all([fullP, extraP]);
     if(moved()) return;
     EXTRA_PENDING=false;
-    DATA=build(core,extra); LAST_OK=Date.now(); STALE=false; cacheSave(DATA); render();
+    DATA=build(core,extra); LAST_OK=Date.now(); STALE=false; cacheSave(DATA); render(); startCams();
   }catch(e){
     if(moved()) return;
     EXTRA_PENDING=false;
@@ -1522,7 +1534,7 @@ async function boot(force){
     if(!DATA && cached){
       DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean; LAST_OK=cached.at;
     }
-    if(DATA) render(); else
+    if(DATA){ render(); startCams(); } else
       document.getElementById('main').innerHTML=`<div class="err">${t(STALE_REASON)}</div>`;
     setTimeout(()=>boot(true),120000);
   }finally{
