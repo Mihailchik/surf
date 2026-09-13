@@ -395,6 +395,11 @@ const ALL_SPOTS=[
   shelter:.3,tide:'mid',cam:null},
  {id:'naiyang',nm:{en:'Nai Yang',ru:'Най Янг',th:'หาดในยาง'},lat:8.0930,lon:98.2960,facing:270,swellMin:0.6,swellMax:2.1,
   shelter:.55,tide:'high',cam:null},
+ /* One Khao Lak break listed on the Phuket page for reference: Khuk Khak by
+    Memories Beach Bar and Pakarang Surf Shop, next to the Sunova board
+    factory. It is 80 km north, so it never takes part in the top. */
+ {id:'kl_memories',noTop:1,nm:{en:'Khao Lak · Memories',ru:'Као Лак · Memories',th:'เขาหลัก · Memories'},lat:8.7135,lon:98.2363,facing:265,swellMin:0.6,swellMax:2.8,
+  shelter:.15,tide:'mid',cam:null},
  /* Khao Lak. Coordinates from OpenStreetMap. Profiles are first estimates
     from local surf guides: long, gently sloping sand beaches for learners,
     reef breaks around Cape Pakarang that need more size. */
@@ -866,13 +871,16 @@ async function safe(key,label,fn){
    every beach, so the page renders as soon as they arrive. Extras
    (weather bar, MET Norway, WW3, ocean points) fill in afterwards: WW3
    alone can take several seconds and must not hold the page back. */
-function spotPoints(){
+function spotPoints(days=10){
   const pts=[...new Set(SPOTS.map(s=>s.lat.toFixed(2)+','+s.lon.toFixed(2)))];
   return {pts, base:'latitude='+pts.map(p=>p.split(',')[0]).join(',')+
-    '&longitude='+pts.map(p=>p.split(',')[1]).join(',')+'&timezone=Asia%2FBangkok&forecast_days=10'};
+    '&longitude='+pts.map(p=>p.split(',')[1]).join(',')+'&timezone=Asia%2FBangkok&forecast_days='+days};
 }
-async function fetchCore(){
-  const {base}=spotPoints();
+/* Open-Meteo takes ~2.4s to compute the 10-day wave run for all points and
+   models, but ~0.8s for 3 days. The first paint only needs today, so a short
+   request goes first and the full 10 days replaces it when it arrives. */
+async function fetchCore(days=10){
+  const {base}=spotPoints(days);
   const [m,w,tSea]=await Promise.all([
     safe('wave',t('srcWave'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
@@ -1371,7 +1379,7 @@ function render(){
   const restSorted=rest.map(sp=>{
     const rows=DATA[sp.id], i=nowIdx(rows);
     return {sp,rows,i,pick:(dark?bestDaylight(rows,i,30):rows[i])||rows[i]};
-  }).sort(byScoreThenName);
+  }).sort((a,b)=>(a.sp.noTop?1:0)-(b.sp.noTop?1:0) || byScoreThenName(a,b));
   const rowsHtml=tops.map(x=>{
     const s=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0];
     const hasCam=!!x.sp.cam;
@@ -1483,13 +1491,23 @@ async function boot(force){
   if(fresh && !force) return;
   LOADING=true;
   try{
-    const extraP=fetchExtra();
     EXTRA_PENDING=true;
-    const core=await fetchCore();
-    DATA=build(core,null); LAST_OK=Date.now(); STALE=false; render();
-    const extra=await extraP;
+    const extraP=fetchExtra();
+    const fullP=fetchCore(10);
+    const quickP=fetchCore(3);
+    quickP.catch(()=>{}); extraP.catch(()=>{});
+    // paint the first core answer that succeeds; a failed short request must
+    // not abort the load while the full one is still on its way
+    const first=await new Promise((res,rej)=>{
+      let fails=0;
+      const fail=e=>{ if(++fails===2) rej(e); };
+      quickP.then(c=>res({c,full:false}),fail);
+      fullP.then(c=>res({c,full:true}),fail);
+    });
+    DATA=build(first.c,null); LAST_OK=Date.now(); STALE=false; render();
+    const [core,extra]=await Promise.all([fullP, extraP]);
     EXTRA_PENDING=false;
-    DATA=build(core,extra); cacheSave(DATA); render();
+    DATA=build(core,extra); LAST_OK=Date.now(); STALE=false; cacheSave(DATA); render();
   }catch(e){
     EXTRA_PENDING=false;
     STALE=true;

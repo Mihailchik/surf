@@ -30,6 +30,12 @@ and the page says so.
 Sources load independently with a 15 s timeout. A failed one does not break the
 page — it is marked in the header (`sources 7/8`) and drops out of the median.
 
+The slowest part is not traffic but Open-Meteo's compute time: a 10-day,
+four-model wave request for all spots takes about 2.4 s, a 3-day one about
+0.8 s. So a 3-day request runs alongside the full one and the page is drawn on
+whichever arrives first, then redrawn with 10 days and the secondary sources.
+Results are cached in the browser for 10 minutes.
+
 ### Cameras
 
 Kata (SSS Dive & Surf), Patong (Patong Tower), Karon (Marina Phuket Resort) —
@@ -49,6 +55,10 @@ Cape Pakarang (reef breaks that need more size), Bang Niang, Nang Thong, Pak
 Weep and Bang Sak. Coordinates come from OpenStreetMap; profiles are first
 estimates from local surf guides and have not been checked against sessions.
 No public webcam points at the water there.
+
+The Phuket list also carries **Khao Lak · Memories** as a reference row: it is
+shown at the end of the list but never enters the top or the verdict
+(`noTop` flag).
 
 ## Scoring
 
