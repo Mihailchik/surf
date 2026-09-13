@@ -311,7 +311,13 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);color:var(--bad)}
 .err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
   color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
-.skel{height:70px;border-radius:14px;background:linear-gradient(90deg,var(--card),var(--card2),var(--card));
+.loader{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 0 8px;
+  color:var(--dim);font-size:13px}
+.dots{display:inline-flex;gap:5px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:dot 1s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-5px);opacity:1}}
+.skel{height:70px;border-radius:14px;background:linear-gradient(90deg,var(--card),color-mix(in srgb,var(--acc) 9%,var(--card)),var(--card));
   background-size:200% 100%;animation:sh 1.3s infinite;margin:10px 0}
 @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
@@ -340,7 +346,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 <div class="wrap">
   <div id="stale"></div>
   <div id="summary"></div>
-  <div id="main"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  <div id="main"><div class="loader"><span class="dots"><i></i><i></i><i></i></span></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
   <div class="src" id="src"></div>
@@ -445,7 +451,7 @@ const I18N={
   title:'Surf', now:'Now', island:'Phuket', d7:'10 days',
   go:'GO', ok:'WORTH IT', weak:'WEAK', no:'SKIP',
   darkNow:'dark now. ', bestIs:'best is {0}', windowAt:'window {0} {1}',
-  today:'today', tomorrow:'tomorrow', peak:'peak', beach:'Beach', outOf:'of 10',
+  loading:'Loading forecast', today:'today', tomorrow:'tomorrow', peak:'peak', beach:'Beach', outOf:'of 10',
   wave:'wave', period:'period', wind:'wind', water:'water',
   noCam:'no camera', camNone:'no public camera',
   tPeak:'peak', tTide:'tide', tNow:'now',
@@ -529,7 +535,7 @@ const I18N={
   title:'Surf', now:'Сейчас', island:'Пхукет', d7:'10 дней',
   go:'ЕХАТЬ', ok:'МОЖНО', weak:'СЛАБО', no:'НЕ СТОИТ',
   darkNow:'сейчас темно. ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
-  today:'сегодня', tomorrow:'завтра', peak:'пик', beach:'Пляж', outOf:'из 10',
+  loading:'Загружаю прогноз', today:'сегодня', tomorrow:'завтра', peak:'пик', beach:'Пляж', outOf:'из 10',
   wave:'волна', period:'период', wind:'ветер', water:'вода',
   noCam:'камеры нет', camNone:'публичных камер нет',
   tPeak:'пик', tTide:'прилив', tNow:'сейчас',
@@ -613,7 +619,7 @@ const I18N={
   title:'Surf', now:'ตอนนี้', island:'ภูเก็ต', d7:'10 วัน',
   go:'ไปเลย', ok:'พอไหว', weak:'คลื่นเล็ก', no:'ไม่ควรไป',
   darkNow:'ตอนนี้มืดแล้ว · ', bestIs:'ดีที่สุดคือ {0}', windowAt:'ช่วงเวลา {0} {1}',
-  today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', beach:'ชายหาด', outOf:'จาก 10',
+  loading:'กำลังโหลดพยากรณ์', today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', beach:'ชายหาด', outOf:'จาก 10',
   wave:'คลื่น', period:'คาบคลื่น', wind:'ลม', water:'น้ำ',
   noCam:'ไม่มีกล้อง', camNone:'ไม่มีกล้องสาธารณะ',
   tPeak:'สูงสุด', tTide:'น้ำขึ้นลง', tNow:'ตอนนี้',
@@ -1174,7 +1180,7 @@ function card(sp,rows,pinned){
 function wxbar(){
   const bar=document.getElementById('wxbar');
   if((!WEATHER||!WEATHER.current) && EXTRA_PENDING){
-    bar.innerHTML=`<span class="wx" style="grid-column:1/-1;color:var(--dim2)">…</span>`;
+    bar.innerHTML=`<span class="wx" style="grid-column:1/-1"><span class="dots"><i></i><i></i><i></i></span></span>`;
     return;
   }
   if(!WEATHER||!WEATHER.current){
@@ -1503,6 +1509,11 @@ async function boot(force){
   // fresh cache and nothing forcing a refresh: no network at all
   if(fresh && !force) return;
   LOADING=true;
+  // moving dots, so a slow answer does not look like a frozen page
+  if(!DATA) document.getElementById('main').innerHTML=
+    `<div class="loader"><span class="dots"><i></i><i></i><i></i></span>${t('loading')}</div>`+
+    '<div class="skel"></div>'.repeat(3);
+  if(!WEATHER){ EXTRA_PENDING=true; wxbar(); }
   // a region switch mid-load must not paint the old region's data
   const reg=REGION, moved=()=>reg!==REGION;
   try{
