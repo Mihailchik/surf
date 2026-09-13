@@ -962,14 +962,14 @@ function mapLink(sp){
 function camBlock(sp){
   // original streams: autoplay, no redirect
   const view=(c,tag)=>{
-    if(c.type==='img') return `<div class="cam">
+    if(c.type==='img') return `<div class="cam" data-src="img:${c.id}">
       <img class="camimg" data-cam="${c.id}" alt="${tag}"
         src="https://imgproxy.windy.com/_/preview/plain/current/${c.id}/original.jpg?v=${Date.now()}">
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
     const src=c.type==='ipcam'
       ? `https://g3.ipcamlive.com/player/player.php?alias=${c.id}&autoplay=1&mute=1`
       : `https://rtsp.me/embed/${c.id}/`;
-    return `<div class="cam">
+    return `<div class="cam" data-src="${src}">
       <iframe src="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
         referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
@@ -1397,7 +1397,7 @@ function render(){
     });
     syncHeights(); markVisibleChip();
   }else{
-  document.getElementById('main').innerHTML=tops.map(x=>card(x.sp,x.rows,true)).join('');
+  patchCards(document.getElementById('main'), tops.map(x=>card(x.sp,x.rows,true)).join(''));
   document.getElementById('rest').innerHTML = TAB==='now'
     ? `<div class="sum">${restSorted.map(x=>{
         const sc=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0], r=x.rows[x.i];
@@ -1471,6 +1471,40 @@ async function boot(force){
     setTimeout(()=>boot(true),120000);
   }finally{ LOADING=false }
 }
+/* Re-render without touching camera players. Replacing innerHTML recreates the
+   iframes, so every render restarted the video streams: two renders per load
+   (core, then extras) and a third from cache meant the cameras loaded up to
+   three times. Cards with the same order and camera are patched in place:
+   everything around the .cam node is swapped, the .cam node itself stays. */
+function patchCards(container, html){
+  // <template> content is inert: images inside it do not start loading
+  const tmp=document.createElement('template'); tmp.innerHTML=html;
+  const next=[...tmp.content.children], prev=[...container.children];
+  const sameShape = next.length===prev.length && next.every((n,i)=>{
+    const o=prev[i];
+    return n.dataset.id && o.dataset && n.dataset.id===o.dataset.id &&
+      (n.querySelector('.cam')?.dataset.src||'') === (o.querySelector('.cam')?.dataset.src||'');
+  });
+  if(!sameShape){ container.innerHTML=html; return; }
+  next.forEach((n,i)=>{
+    const o=prev[i];
+    const ocam=o.querySelector('.cam');
+    if(!ocam){ o.replaceWith(document.importNode(n,true)); return; }
+    o.className=n.className;
+    const oh=o.querySelector(':scope > .chead'), nh=n.querySelector(':scope > .chead');
+    if(oh&&nh) oh.replaceWith(document.importNode(nh,true));
+    const ob=o.querySelector(':scope > .cbody'), nb=n.querySelector(':scope > .cbody');
+    const ncam=nb.querySelector(':scope > .cam');
+    [...ob.children].forEach(ch=>{ if(ch!==ocam) ch.remove(); });
+    let before=true;
+    [...nb.children].forEach(ch=>{
+      if(ch===ncam){ before=false; return; }
+      const node=document.importNode(ch,true);
+      before ? ob.insertBefore(node,ocam) : ob.appendChild(node);
+    });
+  });
+}
+
 /* Fill lazy <details> on first open. toggle does not bubble, so listen in capture. */
 document.addEventListener('toggle',e=>{
   const d=e.target;
