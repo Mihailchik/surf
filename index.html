@@ -313,6 +313,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
 .loader{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 0 8px;
   color:var(--dim);font-size:13px}
+.wave{width:170px;height:auto;display:block}
+.wave path{fill:none;stroke:var(--acc);stroke-linecap:round;stroke-linejoin:round}
 .dots{display:inline-flex;gap:5px}
 .dots i{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:dot 1s ease-in-out infinite}
 .dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
@@ -346,7 +348,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 <div class="wrap">
   <div id="stale"></div>
   <div id="summary"></div>
-  <div id="main"><div class="loader"><span class="dots"><i></i><i></i><i></i></span></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  <div id="main"><div class="loader"><svg class="wave" viewBox="0 270 1024 100" aria-hidden="true"><path class="wl" stroke-width="24"/><path class="wc" stroke-width="20"/><path class="ws" stroke-width="20"/></svg></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
   <div class="src" id="src"></div>
@@ -1479,7 +1481,34 @@ function render(){
    for 10 minutes is safe, and it spares the rate limit on reloads and covers
    a lost connection. */
 const CACHE_TTL=10*60*1000;
-let LOADING=false, EXTRA_PENDING=false, CAMS_ON=false;
+let LOADING=false, EXTRA_PENDING=false, CAMS_ON=false, WAVE_RAF=0;
+/* Loader: a small wave builds on a flat line, rolls right and flattens out.
+   Shapes are drawn around a crest at x=207; the loop stops by itself once
+   the loader is gone from the page. */
+function startWave(){
+  if(WAVE_RAF) return;
+  const B=331, P=2600, ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  const tick=now=>{
+    const svgs=document.querySelectorAll('svg.wave');
+    if(!svgs.length){ WAVE_RAF=0; return; }
+    const p=(now%P)/P, cx=-60+ease(p)*1150;
+    const h=p<.25?ease(p/.25):p>.75?ease((1-p)/.25):1;
+    const X=x=>(x-207+cx).toFixed(1), Y=y=>(B-(B-y)*h).toFixed(1);
+    const line=`M-20 ${B}L${X(90)} ${B}C${X(125)} ${Y(330)} ${X(135)} ${Y(323)} ${X(150)} ${Y(317)}`+
+      `C${X(172)} ${Y(309)} ${X(186)} ${Y(297)} ${X(207)} ${Y(295)}C${X(219)} ${Y(294)} ${X(225)} ${Y(298)} ${X(233)} ${Y(307)}`+
+      `C${X(246)} ${Y(320)} ${X(262)} ${Y(329)} ${X(300)} ${B}L1044 ${B}`;
+    const curl=`M${X(205)} ${Y(299)}C${X(192)} ${Y(306)} ${X(187)} ${Y(320)} ${X(197)} ${Y(328)}`+
+      `C${X(209)} ${Y(336)} ${X(228)} ${Y(334)} ${X(244)} ${Y(333)}`;
+    const swoosh=`M${X(126)} 351C${X(142)} 349 ${X(156)} 347 ${X(164)} 341C${X(170)} 350 ${X(188)} 353 ${X(220)} 347`;
+    svgs.forEach(v=>{
+      v.querySelector('.wl').setAttribute('d',line);
+      const c=v.querySelector('.wc'); c.setAttribute('d',curl); c.style.opacity=Math.max(0,(h-.35)/.65);
+      const s=v.querySelector('.ws'); s.setAttribute('d',swoosh); s.style.opacity=Math.max(0,(h-.5)/.5);
+    });
+    WAVE_RAF=requestAnimationFrame(tick);
+  };
+  WAVE_RAF=requestAnimationFrame(tick);
+}
 function startCams(){
   CAMS_ON=true;
   document.querySelectorAll('.cam [data-live]').forEach(el=>{
@@ -1509,10 +1538,12 @@ async function boot(force){
   // fresh cache and nothing forcing a refresh: no network at all
   if(fresh && !force) return;
   LOADING=true;
-  // moving dots, so a slow answer does not look like a frozen page
-  if(!DATA) document.getElementById('main').innerHTML=
-    `<div class="loader"><span class="dots"><i></i><i></i><i></i></span>${t('loading')}</div>`+
-    '<div class="skel"></div>'.repeat(3);
+  // rolling wave, so a slow answer does not look like a frozen page
+  if(!DATA){
+    document.getElementById('main').innerHTML=
+      `<div class="loader"><svg class="wave" viewBox="0 270 1024 100" aria-hidden="true"><path class="wl" stroke-width="24"/><path class="wc" stroke-width="20"/><path class="ws" stroke-width="20"/></svg>${t('loading')}</div>`+'<div class="skel"></div>'.repeat(3);
+    startWave();
+  }
   if(!WEATHER){ EXTRA_PENDING=true; wxbar(); }
   // a region switch mid-load must not paint the old region's data
   const reg=REGION, moved=()=>reg!==REGION;
