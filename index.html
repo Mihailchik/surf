@@ -834,11 +834,18 @@ async function safe(key,label,fn){
 }
 
 
-async function load(){
+/* Two-stage fetch. Core sources (wave, wind, sea) are enough to score
+   every beach, so the page renders as soon as they arrive. Extras
+   (weather bar, MET Norway, WW3, ocean points) fill in afterwards: WW3
+   alone can take several seconds and must not hold the page back. */
+function spotPoints(){
   const pts=[...new Set(SPOTS.map(s=>s.lat.toFixed(2)+','+s.lon.toFixed(2)))];
-  const lats=pts.map(p=>p.split(',')[0]).join(','), lons=pts.map(p=>p.split(',')[1]).join(',');
-  const base='latitude='+lats+'&longitude='+lons+'&timezone=Asia%2FBangkok&forecast_days=10';
-  const [m,w,tSea,g,mn,ww3,oc,ocw]=await Promise.all([
+  return {pts, base:'latitude='+pts.map(p=>p.split(',')[0]).join(',')+
+    '&longitude='+pts.map(p=>p.split(',')[1]).join(',')+'&timezone=Asia%2FBangkok&forecast_days=10'};
+}
+async function fetchCore(){
+  const {base}=spotPoints();
+  const [m,w,tSea]=await Promise.all([
     safe('wave',t('srcWave'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
         '&hourly=wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,wind_wave_height&models='+WAVE_MODELS.join(','))),
@@ -848,15 +855,22 @@ async function load(){
     // sea level and water temp exist only in best_match
     safe('sea',t('srcSea'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
-        '&hourly=sea_surface_temperature,sea_level_height_msl')),
-    // general weather for the top bar
+        '&hourly=sea_surface_temperature,sea_level_height_msl'))
+  ]);
+  if(!m||!w){
+    const errs=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.err||'').join(' ');
+    throw new Error(/429/.test(errs)?'HTTP 429':'sources unavailable');
+  }
+  return {m,w,tSea};
+}
+async function fetchExtra(){
+  const [g,mn,ww3,oc,ocw]=await Promise.all([
     safe('wx',t('srcWx'),()=>
       jget('https://api.open-meteo.com/v1/forecast?latitude='+REG().wxLat+'&longitude='+REG().wxLon+
         '&timezone=Asia%2FBangkok&forecast_days=2&wind_speed_unit=ms'+
         '&current=temperature_2m,apparent_temperature,weather_code,cloud_cover,'+
         'wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,is_day'+
         '&daily=sunrise,sunset,uv_index_max,temperature_2m_max,temperature_2m_min')),
-    // independent provider
     safe('metno',t('srcMet'),()=>
       jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=7.87&lon=98.29')),
     safe('ww3',t('srcWW3'),loadWW3),
@@ -869,13 +883,14 @@ async function load(){
       '&longitude='+OCEAN.map(o=>o.lon).join(',')+
       '&hourly=wind_speed_10m&timezone=Asia%2FBangkok&forecast_days=10&wind_speed_unit=ms'))
   ]);
-  if(!m||!w){
-    const errs=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.err||'').join(' ');
-    throw new Error(/429/.test(errs)?'HTTP 429':'sources unavailable');
-  }
+  return {g,mn,ww3,oc,ocw};
+}
+function build(core,extra){
+  const {m,w,tSea}=core, {g,mn,ww3,oc,ocw}=extra||{};
+  const {pts}=spotPoints();
   const M=[].concat(m), W=[].concat(w), T=tSea?[].concat(tSea):null;
-  WEATHER=g;
-  OCEANDATA=(oc&&ocw)?{wave:[].concat(oc),wind:[].concat(ocw)}:null;
+  if(g) WEATHER=g;
+  if(oc&&ocw) OCEANDATA={wave:[].concat(oc),wind:[].concat(ocw)};
 
   // index met.no by local hour
   const MET={};
@@ -1069,9 +1084,9 @@ function dayRows(sp,rows,n){
     const bi=rs.reduce((a,b)=>(b.score??0)>(a.score??0)?b:a);
     const dt=new Date(d+'T12:00:00');
     const i0=rows.indexOf(rs[0]);
-    // same details as the Now tab, for this day
-    const detail=`<div class="daybody">${hourStrip(rows,i0)}${timing(sp,rows,i0)}${why(sp,bi)}${sources(bi)}</div>`;
-    return `<details class="dayx"><summary class="day">
+    // details are built on first open, not up front: 120 days of tables was ~34k nodes
+    const detail=`<div class="daybody lz"></div>`;
+    return `<details class="dayx lazy" data-k="day" data-s="${sp.id}" data-i0="${i0}" data-r="${rows.indexOf(bi)}"><summary class="day">
       <div class="dn"><b>${dt.toLocaleDateString(LOCALE[LANG],{weekday:'short'})}</b>${
         dt.toLocaleDateString(LOCALE[LANG],{day:'numeric',month:'short'})}</div>
       <div class="dbar" style="background:color-mix(in srgb,${scoreColor(sc)} 13%,var(--card))">
@@ -1090,8 +1105,8 @@ function card(sp,rows,pinned){
   if(TAB==='now'){
     // camera and verdict up top, everything else under details
     body=camBlock(sp)+timing(sp,rows,i0)+
-      `<details class="more"><summary>${t('more')}</summary>
-         ${hourStrip(rows,i0)}${why(sp,r)}${sources(r)}
+      `<details class="more lazy" data-k="more" data-s="${sp.id}" data-i0="${i0}" data-r="${rows.indexOf(r)}"><summary>${t('more')}</summary>
+         <div class="lz"></div>
        </details>`;
   }else if(TAB==='d7') body=dayRows(sp,rows,10);
   else body='';
@@ -1115,6 +1130,10 @@ function card(sp,rows,pinned){
 
 function wxbar(){
   const bar=document.getElementById('wxbar');
+  if((!WEATHER||!WEATHER.current) && EXTRA_PENDING){
+    bar.innerHTML=`<span class="wx" style="grid-column:1/-1;color:var(--dim2)">…</span>`;
+    return;
+  }
   if(!WEATHER||!WEATHER.current){
     bar.innerHTML=`<span class="wx" style="color:var(--bad);grid-column:1/-1">${t('wxUnavailable')}</span>`;
     return;
@@ -1382,7 +1401,7 @@ function render(){
   document.getElementById('rest').innerHTML = TAB==='now'
     ? `<div class="sum">${restSorted.map(x=>{
         const sc=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0], r=x.rows[x.i];
-        return `<details class="rowx" id="c-${x.sp.id}"><summary class="srow">
+        return `<details class="rowx lazy" id="c-${x.sp.id}" data-k="row" data-s="${x.sp.id}" data-i0="${x.i}" data-r="${x.rows.indexOf(r)}"><summary class="srow">
           <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(sc)} 14%,transparent);
             color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
           <div class="sname">${nameOf(x.sp)}</div>
@@ -1391,9 +1410,7 @@ function render(){
           <div class="speak">${pk?`<b>${pk.hhmm}</b>${t('peak')}`:'<b>–</b>'}</div>
           <span class="chev">›</span>
           </summary>
-          <div class="rowbody">${camBlock(x.sp)}${timing(x.sp,x.rows,x.i)}${
-            hourStrip(x.rows,x.i)}${why(x.sp,r)}${sources(r)}
-          </div></details>`}).join('')}</div>`
+          <div class="rowbody lz"></div></details>`}).join('')}</div>`
     : restSorted.map(x=>card(x.sp,x.rows,false)).join('');
   }
 
@@ -1406,33 +1423,44 @@ function render(){
   document.getElementById('src').innerHTML=t('footer')+`<div class="lic">${t('licence')}</div>`;
 }
 
-/* Кэш последнего удачного ответа. Модели пересчитываются дважды в сутки,
-   поэтому переиспользовать данные 10 минут безопасно. Заодно это спасает
-   от лимита запросов при перезагрузках и от потери связи.               */
+/* Last good response is cached. Models update twice a day, so reusing data
+   for 10 minutes is safe, and it spares the rate limit on reloads and covers
+   a lost connection. */
 const CACHE_TTL=10*60*1000;
+let LOADING=false, EXTRA_PENDING=false;
 function cacheSave(d){
   try{
-    // raw: сырые значения каждой модели по каждому часу, это 90% веса.
-    // В кэш они не нужны: таблица источников всё равно требует свежих данных.
+    // raw per-model values are ~90% of the weight and are rebuilt on refresh
     const slim={};
     for(const k in d) slim[k]=d[k].map(({raw,...rest})=>rest);
     LS.set('data_cache',JSON.stringify({at:Date.now(),weather:WEATHER,ocean:OCEANDATA,data:slim}));
-  }catch{ /* не влезло в квоту, работаем без кэша */ }
+  }catch{ /* over quota, run without cache */ }
 }
 function cacheLoad(){
   try{ return JSON.parse(LS.get('data_cache')||'null') }catch{ return null }
 }
 
-async function boot(){
+async function boot(force){
+  if(LOADING) return;
   const cached=cacheLoad();
-  // свежий кэш, не дёргаем API лишний раз
-  if(cached && Date.now()-cached.at<CACHE_TTL && !DATA){
+  const fresh=cached && Date.now()-cached.at<CACHE_TTL;
+  if(fresh && !DATA){
     DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean;
     LAST_OK=cached.at; STALE=false; render();
   }
+  // fresh cache and nothing forcing a refresh: no network at all
+  if(fresh && !force) return;
+  LOADING=true;
   try{
-    DATA=await load(); LAST_OK=Date.now(); STALE=false; cacheSave(DATA); render();
+    const extraP=fetchExtra();
+    EXTRA_PENDING=true;
+    const core=await fetchCore();
+    DATA=build(core,null); LAST_OK=Date.now(); STALE=false; render();
+    const extra=await extraP;
+    EXTRA_PENDING=false;
+    DATA=build(core,extra); cacheSave(DATA); render();
   }catch(e){
+    EXTRA_PENDING=false;
     STALE=true;
     STALE_REASON = /429/.test(e.message) ? 'rateLimit' : 'noConnection';
     if(!DATA && cached){
@@ -1440,9 +1468,23 @@ async function boot(){
     }
     if(DATA) render(); else
       document.getElementById('main').innerHTML=`<div class="err">${t(STALE_REASON)}</div>`;
-    setTimeout(boot,120000);
-  }
+    setTimeout(()=>boot(true),120000);
+  }finally{ LOADING=false }
 }
+/* Fill lazy <details> on first open. toggle does not bubble, so listen in capture. */
+document.addEventListener('toggle',e=>{
+  const d=e.target;
+  if(!d.classList||!d.classList.contains('lazy')||!d.open||d.dataset.done||!DATA) return;
+  const sp=SPOTS.find(x=>x.id===d.dataset.s), rows=sp&&DATA[sp.id];
+  if(!rows) return;
+  const i0=+d.dataset.i0, r=rows[+d.dataset.r]||rows[i0];
+  const html = d.dataset.k==='day'  ? hourStrip(rows,i0)+timing(sp,rows,i0)+why(sp,r)+sources(r)
+             : d.dataset.k==='row'  ? camBlock(sp)+timing(sp,rows,i0)+hourStrip(rows,i0)+why(sp,r)+sources(r)
+             : hourStrip(rows,i0)+why(sp,r)+sources(r);
+  d.querySelector('.lz').innerHTML=html;
+  d.dataset.done='1';
+},true);
+
 /* Language-dependent labels. */
 function syncHeights(){
   const h=document.querySelector('header')?.offsetHeight||0;
@@ -1470,15 +1512,15 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); TAB=b.dataset.t; render(); window.scrollTo({top:0,behavior:'smooth'});
 });
-boot();
-setInterval(boot,1800000);
+boot(true);
+setInterval(()=>boot(true),1800000);
 // refresh still frames more often than the page
 setInterval(()=>document.querySelectorAll('.camimg').forEach(img=>{
   img.src=`https://imgproxy.windy.com/_/preview/plain/current/${img.dataset.cam}/original.jpg?v=${Date.now()}`;
 }),45000);
 addEventListener('hashchange',()=>{
   const h=(location.hash||'').replace('#','').toLowerCase();
-  if(REGIONS[h]&&h!==REGION){ REGION=h; applyLang(); boot(); }
+  if(REGIONS[h]&&h!==REGION){ REGION=h; DATA=null; applyLang(); boot(true); }
 });
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)boot()});
 </script>
