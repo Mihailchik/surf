@@ -1685,6 +1685,35 @@ addEventListener('hashchange',()=>{
     PICK=null; document.getElementById('main').innerHTML=''; applyLang(); boot(true); }
 });
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)boot()});
+
+/* Analytics events. Camera players are cross-origin, so playback itself is
+   invisible to us: "seen" means 5 s on screen, "tap" means focus moved into
+   the player. */
+const track=(name,p)=>{ if(typeof gtag==='function') gtag('event',name,{...p,region:REGION}); };
+const spotOf=el=>el.closest('[data-id]')?.dataset.id||el.closest('[data-s]')?.dataset.s||'';
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.tab');
+  if(b&&b.dataset.t!=='now') track('tab_open',{tab:b.dataset.t});
+},true);
+document.addEventListener('toggle',e=>{
+  const d=e.target;
+  if(d.open&&d.dataset&&(d.dataset.k==='more'||d.dataset.k==='row')) track('beach_open',{beach:d.dataset.s});
+},true);
+const camSeen={}, camSent=new Set();
+setInterval(()=>{
+  if(document.hidden) return;
+  document.querySelectorAll('.cam').forEach(c=>{
+    const id=spotOf(c), r=c.getBoundingClientRect();
+    if(!id||camSent.has(id)||!r.height) return;
+    const vis=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);
+    camSeen[id]=vis>=r.height/2?(camSeen[id]||0)+1:0;
+    if(camSeen[id]>=5){ camSent.add(id); track('cam_seen',{beach:id}); }
+  });
+},1000);
+addEventListener('blur',()=>setTimeout(()=>{
+  const f=document.activeElement;
+  if(f&&f.tagName==='IFRAME'&&f.closest('.cam')) track('cam_tap',{beach:spotOf(f)});
+}));
 </script>
 </body>
 </html>
