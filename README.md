@@ -56,7 +56,7 @@ Weep and Bang Sak. Coordinates come from OpenStreetMap; profiles are first
 estimates from local surf guides and have not been checked against sessions.
 No public webcam points at the water there.
 
-The Phuket list also carries **Khao Lak · Khuk Khak** as a reference row: it is
+The Phuket list also carries **Khao Lak** (Khuk Khak beach, named when the row is opened) as a reference row: it is
 shown at the end of the list but never enters the top or the verdict
 (`noTop` flag).
 

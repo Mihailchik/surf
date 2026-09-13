@@ -106,6 +106,8 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .rowx[open] .chev{transform:rotate(90deg)}
 .rowx .chev{transition:transform .2s;font-size:13px;color:var(--dim2);flex:0 0 auto;margin-left:2px}
 .rowbody{border-top:1px solid var(--line);background:var(--card2)}
+.rowbody .beach{margin:0;padding:8px 12px 0;font-size:12.5px;color:var(--dim)}
+.rowbody .beach b{color:var(--tx)}
 .rowbody .grid,.rowbody .tim,.rowbody .why,.rowbody .srcbox,.rowbody .nocam{background:var(--card)}
 .rowmap{display:none}
 .srow .map{margin-left:4px}
@@ -398,7 +400,7 @@ const ALL_SPOTS=[
  /* One Khao Lak break listed on the Phuket page for reference: Khuk Khak by
     Memories Beach Bar and Pakarang Surf Shop, next to the Sunova board
     factory. It is 80 km north, so it never takes part in the top. */
- {id:'kl_khukkhak',noTop:1,nm:{en:'Khao Lak · Khuk Khak',ru:'Као Лак · Кук Как',th:'เขาหลัก · หาดคึกคัก'},lat:8.7135,lon:98.2363,facing:265,swellMin:0.6,swellMax:2.8,
+ {id:'kl_khukkhak',noTop:1,nm:{en:'Khao Lak',ru:'Као Лак',th:'เขาหลัก'},beach:{en:'Khuk Khak',ru:'Кук Как',th:'หาดคึกคัก'},lat:8.7135,lon:98.2363,facing:265,swellMin:0.6,swellMax:2.8,
   shelter:.15,tide:'mid',cam:null},
  /* Khao Lak. Coordinates from OpenStreetMap. Profiles are first estimates
     from local surf guides: long, gently sloping sand beaches for learners,
@@ -443,7 +445,7 @@ const I18N={
   title:'Surf', now:'Now', island:'Phuket', d7:'10 days',
   go:'GO', ok:'WORTH IT', weak:'WEAK', no:'SKIP',
   darkNow:'dark now. ', bestIs:'best is {0}', windowAt:'window {0} {1}',
-  today:'today', tomorrow:'tomorrow', peak:'peak', outOf:'of 10',
+  today:'today', tomorrow:'tomorrow', peak:'peak', beach:'Beach', outOf:'of 10',
   wave:'wave', period:'period', wind:'wind', water:'water',
   noCam:'no camera', camNone:'no public camera',
   tPeak:'peak', tTide:'tide', tNow:'now',
@@ -527,7 +529,7 @@ const I18N={
   title:'Surf', now:'Сейчас', island:'Пхукет', d7:'10 дней',
   go:'ЕХАТЬ', ok:'МОЖНО', weak:'СЛАБО', no:'НЕ СТОИТ',
   darkNow:'сейчас темно. ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
-  today:'сегодня', tomorrow:'завтра', peak:'пик', outOf:'из 10',
+  today:'сегодня', tomorrow:'завтра', peak:'пик', beach:'Пляж', outOf:'из 10',
   wave:'волна', period:'период', wind:'ветер', water:'вода',
   noCam:'камеры нет', camNone:'публичных камер нет',
   tPeak:'пик', tTide:'прилив', tNow:'сейчас',
@@ -611,7 +613,7 @@ const I18N={
   title:'Surf', now:'ตอนนี้', island:'ภูเก็ต', d7:'10 วัน',
   go:'ไปเลย', ok:'พอไหว', weak:'คลื่นเล็ก', no:'ไม่ควรไป',
   darkNow:'ตอนนี้มืดแล้ว · ', bestIs:'ดีที่สุดคือ {0}', windowAt:'ช่วงเวลา {0} {1}',
-  today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', outOf:'จาก 10',
+  today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', beach:'ชายหาด', outOf:'จาก 10',
   wave:'คลื่น', period:'คาบคลื่น', wind:'ลม', water:'น้ำ',
   noCam:'ไม่มีกล้อง', camNone:'ไม่มีกล้องสาธารณะ',
   tPeak:'สูงสุด', tTide:'น้ำขึ้นลง', tNow:'ตอนนี้',
@@ -1490,6 +1492,8 @@ async function boot(force){
   // fresh cache and nothing forcing a refresh: no network at all
   if(fresh && !force) return;
   LOADING=true;
+  // a region switch mid-load must not paint the old region's data
+  const reg=REGION, moved=()=>reg!==REGION;
   try{
     EXTRA_PENDING=true;
     const extraP=fetchExtra();
@@ -1504,11 +1508,14 @@ async function boot(force){
       quickP.then(c=>res({c,full:false}),fail);
       fullP.then(c=>res({c,full:true}),fail);
     });
+    if(moved()) return;
     DATA=build(first.c,null); LAST_OK=Date.now(); STALE=false; render();
     const [core,extra]=await Promise.all([fullP, extraP]);
+    if(moved()) return;
     EXTRA_PENDING=false;
     DATA=build(core,extra); LAST_OK=Date.now(); STALE=false; cacheSave(DATA); render();
   }catch(e){
+    if(moved()) return;
     EXTRA_PENDING=false;
     STALE=true;
     STALE_REASON = /429/.test(e.message) ? 'rateLimit' : 'noConnection';
@@ -1518,7 +1525,10 @@ async function boot(force){
     if(DATA) render(); else
       document.getElementById('main').innerHTML=`<div class="err">${t(STALE_REASON)}</div>`;
     setTimeout(()=>boot(true),120000);
-  }finally{ LOADING=false }
+  }finally{
+    LOADING=false;
+    if(moved()) boot(true);
+  }
 }
 /* Re-render without touching camera players. Replacing innerHTML recreates the
    iframes, so every render restarted the video streams: two renders per load
@@ -1562,7 +1572,7 @@ document.addEventListener('toggle',e=>{
   if(!rows) return;
   const i0=+d.dataset.i0, r=rows[+d.dataset.r]||rows[i0];
   const html = d.dataset.k==='day'  ? hourStrip(rows,i0)+timing(sp,rows,i0)+why(sp,r)+sources(r)
-             : d.dataset.k==='row'  ? camBlock(sp)+timing(sp,rows,i0)+hourStrip(rows,i0)+why(sp,r)+sources(r)
+             : d.dataset.k==='row'  ? (sp.beach?`<p class="beach">${t('beach')}: <b>${sp.beach[LANG]||sp.beach.en}</b></p>`:'')+camBlock(sp)+timing(sp,rows,i0)+hourStrip(rows,i0)+why(sp,r)+sources(r)
              : hourStrip(rows,i0)+why(sp,r)+sources(r);
   d.querySelector('.lz').innerHTML=html;
   d.dataset.done='1';
