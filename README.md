@@ -101,6 +101,9 @@ Calibration log:
   shifted so the scale reproduces that.
 - 14 Sep 2026: morning and 16–17h on the west coast were good, powerful and
   even; GOOD now starts at a displayed 6 (was 6.5).
+- 14 Sep 2026: the site showed 3 at Nai Harn for 0.7 m at 13 s, the same as
+  for 0.7 m at 5 s on 8 Sep, yet one was great and the other poor. Height is
+  now scaled by period (`TUNE.swellPeriod`): 13 s scores 6, 5 s scores 2.
 
 ## Known limits
 

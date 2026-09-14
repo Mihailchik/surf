@@ -767,6 +767,10 @@ const fmt=(v,d=1,dash='–')=>v==null||isNaN(v)?dash:v.toFixed(d);
    weights  : share of each factor in the score, should add up to 1.
    size     : below swellMin the size factor is 0..belowMax, at the
               optimum (opt, 0..1 inside the spot range) it is 10.
+   swellPeriod: long swell breaks bigger and wraps headlands better, so the
+              height is scaled by (period/ref)^power, never below floor.
+              power 0 switches it off. 0.7 m at 5 s and at 13 s are
+              different waves (8 vs 14 Sep 2026 at Nai Harn).
    cap      : without waves the score cannot go above this.
    danger   : red banner, separate from the score.                    */
 const TUNE={
@@ -781,6 +785,7 @@ const TUNE={
   weights:{size:0.34, wind:0.30, period:0.20, dir:0.16},
   size:{opt:0.45, belowMax:2, atMin:2, overMax:4, overFade:1.2},
   period:{from:3.5, span:8},
+  swellPeriod:{ref:7, power:1, floor:0.6},
   cap:{base:0.4, slope:5},
   shelterLoss:0.55,
   danger:{gust:14}
@@ -828,7 +833,9 @@ function extrema(rows,key,from,to){
 function scoreHour(sp,h){
   const {swell:sw,period:per,sdir,wind:wsp,wdir,tide}=h;
   if(sw==null) return null;
-  const eff=sw*(1-sp.shelter*TUNE.shelterLoss); // how much gets past the headlands
+  const SP=TUNE.swellPeriod;
+  const boost=per==null?1:Math.max(SP.floor,Math.pow(per/SP.ref,SP.power));
+  const eff=sw*boost*(1-sp.shelter*TUNE.shelterLoss); // how much gets past the headlands
   const Z=TUNE.size, W=TUNE.weights;
   /* Размер. Прежняя версия давала 7+ уже на нижней границе диапазона,
      из-за чего еле живая волна выглядела приличной. Теперь у минимума
