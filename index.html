@@ -760,18 +760,33 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const angDiff=(a,b)=>{let d=Math.abs(a-b)%360;return d>180?360-d:d};
 const dirRu=d=>t('dirs')[Math.round(d/22.5)%16];
 const fmt=(v,d=1,dash='–')=>v==null||isNaN(v)?dash:v.toFixed(d);
-/* Шесть ступеней качества. Балл считается как раньше, слово и цвет
-   берутся от него. Порог берём от округлённого балла, иначе 5.6
-   показывается как «6», но красится в цвет пятёрки. */
-const GRADES=[
-  {min:8.2, key:'gEpic',  color:'var(--go)'},
-  {min:6.5, key:'gGood',  color:'var(--ok)'},
-  {min:4.5, key:'gFair',  color:'var(--fair)'},
-  {min:3.0, key:'gWeak',  color:'var(--mid)'},
-  {min:1.5, key:'gPoor',  color:'var(--bad)'},
-  {min:-1,  key:'gFlat',  color:'var(--no)'}
-];
-const gradeOf=v=>GRADES.find(g=>Math.round((v??0)*10)/10>=g.min)||GRADES[GRADES.length-1];
+/* ===== TUNE: everything that decides "good waves" lives here. =====
+   Change numbers in this block only; the rest of the code reads them.
+   grades   : colour and word by the score AS DISPLAYED (whole number),
+              so a "6" is always the same colour whatever the decimals.
+   weights  : share of each factor in the score, should add up to 1.
+   size     : below swellMin the size factor is 0..belowMax, at the
+              optimum (opt, 0..1 inside the spot range) it is 10.
+   cap      : without waves the score cannot go above this.
+   danger   : red banner, separate from the score.                    */
+const TUNE={
+  grades:[
+    {min:8, key:'gEpic', color:'var(--go)'},
+    {min:6, key:'gGood', color:'var(--ok)'},
+    {min:5, key:'gFair', color:'var(--fair)'},
+    {min:3, key:'gWeak', color:'var(--mid)'},
+    {min:2, key:'gPoor', color:'var(--bad)'},
+    {min:-1,key:'gFlat', color:'var(--no)'}
+  ],
+  weights:{size:0.34, wind:0.30, period:0.20, dir:0.16},
+  size:{opt:0.45, belowMax:2, atMin:2, overMax:4, overFade:1.2},
+  period:{from:3.5, span:8},
+  cap:{base:0.4, slope:5},
+  shelterLoss:0.55,
+  danger:{gust:14}
+};
+const GRADES=TUNE.grades;
+const gradeOf=v=>GRADES.find(g=>Math.round(v??0)>=g.min)||GRADES[GRADES.length-1];
 const scoreColor=v=>gradeOf(v).color;
 const gradeWord=v=>t(gradeOf(v).key);
 
@@ -779,9 +794,9 @@ const gradeWord=v=>t(gradeOf(v).key);
    для спота или штормовые порывы. Это не низкий балл, а отдельный флаг. */
 function dangerOf(sp,r){
   if(!r) return null;
-  const eff=r.swell==null?null:r.swell*(1-sp.shelter*0.55);
+  const eff=r.swell==null?null:r.swell*(1-sp.shelter*TUNE.shelterLoss);
   if(eff!=null && eff>sp.swellMax) return {key:'dBig', v:fmt(eff,1)};
-  if(r.gust!=null && r.gust>=14) return {key:'dWind', v:fmt(r.gust,0)};
+  if(r.gust!=null && r.gust>=TUNE.danger.gust) return {key:'dWind', v:fmt(r.gust,0)};
   return null;
 }
 
@@ -813,19 +828,19 @@ function extrema(rows,key,from,to){
 function scoreHour(sp,h){
   const {swell:sw,period:per,sdir,wind:wsp,wdir,tide}=h;
   if(sw==null) return null;
-  const eff=sw*(1-sp.shelter*0.55);            // how much gets past the headlands
+  const eff=sw*(1-sp.shelter*TUNE.shelterLoss); // how much gets past the headlands
+  const Z=TUNE.size, W=TUNE.weights;
   /* Размер. Прежняя версия давала 7+ уже на нижней границе диапазона,
      из-за чего еле живая волна выглядела приличной. Теперь у минимума
      это двойка, десятка только около оптимума. */
-  const OPT=0.45;
   let size;
-  if(eff<sp.swellMin) size=clamp(eff/sp.swellMin,0,1)*2;
-  else if(eff>sp.swellMax) size=clamp(1-(eff-sp.swellMax)/1.2,0,1)*4;
+  if(eff<sp.swellMin) size=clamp(eff/sp.swellMin,0,1)*Z.belowMax;
+  else if(eff>sp.swellMax) size=clamp(1-(eff-sp.swellMax)/Z.overFade,0,1)*Z.overMax;
   else{
     const rel=(eff-sp.swellMin)/(sp.swellMax-sp.swellMin);
-    size = rel<=OPT ? 2+8*(rel/OPT) : 10-6*((rel-OPT)/(1-OPT));
+    size = rel<=Z.opt ? Z.atMin+(10-Z.atMin)*(rel/Z.opt) : 10-(10-Z.overMax)*((rel-Z.opt)/(1-Z.opt));
   }
-  const period=per==null?5:clamp((per-3.5)/8,0,1)*10;
+  const period=per==null?5:clamp((per-TUNE.period.from)/TUNE.period.span,0,1)*10;
   const dirS=clamp(1-(sdir==null?45:angDiff(sdir,sp.facing))/95,0,1)*10;
   const wOff=angDiff(wdir==null?sp.facing:wdir,(sp.facing+180)%360);
   let wind;
@@ -839,10 +854,10 @@ function scoreHour(sp,h){
     else if(sp.tide==='low') tideAdj=(0.55-tide)*1.7;
     else if(sp.tide==='mid') tideAdj=(0.5-Math.abs(tide-0.55))*1.6;
   }
-  const raw=size*0.34+period*0.20+dirS*0.16+wind*0.30+tideAdj;
+  const raw=size*W.size+period*W.period+dirS*W.dir+wind*W.wind+tideAdj;
   /* Размер работает и как потолок. Без волны хороший ветер и удачное
      направление не должны давать четвёрку: кататься всё равно не на чем. */
-  const cap = eff>=sp.swellMin ? 10 : clamp(eff/sp.swellMin,0,1)*5+0.4;
+  const cap = eff>=sp.swellMin ? 10 : clamp(eff/sp.swellMin,0,1)*TUNE.cap.slope+TUNE.cap.base;
   return clamp(Math.min(raw,cap),0,10);
 }
 

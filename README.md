@@ -64,16 +64,26 @@ shown at the end of the list but never enters the top or the verdict
 
 ## Scoring
 
-Each hour gets a number 0–10 and a word from a six-step scale:
+Each hour gets a number 0–10 and a word from a six-step scale. The word and
+colour follow the number as displayed, so the same number always has the same
+colour:
 
-| score | grade | meaning |
+| shown | grade | meaning |
 |---|---|---|
-| 8.2+ | EPIC | best it gets here |
-| 6.5+ | GOOD | what you come here for |
-| 4.5+ | FAIR | most waves are rideable |
-| 3.0+ | POOR | rare rideable waves, you have to hunt |
-| 1.5+ | VERY POOR | you can paddle, you will not ride |
-| below | FLAT | nothing to catch |
+| 8–10 | EPIC | best it gets here |
+| 6–7 | GOOD | what you come here for |
+| 5 | FAIR | most waves are rideable |
+| 3–4 | POOR | rare rideable waves, you have to hunt |
+| 2 | VERY POOR | you can paddle, you will not ride |
+| 0–1 | FLAT | nothing to catch |
+
+### Tuning
+
+Every number that decides what counts as good lives in one block, `TUNE`, near
+the top of the script: grade thresholds, factor weights, the size curve, the
+no-wave ceiling and the gust limit for the danger banner. Change the numbers
+there; nothing else in the code needs to move. Per-beach ranges (`swellMin`,
+`swellMax`, `shelter`, preferred tide) stay in `ALL_SPOTS`.
 
 The number is a weighted sum: wave size against the spot's working range (34%),
 wind direction and strength (30%), period (20%), wave direction relative to the
@@ -86,8 +96,11 @@ direction cannot add up to a passing score — there is still nothing to ride.
 own red banner instead of being folded into the quality score, because a wave
 that is too big and a wave that is too small are different problems.
 
-Thresholds were shifted on 8 Sep 2026 after a session at Nai Harn where
-conditions read as "very poor to poor" — the scale now reproduces that.
+Calibration log:
+- 8 Sep 2026: a session at Nai Harn read as "very poor to poor"; thresholds
+  shifted so the scale reproduces that.
+- 14 Sep 2026: morning and 16–17h on the west coast were good, powerful and
+  even; GOOD now starts at a displayed 6 (was 6.5).
 
 ## Known limits
 
