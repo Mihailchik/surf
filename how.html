@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-72CS4WJ571"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-72CS4WJ571');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Surf · How the score works</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7fc7'/%3E%3Cpath d='M3 19q4.5-5 9 0t9 0 8-3' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="description" content="How Surf turns wave, period, wind and tide into one score from 0 to 10">
+<script>
+  // same stored theme and language as the main page
+  try{ if(localStorage.getItem('theme')==='dark') document.documentElement.dataset.theme='dark'; }catch{}
+  try{ const l=localStorage.getItem('lang'); if(l==='ru'||l==='th') document.documentElement.lang=l; }catch{}
+</script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f2f5f9; --card:#fff; --card2:#f7f9fc; --line:#e3e9f0;
+  --tx:#0f1b2d; --dim:#4a5a6e; --dim2:#697a8e;
+  --go:#00a5a5; --ok:#3d9b2f; --fair:#9d7c05; --mid:#e07a12; --bad:#d43a26; --no:#9aa8b8;
+  --acc:#0b7fc7; --sea:#bfe3fa; --shadow:0 1px 2px rgba(15,27,45,.05),0 2px 10px rgba(15,27,45,.05);
+}
+:root[data-theme="dark"]{
+  --bg:#0a0e14; --card:#121822; --card2:#0e141d; --line:#1e2836;
+  --tx:#e8eef6; --dim:#94a3b8; --dim2:#8494a8;
+  --go:#2fd8d8; --ok:#7ede4a; --fair:#f2d43a; --mid:#f79b3c; --bad:#f0604a; --no:#4a5568;
+  --acc:#38b6ff; --sea:#123a55; --shadow:none;
+}
+html,body{margin:0;background:var(--bg);color:var(--tx)}
+body{font:15px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:600px;margin:0 auto;padding:10px 14px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0 4px}
+.top a{color:var(--acc);text-decoration:none;font-weight:650;font-size:14px}
+.lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.lang button{font:inherit;font-size:12px;font-weight:650;border:0;background:var(--card);color:var(--dim);padding:5px 10px;cursor:pointer}
+.lang button.on{background:var(--acc);color:#fff}
+h1{font-size:24px;line-height:1.2;margin:14px 0 6px;letter-spacing:-.3px}
+h2{font-size:18px;margin:30px 0 8px}
+p{margin:0 0 10px}
+.lead{color:var(--dim);font-size:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin:12px 0}
+.dim{color:var(--dim)}
+.small{font-size:13px;color:var(--dim)}
+svg{display:block;width:100%;height:auto}
+.sk path,.sk line{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.grades{display:grid;grid-template-columns:auto auto 1fr;gap:6px 10px;align-items:center;font-size:14px}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:30px;padding:0 8px;border-radius:9px;font-weight:750}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:6px 0}
+.bar div{height:100%}
+.fac{display:grid;grid-template-columns:52px 1fr;gap:4px 10px;align-items:baseline;margin:8px 0}
+.fac b{font-size:18px}
+.ex{display:grid;grid-template-columns:1fr 64px;gap:10px;align-items:center}
+.ex h3{margin:0 0 2px;font-size:15px}
+.ex .cond{font-size:13px;color:var(--dim)}
+.ex .score{display:flex;flex-direction:column;align-items:center;justify-content:center;height:64px;border-radius:12px;font-weight:800;font-size:26px;line-height:1}
+.ex .score small{font-size:10px;font-weight:700;margin-top:4px;letter-spacing:.3px}
+.warn{color:var(--bad);font-weight:650}
+[data-l]{display:none}
+html[lang="en"] [data-l="en"],html[lang="ru"] [data-l="ru"],html[lang="th"] [data-l="th"]{display:revert}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <a href="./"><span data-l="en">← Back to forecast</span><span data-l="ru">← К прогнозу</span><span data-l="th">← กลับไปที่พยากรณ์</span></a>
+  <div class="lang"><button data-set="en">EN</button><button data-set="ru">RU</button><button data-set="th">TH</button></div>
+</div>
+
+<h1><span data-l="en">How the score works</span><span data-l="ru">Как считаются баллы</span><span data-l="th">คะแนนคำนวณอย่างไร</span></h1>
+<p class="lead" data-l="en">Every hour on every beach gets one number from 0 to 10. It answers a single question: is it worth going surfing. Here is what goes into it, in plain words.</p>
+<p class="lead" data-l="ru">Каждый час на каждом пляже получает одно число от 0 до 10. Оно отвечает на один вопрос: стоит ли ехать кататься. Ниже простыми словами, из чего оно складывается.</p><p class="lead" data-l="th">ทุกชั่วโมงของทุกชายหาดได้คะแนนหนึ่งตัวเลขจาก 0 ถึง 10 ซึ่งตอบคำถามเดียว: ควรไปเล่นเซิร์ฟไหม ด้านล่างอธิบายง่ายๆ ว่าคะแนนมาจากอะไร</p>
+
+<!-- ===== grades ===== -->
+<h2><span data-l="en">What the colours mean</span><span data-l="ru">Что значат цвета</span><span data-l="th">สีหมายถึงอะไร</span></h2>
+<div class="card grades">
+  <span class="badge" style="background:color-mix(in srgb,var(--go) 16%,transparent);color:var(--go)">8–10</span>
+  <b data-l="en">Epic</b><b data-l="ru">Отлично</b><b data-l="th">ยอดเยี่ยม</b>
+  <span data-l="en">Best it gets here. Drop everything.</span><span data-l="ru">Лучше здесь не бывает. Бросай всё.</span><span data-l="th">ดีที่สุดเท่าที่ที่นี่จะมี ทิ้งทุกอย่างแล้วไปเลย</span>
+
+  <span class="badge" style="background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)">6–7</span>
+  <b data-l="en">Good</b><b data-l="ru">Хорошо</b><b data-l="th">ดี</b>
+  <span data-l="en">What you come here for. Go.</span><span data-l="ru">То, ради чего сюда едут. Надо ехать.</span><span data-l="th">คือเหตุผลที่คนมาที่นี่ ควรไป</span>
+
+  <span class="badge" style="background:color-mix(in srgb,var(--fair) 16%,transparent);color:var(--fair)">5</span>
+  <b data-l="en">Fair</b><b data-l="ru">Средне</b><b data-l="th">ปานกลาง</b>
+  <span data-l="en">Most waves are rideable. Worth it if you are close.</span><span data-l="ru">Большинство волн можно поймать. Стоит, если рядом.</span><span data-l="th">คลื่นส่วนใหญ่เล่นได้ คุ้มถ้าอยู่ใกล้</span>
+
+  <span class="badge" style="background:color-mix(in srgb,var(--mid) 16%,transparent);color:var(--mid)">3–4</span>
+  <b data-l="en">Poor</b><b data-l="ru">Слабо</b><b data-l="th">อ่อน</b>
+  <span data-l="en">Rare rideable waves. You can skip it.</span><span data-l="ru">Редкие волны, их надо ловить. Можно не ехать.</span><span data-l="th">คลื่นที่เล่นได้มีน้อย ไม่ไปก็ได้</span>
+
+  <span class="badge" style="background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)">2</span>
+  <b data-l="en">Very poor</b><b data-l="ru">Очень слабо</b><b data-l="th">อ่อนมาก</b>
+  <span data-l="en">You can paddle, you will not ride.</span><span data-l="ru">Погрести можно, покататься нет.</span><span data-l="th">พายได้ แต่ไม่ได้เล่นคลื่น</span>
+
+  <span class="badge" style="background:color-mix(in srgb,var(--no) 22%,transparent);color:var(--dim2)">0–1</span>
+  <b data-l="en">Flat</b><b data-l="ru">Плоско</b><b data-l="th">ทะเลเรียบ</b>
+  <span data-l="en">Nothing to catch.</span><span data-l="ru">Ловить нечего.</span><span data-l="th">ไม่มีคลื่นให้เล่น</span>
+</div>
+
+<!-- ===== factors ===== -->
+<h2><span data-l="en">Four things, one number</span><span data-l="ru">Четыре вещи, одно число</span><span data-l="th">สี่อย่าง รวมเป็นหนึ่งคะแนน</span></h2>
+<p data-l="en">The score is a mix of four factors, each rated 0 to 10 on its own. They do not count equally:</p>
+<p data-l="ru">Балл складывается из четырёх факторов. Каждый оценивается сам по себе от 0 до 10, но весят они по-разному:</p><p data-l="th">คะแนนมาจากสี่ปัจจัย แต่ละอย่างให้คะแนน 0 ถึง 10 แยกกัน แต่มีน้ำหนักไม่เท่ากัน:</p>
+<div class="card">
+  <div class="bar">
+    <div style="width:34%;background:var(--acc)"></div>
+    <div style="width:30%;background:var(--go)"></div>
+    <div style="width:20%;background:var(--fair)"></div>
+    <div style="width:16%;background:var(--mid)"></div>
+  </div>
+  <div class="fac"><b style="color:var(--acc)">34%</b>
+    <span data-l="en"><b>Wave size</b> against what this particular beach likes.</span>
+    <span data-l="ru"><b>Размер волны</b> по сравнению с тем, что любит именно этот пляж.</span><span data-l="th"><b>ขนาดคลื่น</b> เทียบกับขนาดที่ชายหาดนั้นชอบ</span></div>
+  <div class="fac"><b style="color:var(--go)">30%</b>
+    <span data-l="en"><b>Wind</b>: where it blows from and how hard.</span>
+    <span data-l="ru"><b>Ветер</b>: откуда дует и насколько сильно.</span><span data-l="th"><b>ลม</b>: พัดมาจากทางไหนและแรงแค่ไหน</span></div>
+  <div class="fac"><b style="color:var(--fair)">20%</b>
+    <span data-l="en"><b>Period</b>: seconds between waves. Tells how powerful they are.</span>
+    <span data-l="ru"><b>Период</b>: секунды между волнами. Говорит, насколько они мощные.</span><span data-l="th"><b>คาบคลื่น</b>: จำนวนวินาทีระหว่างคลื่น บอกว่าคลื่นมีพลังแค่ไหน</span></div>
+  <div class="fac"><b style="color:var(--mid)">16%</b>
+    <span data-l="en"><b>Direction</b>: does the swell hit the beach straight or pass by.</span>
+    <span data-l="ru"><b>Направление</b>: бьёт волна в пляж прямо или проходит мимо.</span><span data-l="th"><b>ทิศทาง</b>: คลื่นเข้าหาหาดตรงๆ หรือผ่านไปด้านข้าง</span></div>
+  <p class="small" style="margin:8px 0 0" data-l="en">Plus a small bonus or penalty for the tide, if the beach has a favourite one.</p>
+  <p class="small" style="margin:8px 0 0" data-l="ru">Плюс небольшая прибавка или штраф за прилив, если у пляжа есть любимый.</p><p class="small" style="margin:8px 0 0" data-l="th">บวกหรือลบเล็กน้อยตามระดับน้ำขึ้นลง ถ้าหาดนั้นชอบระดับน้ำแบบใดแบบหนึ่ง</p>
+</div>
+
+<!-- ===== size ===== -->
+<h2><span data-l="en">Size: every beach has its own range</span><span data-l="ru">Размер: у каждого пляжа свой диапазон</span><span data-l="th">ขนาด: แต่ละหาดมีช่วงของตัวเอง</span></h2>
+<p data-l="en">Kata starts working from about 0.6 m. Kalim, a reef, needs almost 2 m. So the same wave can be great on one beach and useless on another. Best is a bit above the bottom of the range; too much and it closes out.</p>
+<p data-l="ru">Ката начинает работать примерно с 0,6 м. Калиму, это риф, нужно почти 2 м. Поэтому одна и та же волна на одном пляже отличная, а на другом бесполезна. Лучше всего чуть выше нижней границы; если слишком много, волна закрывается.</p><p data-l="th">กะตะเริ่มเล่นได้ราว 0.6 ม. กะหลิมซึ่งเป็นแนวปะการังต้องการเกือบ 2 ม. คลื่นเดียวกันจึงอาจดีมากที่หาดหนึ่งและใช้ไม่ได้ที่อีกหาด ดีที่สุดคือสูงกว่าขอบล่างเล็กน้อย ถ้าใหญ่เกินไปคลื่นจะปิดทั้งแนว</p>
+<div class="card">
+  <svg class="sk" viewBox="0 0 560 120" role="img" aria-label="Size scale">
+    <line x1="20" y1="70" x2="540" y2="70" stroke="var(--line)" stroke-width="14"/>
+    <path d="M120 70 L520 70" stroke="color-mix(in srgb,var(--ok) 35%,transparent)" stroke-width="14"/>
+    <path d="M20 94 C80 94 110 90 120 86 C170 60 230 22 300 20 C380 24 460 60 520 80" stroke="var(--acc)" stroke-width="3"/>
+    <line x1="120" y1="50" x2="120" y2="90" stroke="var(--dim2)" stroke-width="2" stroke-dasharray="4 4"/>
+    <line x1="520" y1="50" x2="520" y2="90" stroke="var(--dim2)" stroke-width="2" stroke-dasharray="4 4"/>
+    <text x="120" y="112" text-anchor="middle" font-size="12" fill="var(--dim)">min</text>
+    <text x="300" y="112" text-anchor="middle" font-size="12" fill="var(--ok)">★</text>
+    <text x="520" y="112" text-anchor="middle" font-size="12" fill="var(--dim)">max</text>
+  </svg>
+  <p class="small" style="margin:6px 0 0" data-l="en">Blue line: how many points size gives. Low below the range, peak a bit above the minimum, falling towards the top. Above the maximum a red "too big" warning appears instead.</p>
+  <p class="small" style="margin:6px 0 0" data-l="ru">Синяя линия: сколько баллов даёт размер. Ниже диапазона мало, пик чуть выше минимума, к верхней границе снова меньше. Выше максимума вместо баллов появляется красное предупреждение «слишком большая».</p><p class="small" style="margin:6px 0 0" data-l="th">เส้นสีฟ้า: ขนาดให้คะแนนเท่าไร ต่ำกว่าช่วงได้น้อย สูงสุดที่เหนือค่าต่ำสุดเล็กน้อย แล้วลดลงเมื่อใกล้ขอบบน ถ้าเกินค่าสูงสุดจะมีคำเตือนสีแดงว่า «ใหญ่เกินไป»</p>
+</div>
+<p data-l="en"><b>No waves, no score.</b> Perfect wind and direction cannot make up for a flat sea. When the wave is below the range, the score cannot rise above about 3.</p>
+<p data-l="ru"><b>Нет волны, нет балла.</b> Идеальный ветер и направление не спасут плоское море. Если волна ниже диапазона, балл не поднимется выше примерно 3.</p><p data-l="th"><b>ไม่มีคลื่น ก็ไม่มีคะแนน</b> ลมและทิศทางที่ดีช่วยทะเลเรียบไม่ได้ ถ้าคลื่นต่ำกว่าช่วง คะแนนจะไม่เกินราว 3</p>
+
+<!-- ===== period ===== -->
+<h2><span data-l="en">Period: same height, different wave</span><span data-l="ru">Период: высота та же, волна другая</span><span data-l="th">คาบคลื่น: สูงเท่ากัน แต่เป็นคลื่นคนละแบบ</span></h2>
+<p data-l="en">Period is the time between two waves. It matters as much as height. On 8 and 14 September 2026 Nai Harn had the same 0.7 m, and they were two different days:</p>
+<p data-l="ru">Период — это время между двумя волнами. Он важен не меньше высоты. 8 и 14 сентября 2026 на Най Харне было одинаково 0,7 м, а дни были совсем разные:</p><p data-l="th">คาบคลื่นคือเวลาระหว่างคลื่นสองลูก สำคัญพอๆ กับความสูง วันที่ 8 และ 14 กันยายน 2026 ที่หาดในหานสูง 0.7 ม. เท่ากัน แต่เป็นสองวันที่ต่างกันมาก:</p>
+<div class="card">
+  <p style="margin:0 0 2px"><b data-l="en">5 s</b><b data-l="ru">5 с</b><b data-l="th">5 วิ</b> <span class="dim" data-l="en">· short, wind-made waves</span><span class="dim" data-l="ru">· короткие, их нагнал ветер</span><span class="dim" data-l="th">· คลื่นสั้นที่เกิดจากลม</span></p>
+  <svg class="sk" id="pShort" viewBox="0 0 560 90" aria-hidden="true"></svg>
+  <p class="small" data-l="en">Close together, weak, crumbly. Little push, no time between them. You paddle a lot and ride little.</p>
+  <p class="small" data-l="ru">Идут часто, слабые, рассыпаются. Толкают мало, передышки нет. Много гребёшь, мало катаешься.</p><p class="small" data-l="th">มาถี่ อ่อน แตกกระจาย แรงส่งน้อย ไม่มีช่วงพัก พายเยอะ ได้เล่นน้อย</p>
+  <p style="margin:12px 0 2px"><b data-l="en">14 s</b><b data-l="ru">14 с</b><b data-l="th">14 วิ</b> <span class="dim" data-l="en">· long swell from a far storm</span><span class="dim" data-l="ru">· длинный свелл от далёкого шторма</span><span class="dim" data-l="th">· สเวลยาวจากพายุที่อยู่ไกล</span></p>
+  <svg class="sk" id="pLong" viewBox="0 0 560 90" aria-hidden="true"></svg>
+  <p class="small" style="margin:0" data-l="en">Rare, even and heavy. Near the shore they stand up much taller than the forecast height, and there is time to paddle back out. Longer wait, much better ride.</p>
+  <p class="small" style="margin:0" data-l="ru">Редкие, ровные и тяжёлые. У берега встают заметно выше, чем высота в прогнозе, и успеваешь выгрести обратно. Ждать дольше, катание намного лучше.</p><p class="small" style="margin:0" data-l="th">มาห่างๆ เรียบ และหนัก ใกล้ฝั่งจะตั้งสูงกว่าความสูงในพยากรณ์มาก และมีเวลาพายกลับออกไป รอนานกว่า แต่เล่นได้ดีกว่ามาก</p>
+</div>
+<p data-l="en">That is why the height used for scoring is corrected by period: long swell counts as bigger, short chop as smaller.</p>
+<p data-l="ru">Поэтому для балла высота поправляется на период: длинный свелл считается как более крупная волна, короткая рябь как более мелкая.</p><p data-l="th">ดังนั้นความสูงที่ใช้คิดคะแนนจึงปรับตามคาบคลื่น: สเวลยาวนับเป็นคลื่นที่ใหญ่ขึ้น คลื่นสั้นนับเป็นคลื่นที่เล็กลง</p>
+
+<!-- ===== wind ===== -->
+<h2><span data-l="en">Wind: from the land is good, from the sea is bad</span><span data-l="ru">Ветер: с берега хорошо, с моря плохо</span><span data-l="th">ลม: จากฝั่งดี จากทะเลไม่ดี</span></h2>
+<div class="card">
+  <svg class="sk" id="windOff" viewBox="0 0 560 110" aria-hidden="true"></svg>
+  <p class="small" data-l="en"><b style="color:var(--ok)">Offshore</b>, blowing from land to sea: it holds the wave face up, waves are clean and break later. Up to about 6 m/s this only helps.</p>
+  <p class="small" data-l="ru"><b style="color:var(--ok)">С берега</b>, дует с суши в море: держит стенку волны, она чистая и ломается позже. До 6 м/с это только плюс.</p><p class="small" data-l="th"><b style="color:var(--ok)">ลมจากฝั่ง</b> พัดจากบกออกทะเล: ช่วยพยุงหน้าคลื่น คลื่นสะอาดและแตกช้าลง ไม่เกินราว 6 ม./วิ ช่วยได้อย่างเดียว</p>
+  <svg class="sk" id="windOn" viewBox="0 0 560 110" aria-hidden="true"></svg>
+  <p class="small" style="margin:0" data-l="en"><b style="color:var(--bad)">Onshore</b>, blowing from the sea: pushes the tops over, the water gets choppy and messy. Every extra metre per second costs points fast.</p>
+  <p class="small" style="margin:0" data-l="ru"><b style="color:var(--bad)">С моря</b>: сдувает гребни вперёд, вода рябит и становится кашей. Каждый лишний метр в секунду быстро отнимает баллы.</p><p class="small" style="margin:0" data-l="th"><b style="color:var(--bad)">ลมจากทะเล</b>: ผลักยอดคลื่นให้ล้มก่อน น้ำเป็นระลอกและยุ่ง ลมแรงขึ้นทุก ม./วิ ทำให้คะแนนลดเร็ว</p>
+</div>
+<p data-l="en">Wind from the side is in between. No wind at all is almost as good as offshore.</p>
+<p data-l="ru">Боковой ветер где-то посередине. Полный штиль почти так же хорош, как ветер с берега.</p><p data-l="th">ลมด้านข้างอยู่ระหว่างกลาง ไม่มีลมเลยดีเกือบเท่าลมจากฝั่ง</p>
+
+<!-- ===== examples ===== -->
+<h2><span data-l="en">Examples</span><span data-l="ru">Примеры</span><span data-l="th">ตัวอย่าง</span></h2>
+<p data-l="en">Real scores the site gives for Kata (working range 0.6–3.1 m, faces west).</p>
+<p data-l="ru">Настоящие баллы, которые сайт ставит Кате (рабочий диапазон 0,6–3,1 м, смотрит на запад).</p><p data-l="th">คะแนนจริงที่เว็บให้หาดกะตะ (ช่วงที่เล่นได้ 0.6–3.1 ม. หันไปทางตะวันตก)</p>
+<div id="examples"></div>
+
+<!-- ===== honest ===== -->
+<h2><span data-l="en">Where it can be wrong</span><span data-l="ru">Где можно ошибиться</span><span data-l="th">อาจผิดพลาดตรงไหน</span></h2>
+<p data-l="en">Forecast models see the sea on a 9 km grid; they do not see a sandbar or a reef. Beach ranges are estimates, and they are corrected after real sessions: if the site said 3 and it was a 6, the numbers get adjusted. It is a forecast, not a safety service.</p>
+<p data-l="ru">Модели прогноза видят море сеткой 9 км и не видят отмель или риф. Диапазоны пляжей — это оценки, их поправляют по реальным катаниям: если сайт показывал 3, а было на 6, цифры подкручиваются. Это прогноз, а не служба безопасности.</p><p data-l="th">แบบจำลองพยากรณ์มองทะเลเป็นตาราง 9 กม. จึงไม่เห็นสันทรายหรือแนวปะการัง ช่วงของแต่ละหาดเป็นค่าประมาณและถูกปรับจากการเล่นจริง: ถ้าเว็บบอก 3 แต่จริงๆ เป็น 6 ตัวเลขจะถูกปรับ นี่คือพยากรณ์ ไม่ใช่บริการด้านความปลอดภัย</p>
+
+</div>
+
+<script>
+/* Language switch shared with the main page */
+const setLang=l=>{ document.documentElement.lang=l;
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.set===l));
+  try{ localStorage.setItem('lang',l) }catch{} };
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.set));
+setLang(document.documentElement.lang);
+
+/* Sea profile: height in px, gap between crests in px, chop adds small ripples */
+function sea(h,gap,chop=0,y=60,w=560){
+  let d=`M0 ${y}`;
+  for(let x=0;x<w;x+=gap){
+    const c=x+gap*.62;
+    d+=` C${x+gap*.35} ${y} ${c-gap*.12} ${y-h} ${c} ${y-h} C${c+gap*.1} ${y-h} ${c+gap*.14} ${y-h*.55} ${x+gap} ${y}`;
+  }
+  let r='';
+  if(chop) for(let x=6;x<w;x+=18) r+=`<path d="M${x} ${y+10+ (x%36?3:0)} q5 -${chop} 10 0" stroke="var(--acc)" stroke-width="1.6" opacity=".55"/>`;
+  return `<path d="${d} L${w} ${y+30} L0 ${y+30}Z" style="fill:var(--sea);stroke:none"/>
+    <path d="${d}" stroke="var(--acc)" stroke-width="3"/>${r}`;
+}
+function arrows(dir,y=22){
+  // dir 1 = to the right (offshore when the shore is on the left)
+  let s='';
+  for(const x of [150,300,450]){
+    const a=dir>0?[x-40,x+40]:[x+40,x-40];
+    s+=`<line x1="${a[0]}" y1="${y}" x2="${a[1]}" y2="${y}" stroke="var(--dim2)" stroke-width="2.2"/>
+      <path d="M${a[1]-dir*9} ${y-6} L${a[1]} ${y} L${a[1]-dir*9} ${y+6}" stroke="var(--dim2)" stroke-width="2.2"/>`;
+  }
+  return s;
+}
+const beach=`<path d="M0 104 L70 104 C60 80 45 70 0 66Z" style="fill:color-mix(in srgb,var(--fair) 35%,transparent);stroke:none"/>`;
+document.getElementById('pShort').innerHTML=sea(22,56,0,70);
+document.getElementById('pLong').innerHTML=sea(40,190,0,70);
+document.getElementById('windOff').innerHTML=beach+`<g transform="translate(70,0)">${sea(34,150,0,80,490)}</g>`+arrows(1);
+document.getElementById('windOn').innerHTML=beach+`<g transform="translate(70,0)">${sea(22,60,5,80,490)}</g>`+arrows(-1);
+
+/* Scores below come from the site's own formula for Kata */
+const L=document.documentElement;
+const EX=[
+  {s:9, c:'go', h:40,g:190,ch:0,w:1,
+   en:['Long swell, calm','0.7 m · 14 s · wind 1.5 m/s offshore','Modest height, but long period and no wind: clean, powerful and rare waves.'],
+   ru:['Длинный свелл, штиль','0,7 м · 14 с · ветер 1,5 м/с с берега','Высота скромная, но длинный период и нет ветра: чистые, мощные, редкие волны.'],
+   th:['สเวลยาว ไม่มีลม','0.7 ม. · 14 วิ · ลม 1.5 ม./วิ จากฝั่ง','สูงไม่มาก แต่คาบยาวและไม่มีลม: คลื่นสะอาด มีพลัง มาห่างๆ']},
+  {s:6, c:'ok', h:30,g:70,ch:0,w:1,
+   en:['Short waves, offshore wind','1.0 m · 6 s · wind 3 m/s offshore','Weak and frequent waves, but the wind keeps them tidy. Worth going.'],
+   ru:['Короткая волна, ветер с берега','1,0 м · 6 с · ветер 3 м/с с берега','Волны частые и слабые, но ветер держит их аккуратными. Ехать стоит.'],
+   th:['คลื่นสั้น ลมจากฝั่ง','1.0 ม. · 6 วิ · ลม 3 ม./วิ จากฝั่ง','คลื่นถี่และอ่อน แต่ลมช่วยให้เป็นระเบียบ คุ้มที่จะไป']},
+  {s:6, c:'ok', h:36,g:190,ch:5,w:-1,
+   en:['Long swell, strong onshore wind','0.7 m · 14 s · wind 8 m/s from the sea','Good swell spoiled by wind: still rideable, but messy. It would be a 9 on a calm day.'],
+   ru:['Длинный свелл, сильный ветер с моря','0,7 м · 14 с · ветер 8 м/с с моря','Хороший свелл испорчен ветром: кататься можно, но каша. В штиль было бы 9.'],
+   th:['สเวลยาว ลมทะเลแรง','0.7 ม. · 14 วิ · ลม 8 ม./วิ จากทะเล','สเวลดีแต่ลมทำเสีย: ยังเล่นได้แต่ยุ่ง ถ้าไม่มีลมจะได้ 9']},
+  {s:4, c:'mid', h:22,g:56,ch:0,w:1,
+   en:['Short waves, calm','0.7 m · 5 s · wind 1.5 m/s','Same height as the first example, but short period: small and weak. You can skip it.'],
+   ru:['Короткая волна, штиль','0,7 м · 5 с · ветер 1,5 м/с','Высота как в первом примере, но период короткий: мелко и слабо. Можно не ехать.'],
+   th:['คลื่นสั้น ไม่มีลม','0.7 ม. · 5 วิ · ลม 1.5 ม./วิ','สูงเท่าตัวอย่างแรก แต่คาบสั้น: เล็กและอ่อน ไม่ไปก็ได้']},
+  {s:3, c:'mid', h:26,g:60,ch:6,w:-1,
+   en:['Short waves, strong onshore wind','1.0 m · 6 s · wind 8 m/s from the sea','Choppy wash. There is water moving, not waves to ride.'],
+   ru:['Короткая волна, сильный ветер с моря','1,0 м · 6 с · ветер 8 м/с с моря','Рябь и каша. Вода движется, а кататься не на чем.'],
+   th:['คลื่นสั้น ลมทะเลแรง','1.0 ม. · 6 วิ · ลม 8 ม./วิ จากทะเล','น้ำเป็นระลอกยุ่งๆ มีน้ำเคลื่อนไหว แต่ไม่มีคลื่นให้เล่น']},
+  {s:3, c:'mid', h:8,g:120,ch:0,w:1,
+   en:['Perfect wind, no waves','0.25 m · 8 s · wind 1 m/s offshore','Everything is perfect except there is nothing to ride. Size caps the score.'],
+   ru:['Идеальный ветер, волны нет','0,25 м · 8 с · ветер 1 м/с с берега','Всё идеально, только кататься не на чем. Размер ограничивает балл.'],
+   th:['ลมดีมาก ไม่มีคลื่น','0.25 ม. · 8 วิ · ลม 1 ม./วิ จากฝั่ง','ทุกอย่างดีหมด ยกเว้นไม่มีคลื่นให้เล่น ขนาดจำกัดคะแนน']},
+  {s:7, c:'ok', h:62,g:220,ch:0,w:1,danger:1,
+   en:['Too big','3.6 m · 15 s · wind 2 m/s','The score is still decent, but a red warning appears: bigger than this beach handles. Experienced surfers only.'],
+   ru:['Слишком большая','3,6 м · 15 с · ветер 2 м/с','Балл ещё приличный, но появляется красное предупреждение: больше, чем держит пляж. Только для опытных.'],
+   th:['ใหญ่เกินไป','3.6 ม. · 15 วิ · ลม 2 ม./วิ','คะแนนยังพอใช้ แต่มีคำเตือนสีแดง: ใหญ่เกินกว่าที่หาดนี้รับได้ สำหรับนักเซิร์ฟที่มีประสบการณ์เท่านั้น']}
+];
+const grade={go:['Epic','Отлично','ยอดเยี่ยม'],ok:['Good','Хорошо','ดี'],fair:['Fair','Средне','ปานกลาง'],mid:['Poor','Слабо','อ่อน']};
+document.getElementById('examples').innerHTML=EX.map(e=>`
+  <div class="card">
+    <div class="ex">
+      <div>${['en','ru','th'].map(l=>`<div data-l="${l}"><h3>${e[l][0]}</h3><div class="cond">${e[l][1]}</div></div>`).join('')}</div>
+      <div class="score" style="background:color-mix(in srgb,var(--${e.c}) 16%,transparent);color:var(--${e.c})">${e.s}
+        <small data-l="en">${grade[e.c][0].toUpperCase()}</small><small data-l="ru">${grade[e.c][1].toUpperCase()}</small><small data-l="th">${grade[e.c][2]}</small></div>
+    </div>
+    <svg class="sk" viewBox="0 0 560 110" aria-hidden="true" style="margin:8px 0">${beach}<g transform="translate(70,0)">${sea(e.h,e.g,e.ch,86,490)}</g>${arrows(e.w,20)}</svg>
+    ${['en','ru','th'].map(l=>`<p class="small" style="margin:0" data-l="${l}">${e.danger?'<span class="warn">⚠ </span>':''}${e[l][2]}</p>`).join('')}
+  </div>`).join('');
+</script>
+</body>
+</html>

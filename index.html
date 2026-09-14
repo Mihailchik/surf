@@ -115,6 +115,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .rowx[open] .chev{transform:rotate(90deg)}
 .rowx .chev{transition:transform .2s;font-size:13px;color:var(--dim2);flex:0 0 auto;margin-left:2px}
 .rowbody{border-top:1px solid var(--line);background:var(--card2)}
+.exact{margin:0;padding:8px 12px 0;font-size:12.5px;color:var(--dim)}
 .rowbody .beach{margin:0;padding:8px 12px 0;font-size:12.5px;color:var(--dim)}
 .rowbody .beach b{color:var(--tx)}
 .rowbody .grid,.rowbody .tim,.rowbody .why,.rowbody .srcbox,.rowbody .nocam{background:var(--card)}
@@ -361,6 +362,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
   <div class="src" id="src"></div>
+  <div class="made"><a id="howlink" href="how.html">How the score works</a></div>
   <div class="made">made by <a href="https://voidstudio.top" target="_blank" rel="noopener">voidstudio.top</a></div>
   <div class="hits"><img alt="" width="56" height="20"
     src="https://hits.sh/surf.voidstudio.top.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
@@ -462,7 +464,7 @@ const I18N={
   title:'Surf', now:'Now', island:'Phuket', d7:'10 days',
   go:'GO', ok:'WORTH IT', weak:'WEAK', no:'SKIP',
   darkNow:'dark now. ', bestIs:'best is {0}', windowAt:'window {0} {1}',
-  loading:'Loading forecast', today:'today', tomorrow:'tomorrow', peak:'peak', beach:'Beach', outOf:'of 10',
+  loading:'Loading forecast', howLink:'How the score works', exact:'Exact score', today:'today', tomorrow:'tomorrow', peak:'peak', beach:'Beach', outOf:'of 10',
   wave:'wave', period:'period', wind:'wind', water:'water',
   noCam:'no camera', camNone:'no public camera',
   tPeak:'peak', tTide:'tide', tNow:'now',
@@ -546,7 +548,7 @@ const I18N={
   title:'Surf', now:'Сейчас', island:'Пхукет', d7:'10 дней',
   go:'ЕХАТЬ', ok:'МОЖНО', weak:'СЛАБО', no:'НЕ СТОИТ',
   darkNow:'сейчас темно. ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
-  loading:'Загружаю прогноз', today:'сегодня', tomorrow:'завтра', peak:'пик', beach:'Пляж', outOf:'из 10',
+  loading:'Загружаю прогноз', howLink:'Как считаются баллы', exact:'Точный балл', today:'сегодня', tomorrow:'завтра', peak:'пик', beach:'Пляж', outOf:'из 10',
   wave:'волна', period:'период', wind:'ветер', water:'вода',
   noCam:'камеры нет', camNone:'публичных камер нет',
   tPeak:'пик', tTide:'прилив', tNow:'сейчас',
@@ -630,7 +632,7 @@ const I18N={
   title:'Surf', now:'ตอนนี้', island:'ภูเก็ต', d7:'10 วัน',
   go:'ไปเลย', ok:'พอไหว', weak:'คลื่นเล็ก', no:'ไม่ควรไป',
   darkNow:'ตอนนี้มืดแล้ว · ', bestIs:'ดีที่สุดคือ {0}', windowAt:'ช่วงเวลา {0} {1}',
-  loading:'กำลังโหลดพยากรณ์', today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', beach:'ชายหาด', outOf:'จาก 10',
+  loading:'กำลังโหลดพยากรณ์', howLink:'คะแนนคำนวณอย่างไร', exact:'คะแนนละเอียด', today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', beach:'ชายหาด', outOf:'จาก 10',
   wave:'คลื่น', period:'คาบคลื่น', wind:'ลม', water:'น้ำ',
   noCam:'ไม่มีกล้อง', camNone:'ไม่มีกล้องสาธารณะ',
   tPeak:'สูงสุด', tTide:'น้ำขึ้นลง', tNow:'ตอนนี้',
@@ -1656,9 +1658,11 @@ document.addEventListener('toggle',e=>{
   const sp=SPOTS.find(x=>x.id===d.dataset.s), rows=sp&&DATA[sp.id];
   if(!rows) return;
   const i0=+d.dataset.i0, r=rows[+d.dataset.r]||rows[i0];
+  // the badge shows a whole number; the unrounded score is here for an honest look
+  const exact=r.score==null?'':`<p class="exact">${t('exact')}: <b style="color:${scoreColor(r.score)}">${fmt(r.score,1)}</b> / 10</p>`;
   const html = d.dataset.k==='day'  ? hourStrip(rows,i0)+timing(sp,rows,i0)+why(sp,r)+sources(r)
-             : d.dataset.k==='row'  ? (sp.beach?`<p class="beach">${t('beach')}: <b>${sp.beach[LANG]||sp.beach.en}</b></p>`:'')+camBlock(sp)+timing(sp,rows,i0)+hourStrip(rows,i0)+why(sp,r)+sources(r)
-             : hourStrip(rows,i0)+why(sp,r)+sources(r);
+             : d.dataset.k==='row'  ? exact+(sp.beach?`<p class="beach">${t('beach')}: <b>${sp.beach[LANG]||sp.beach.en}</b></p>`:'')+camBlock(sp)+timing(sp,rows,i0)+hourStrip(rows,i0)+why(sp,r)+sources(r)
+             : exact+hourStrip(rows,i0)+why(sp,r)+sources(r);
   d.querySelector('.lz').innerHTML=html;
   d.dataset.done='1';
 },true);
@@ -1681,6 +1685,7 @@ function applyLang(){
   document.getElementById('regbtn').onclick=e=>{e.stopPropagation();
     const m=document.getElementById('regmenu'); m.hidden=!m.hidden;};
   document.title='Surf · '+regName();
+  document.getElementById('howlink').textContent=t('howLink');
   const map={now:'now',island:'island',d7:'d7'};
   document.querySelectorAll('.tab').forEach(b=>b.textContent=b.dataset.t==='island'?regName():t(map[b.dataset.t]));
   document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));

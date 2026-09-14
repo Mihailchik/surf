@@ -77,6 +77,11 @@ colour:
 | 2 | VERY POOR | you can paddle, you will not ride |
 | 0–1 | FLAT | nothing to catch |
 
+A plain-language explainer with drawings and worked examples lives in
+`how.html` (EN, RU, TH), linked from the page footer. Its example scores are
+computed with the site's own formula for Kata; update them if `TUNE` changes.
+When a beach is expanded, the unrounded score is shown next to the badge.
+
 ### Tuning
 
 Every number that decides what counts as good lives in one block, `TUNE`, near
