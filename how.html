@@ -100,7 +100,7 @@ html[lang="en"] [data-l="en"],html[lang="ru"] [data-l="ru"],html[lang="th"] [dat
 
   <span class="badge" style="background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)">2</span>
   <b data-l="en">Very poor</b><b data-l="ru">Очень слабо</b><b data-l="th">อ่อนมาก</b>
-  <span data-l="en">You can paddle, you will not ride.</span><span data-l="ru">Погрести можно, покататься нет.</span><span data-l="th">พายได้ แต่ไม่ได้เล่นคลื่น</span>
+  <span data-l="en">Paddling only.</span><span data-l="ru">Только погрести.</span><span data-l="th">พายได้อย่างเดียว</span>
 
   <span class="badge" style="background:color-mix(in srgb,var(--no) 22%,transparent);color:var(--dim2)">0–1</span>
   <b data-l="en">Flat</b><b data-l="ru">Плоско</b><b data-l="th">ทะเลเรียบ</b>
@@ -109,7 +109,7 @@ html[lang="en"] [data-l="en"],html[lang="ru"] [data-l="ru"],html[lang="th"] [dat
 
 <!-- ===== factors ===== -->
 <h2><span data-l="en">Four things, one number</span><span data-l="ru">Четыре вещи, одно число</span><span data-l="th">สี่อย่าง รวมเป็นหนึ่งคะแนน</span></h2>
-<p data-l="en">The score is a mix of four factors, each rated 0 to 10 on its own. They do not count equally:</p>
+<p data-l="en">The score is a mix of four factors, each rated 0 to 10 on its own. Their weights differ:</p>
 <p data-l="ru">Балл складывается из четырёх факторов. Каждый оценивается сам по себе от 0 до 10, но весят они по-разному:</p><p data-l="th">คะแนนมาจากสี่ปัจจัย แต่ละอย่างให้คะแนน 0 ถึง 10 แยกกัน แต่มีน้ำหนักไม่เท่ากัน:</p>
 <div class="card">
   <div class="bar">
@@ -152,13 +152,13 @@ html[lang="en"] [data-l="en"],html[lang="ru"] [data-l="ru"],html[lang="th"] [dat
   <p class="small" style="margin:6px 0 0" data-l="en">Blue line: how many points size gives. Low below the range, peak a bit above the minimum, falling towards the top. Above the maximum a red "too big" warning appears instead.</p>
   <p class="small" style="margin:6px 0 0" data-l="ru">Синяя линия: сколько баллов даёт размер. Ниже диапазона мало, пик чуть выше минимума, к верхней границе снова меньше. Выше максимума вместо баллов появляется красное предупреждение «слишком большая».</p><p class="small" style="margin:6px 0 0" data-l="th">เส้นสีฟ้า: ขนาดให้คะแนนเท่าไร ต่ำกว่าช่วงได้น้อย สูงสุดที่เหนือค่าต่ำสุดเล็กน้อย แล้วลดลงเมื่อใกล้ขอบบน ถ้าเกินค่าสูงสุดจะมีคำเตือนสีแดงว่า «ใหญ่เกินไป»</p>
 </div>
-<p data-l="en"><b>No waves, no score.</b> Perfect wind and direction cannot make up for a flat sea. When the wave is below the range, the score cannot rise above about 3.</p>
-<p data-l="ru"><b>Нет волны, нет балла.</b> Идеальный ветер и направление не спасут плоское море. Если волна ниже диапазона, балл не поднимется выше примерно 3.</p><p data-l="th"><b>ไม่มีคลื่น ก็ไม่มีคะแนน</b> ลมและทิศทางที่ดีช่วยทะเลเรียบไม่ได้ ถ้าคลื่นต่ำกว่าช่วง คะแนนจะไม่เกินราว 3</p>
+<p data-l="en"><b>Without waves the score stays low.</b> Perfect wind and direction cannot make up for a flat sea. When the wave is below the range, the score cannot rise above about 3.</p>
+<p data-l="ru"><b>Без волны балл низкий.</b> Идеальный ветер и направление не спасут плоское море. Если волна ниже диапазона, балл не поднимется выше примерно 3.</p><p data-l="th"><b>ไม่มีคลื่น คะแนนก็ต่ำ</b> ลมและทิศทางที่ดีช่วยทะเลเรียบไม่ได้ ถ้าคลื่นต่ำกว่าช่วง คะแนนจะไม่เกินราว 3</p>
 
 <!-- ===== period ===== -->
-<h2><span data-l="en">Period: same height, different wave</span><span data-l="ru">Период: высота та же, волна другая</span><span data-l="th">คาบคลื่น: สูงเท่ากัน แต่เป็นคลื่นคนละแบบ</span></h2>
-<p data-l="en">Period is the time between two waves. It matters as much as height. On 8 and 14 September 2026 Nai Harn had the same 0.7 m, and they were two different days:</p>
-<p data-l="ru">Период — это время между двумя волнами. Он важен не меньше высоты. 8 и 14 сентября 2026 на Най Харне было одинаково 0,7 м, а дни были совсем разные:</p><p data-l="th">คาบคลื่นคือเวลาระหว่างคลื่นสองลูก สำคัญพอๆ กับความสูง วันที่ 8 และ 14 กันยายน 2026 ที่หาดในหานสูง 0.7 ม. เท่ากัน แต่เป็นสองวันที่ต่างกันมาก:</p>
+<h2><span data-l="en">Period: seconds between waves</span><span data-l="ru">Период: секунды между волнами</span><span data-l="th">คาบคลื่น: วินาทีระหว่างคลื่น</span></h2>
+<p data-l="en">Period is the time between two waves. It matters as much as height. On 8 and 14 September 2026 Nai Harn had the same 0.7 m. The 8th was poor, the 14th was great:</p>
+<p data-l="ru">Период: время между двумя волнами. Он важен не меньше высоты. 8 и 14 сентября 2026 на Най Харне было одинаково 0,7 м. 8-го было плохо, 14-го отлично:</p><p data-l="th">คาบคลื่นคือเวลาระหว่างคลื่นสองลูก สำคัญพอๆ กับความสูง วันที่ 8 และ 14 กันยายน 2026 ที่หาดในหานสูง 0.7 ม. เท่ากัน วันที่ 8 เล่นไม่ดี วันที่ 14 ดีมาก:</p>
 <div class="card">
   <p style="margin:0 0 2px"><b data-l="en">5 s</b><b data-l="ru">5 с</b><b data-l="th">5 วิ</b> <span class="dim" data-l="en">· short, wind-made waves</span><span class="dim" data-l="ru">· короткие, их нагнал ветер</span><span class="dim" data-l="th">· คลื่นสั้นที่เกิดจากลม</span></p>
   <svg class="sk" id="pShort" viewBox="0 0 560 90" aria-hidden="true"></svg>
@@ -193,8 +193,8 @@ html[lang="en"] [data-l="en"],html[lang="ru"] [data-l="ru"],html[lang="th"] [dat
 
 <!-- ===== honest ===== -->
 <h2><span data-l="en">Where it can be wrong</span><span data-l="ru">Где можно ошибиться</span><span data-l="th">อาจผิดพลาดตรงไหน</span></h2>
-<p data-l="en">Forecast models see the sea on a 9 km grid; they do not see a sandbar or a reef. Beach ranges are estimates, and they are corrected after real sessions: if the site said 3 and it was a 6, the numbers get adjusted. It is a forecast, not a safety service.</p>
-<p data-l="ru">Модели прогноза видят море сеткой 9 км и не видят отмель или риф. Диапазоны пляжей — это оценки, их поправляют по реальным катаниям: если сайт показывал 3, а было на 6, цифры подкручиваются. Это прогноз, а не служба безопасности.</p><p data-l="th">แบบจำลองพยากรณ์มองทะเลเป็นตาราง 9 กม. จึงไม่เห็นสันทรายหรือแนวปะการัง ช่วงของแต่ละหาดเป็นค่าประมาณและถูกปรับจากการเล่นจริง: ถ้าเว็บบอก 3 แต่จริงๆ เป็น 6 ตัวเลขจะถูกปรับ นี่คือพยากรณ์ ไม่ใช่บริการด้านความปลอดภัย</p>
+<p data-l="en">Forecast models see the sea on a 9 km grid; they do not see a sandbar or a reef. Beach ranges are estimates, and they are corrected after real sessions: if the site said 3 and it was a 6, the numbers get adjusted. Whether to go in the water is your call.</p>
+<p data-l="ru">Модели прогноза видят море сеткой 9 км и не видят отмель или риф. Диапазоны пляжей примерные, их поправляют по реальным катаниям: если сайт показывал 3, а было на 6, цифры подкручиваются. Решение, заходить ли в воду, всегда за вами.</p><p data-l="th">แบบจำลองพยากรณ์มองทะเลเป็นตาราง 9 กม. จึงไม่เห็นสันทรายหรือแนวปะการัง ช่วงของแต่ละหาดเป็นค่าประมาณและถูกปรับจากการเล่นจริง: ถ้าเว็บบอก 3 แต่จริงๆ เป็น 6 ตัวเลขจะถูกปรับ การตัดสินใจลงน้ำเป็นของคุณเสมอ</p>
 
 </div>
 
@@ -254,13 +254,13 @@ const EX=[
    ru:['Короткая волна, штиль','0,7 м · 5 с · ветер 1,5 м/с','Высота как в первом примере, но период короткий: мелко и слабо. Можно не ехать.'],
    th:['คลื่นสั้น ไม่มีลม','0.7 ม. · 5 วิ · ลม 1.5 ม./วิ','สูงเท่าตัวอย่างแรก แต่คาบสั้น: เล็กและอ่อน ไม่ไปก็ได้']},
   {s:3, c:'mid', h:26,g:60,ch:6,w:-1,
-   en:['Short waves, strong onshore wind','1.0 m · 6 s · wind 8 m/s from the sea','Choppy wash. There is water moving, not waves to ride.'],
-   ru:['Короткая волна, сильный ветер с моря','1,0 м · 6 с · ветер 8 м/с с моря','Рябь и каша. Вода движется, а кататься не на чем.'],
-   th:['คลื่นสั้น ลมทะเลแรง','1.0 ม. · 6 วิ · ลม 8 ม./วิ จากทะเล','น้ำเป็นระลอกยุ่งๆ มีน้ำเคลื่อนไหว แต่ไม่มีคลื่นให้เล่น']},
+   en:['Short waves, strong onshore wind','1.0 m · 6 s · wind 8 m/s from the sea','Choppy wash with nothing clean to ride.'],
+   ru:['Короткая волна, сильный ветер с моря','1,0 м · 6 с · ветер 8 м/с с моря','Рябь и каша, чистых волн нет.'],
+   th:['คลื่นสั้น ลมทะเลแรง','1.0 ม. · 6 วิ · ลม 8 ม./วิ จากทะเล','น้ำเป็นระลอกยุ่งๆ ไม่มีคลื่นดีๆ ให้เล่น']},
   {s:3, c:'mid', h:8,g:120,ch:0,w:1,
-   en:['Perfect wind, no waves','0.25 m · 8 s · wind 1 m/s offshore','Everything is perfect except there is nothing to ride. Size caps the score.'],
-   ru:['Идеальный ветер, волны нет','0,25 м · 8 с · ветер 1 м/с с берега','Всё идеально, только кататься не на чем. Размер ограничивает балл.'],
-   th:['ลมดีมาก ไม่มีคลื่น','0.25 ม. · 8 วิ · ลม 1 ม./วิ จากฝั่ง','ทุกอย่างดีหมด ยกเว้นไม่มีคลื่นให้เล่น ขนาดจำกัดคะแนน']},
+   en:['Perfect wind, no waves','0.25 m · 8 s · wind 1 m/s offshore','Wind and direction are ideal, the wave is too small. Size caps the score.'],
+   ru:['Идеальный ветер, волны нет','0,25 м · 8 с · ветер 1 м/с с берега','Ветер и направление идеальные, волна слишком мелкая. Размер ограничивает балл.'],
+   th:['ลมดีมาก ไม่มีคลื่น','0.25 ม. · 8 วิ · ลม 1 ม./วิ จากฝั่ง','ลมและทิศทางดีมาก คลื่นเล็กเกินไป ขนาดจำกัดคะแนน']},
   {s:7, c:'ok', h:62,g:220,ch:0,w:1,danger:1,
    en:['Too big','3.6 m · 15 s · wind 2 m/s','The score is still decent, but a red warning appears: bigger than this beach handles. Experienced surfers only.'],
    ru:['Слишком большая','3,6 м · 15 с · ветер 2 м/с','Балл ещё приличный, но появляется красное предупреждение: больше, чем держит пляж. Только для опытных.'],
