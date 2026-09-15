@@ -1,0 +1,46 @@
+# Records what the site forecast for today and what the models say happened
+# yesterday, every morning at 05:00 Bangkok (22:00 UTC). See tools/record.mjs.
+name: history
+
+on:
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: history
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Record
+        run: node tools/record.mjs
+
+      - name: Commit
+        run: |
+          git config user.name "Mihailchik"
+          git config user.email "129635161+Mihailchik@users.noreply.github.com"
+          git add history
+          if git diff --cached --quiet; then echo "nothing new"; exit 0; fi
+          git commit -m "History for $(TZ=Asia/Bangkok date +%F)"
+          git pull --rebase
+          git push
+
+      # pushes made with the workflow token do not start a Pages build on their own
+      - name: Rebuild Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || true

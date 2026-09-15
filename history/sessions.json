@@ -1,0 +1,10 @@
+[
+ {"date":"2026-09-08","spot":"naiharn","time":"morning","site":null,"felt":2,
+  "note":{"ru":"Очень слабо, местами слабо","en":"Very poor to poor","th":"อ่อนมากถึงอ่อน"}},
+ {"date":"2026-09-14","spot":"naiharn","time":"morning","site":3,"felt":6,
+  "note":{"ru":"Большие, ровные, мощные волны, редкие и стабильные","en":"Big, even, powerful waves with long gaps","th":"คลื่นใหญ่ เรียบ มีพลัง มาห่างๆ"}},
+ {"date":"2026-09-14","spot":"naiharn","time":"16-17","site":null,"felt":6,
+  "note":{"ru":"Вечером тоже отличные волны","en":"Great waves in the evening too","th":"ตอนเย็นคลื่นก็ดีมาก"}},
+ {"date":"2026-09-15","spot":"kata","time":"morning","site":8,"felt":null,
+  "note":{"ru":"На деле было заметно слабее","en":"It was clearly less","th":"จริงๆ อ่อนกว่าชัดเจน"}}
+]

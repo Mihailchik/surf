@@ -113,6 +113,36 @@ Calibration log:
 - 15 Sep 2026: Kata showed 8 in the morning and it was not an 8. Scores are
   now rounded down everywhere instead of to the nearest.
 
+## History
+
+Every morning at 05:00 Bangkok a GitHub Actions job (`.github/workflows/history.yml`)
+runs `tools/record.mjs`. It saves two things per beach, hour by hour from 06 to 18:
+
+- **forecast**: what the site showed that morning, recorded once and never
+  overwritten;
+- **actual**: Open-Meteo model data for the day that just passed, fetched the
+  next morning.
+
+Both are scored with `core.js`, the same file the page loads, so history and
+site never drift apart. Each record also stores the `TUNE` it was scored with.
+
+Files live in `history/`: one JSON per day in `days/`, a list in `index.json`,
+a CSV per month in `csv/` for spreadsheets, and `sessions.json` with real
+sessions (what the site said, what it felt like). `history.html` shows all of
+it: a grid of days and beaches, hours for a picked day, and the sessions list.
+
+The job commits as Mihailchik and asks Pages to rebuild, since pushes made with
+the workflow token do not trigger a build on their own. Run it by hand from the
+Actions tab (`history` → Run workflow) or locally:
+
+```
+node tools/record.mjs                          # today's forecast + yesterday's actual
+node tools/record.mjs actual 2026-09-01 2026-09-14
+```
+
+"Actual" is still model output, not a measurement at the beach. Actual data was
+backfilled from 1 Sep 2026; morning forecasts exist from 15 Sep 2026 on.
+
 ## Known limits
 
 - **10-day horizon.** No wave forecast exists beyond that anywhere — the

@@ -1,0 +1,80 @@
+{
+ "updated": "2026-09-15T06:56:47.600Z",
+ "days": [
+  {
+   "date": "2026-09-15",
+   "forecast": true,
+   "actual": false
+  },
+  {
+   "date": "2026-09-14",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-13",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-12",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-11",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-10",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-09",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-08",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-07",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-06",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-05",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-04",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-03",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-02",
+   "forecast": false,
+   "actual": true
+  },
+  {
+   "date": "2026-09-01",
+   "forecast": false,
+   "actual": true
+  }
+ ]
+}

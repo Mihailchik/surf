@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-72CS4WJ571"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-72CS4WJ571');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Surf · History</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b7fc7'/%3E%3Cpath d='M3 19q4.5-5 9 0t9 0 8-3' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="description" content="Past days: what Surf forecast and what the models say happened, beach by beach">
+<script>
+  try{ if(localStorage.getItem('theme')==='dark') document.documentElement.dataset.theme='dark'; }catch{}
+  try{ const l=localStorage.getItem('lang'); if(l==='ru'||l==='th') document.documentElement.lang=l; }catch{}
+</script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f2f5f9; --card:#fff; --card2:#f7f9fc; --line:#e3e9f0;
+  --tx:#0f1b2d; --dim:#4a5a6e; --dim2:#697a8e;
+  --go:#00a5a5; --ok:#3d9b2f; --fair:#9d7c05; --mid:#e07a12; --bad:#d43a26; --no:#9aa8b8;
+  --acc:#0b7fc7; --shadow:0 1px 2px rgba(15,27,45,.05),0 2px 10px rgba(15,27,45,.05);
+}
+:root[data-theme="dark"]{
+  --bg:#0a0e14; --card:#121822; --card2:#0e141d; --line:#1e2836;
+  --tx:#e8eef6; --dim:#94a3b8; --dim2:#8494a8;
+  --go:#2fd8d8; --ok:#7ede4a; --fair:#f2d43a; --mid:#f79b3c; --bad:#f0604a; --no:#4a5568;
+  --acc:#38b6ff; --shadow:none;
+}
+html,body{margin:0;background:var(--bg);color:var(--tx)}
+body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding:10px 12px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0}
+.top a{color:var(--acc);text-decoration:none;font-weight:650;font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{font:inherit;font-size:12px;font-weight:650;border:0;background:none;color:var(--dim);padding:6px 10px;cursor:pointer}
+.seg button.on{background:var(--acc);color:#fff}
+h1{font-size:22px;margin:10px 0 4px;letter-spacing:-.3px}
+.lead{color:var(--dim);font-size:14px;margin:0 0 12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin:12px 0;overflow:hidden}
+.grid{overflow-x:auto}
+table{border-collapse:separate;border-spacing:2px;margin:6px 4px}
+th{font-size:10.5px;font-weight:650;color:var(--dim2);padding:0 0 4px;height:78px;vertical-align:bottom}
+th span{display:inline-block;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+td.date{font-size:11.5px;color:var(--dim);white-space:nowrap;padding-right:3px;text-align:right}
+td.date b{color:var(--tx);font-weight:650}
+.c{width:21px;height:26px;border-radius:6px;border:0;font:inherit;font-size:12.5px;font-weight:750;cursor:pointer;position:relative;padding:0}
+.c.none{background:var(--card2);color:var(--dim2);cursor:default;font-weight:400}
+.c.sel{outline:2px solid var(--tx);outline-offset:1px}
+.c i{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--acc);border:2px solid var(--card)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--dim);padding:8px 12px 12px;border-top:1px solid var(--line)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend b{width:12px;height:12px;border-radius:4px;display:inline-block}
+.det{padding:12px}
+.det h2{font-size:17px;margin:0 0 2px}
+.det .sub{font-size:13px;color:var(--dim);margin:0 0 10px}
+.hours{display:grid;grid-template-columns:52px repeat(13,minmax(0,1fr));gap:2px;align-items:center;font-size:11px}
+.hours .lab{color:var(--dim);font-size:11.5px}
+.hours .hh{text-align:center;color:var(--dim2)}
+.hours .s{height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:750;font-size:11.5px;cursor:pointer}
+.hours .s.none{background:var(--card2);color:var(--dim2);font-weight:400;cursor:default}
+.hours .s.sel{outline:2px solid var(--tx);outline-offset:1px}
+.cond{margin:10px 0 0;font-size:13px;color:var(--dim);display:grid;grid-template-columns:auto 1fr;gap:3px 10px}
+.cond b{color:var(--tx)}
+.note{margin:10px 0 0;padding:10px;border-radius:10px;background:color-mix(in srgb,var(--acc) 9%,transparent);font-size:13px}
+.sess{padding:4px 12px 10px}
+.srow{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.srow:first-child{border-top:0}
+.srow small{display:block;color:var(--dim);font-size:12px}
+.pill{min-width:34px;text-align:center;padding:3px 6px;border-radius:7px;font-weight:750;font-size:13px}
+.pill em{display:block;font-style:normal;font-size:9.5px;font-weight:650;opacity:.8}
+.empty{padding:20px;text-align:center;color:var(--dim)}
+.foot{font-size:12px;color:var(--dim2);margin:16px 2px}
+.foot a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="./" id="back"></a>
+    <div class="seg" id="lang"><button data-l="en">EN</button><button data-l="ru">RU</button><button data-l="th">TH</button></div>
+  </div>
+  <h1 id="title"></h1>
+  <p class="lead" id="lead"></p>
+  <div class="bar">
+    <div class="seg" id="region"></div>
+    <div class="seg" id="kind"><button data-k="actual"></button><button data-k="forecast"></button></div>
+  </div>
+  <div class="card"><div class="grid" id="grid"><div class="empty">…</div></div><div class="legend" id="legend"></div></div>
+  <div class="card" id="detail" hidden></div>
+  <h1 style="font-size:18px;margin-top:24px" id="sessTitle"></h1>
+  <div class="card"><div class="sess" id="sessions"></div></div>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script src="core.js"></script>
+<script>
+const T={
+  en:{back:'← Back to forecast',title:'History',lead:'The best daylight score of each day, beach by beach. Tap a square to see the hours.',
+    actual:'How it was',forecast:'Morning forecast',dateFmt:'en-GB',noData:'No data yet',
+    fc:'Forecast',ac:'Was',wave:'Wave',period:'Period',wind:'Wind',tide:'Tide',hour:'Hour',
+    sessions:'Sessions',site:'site',felt:'felt',model:'models',
+    actualNote:'"How it was" is model data for a day that has already passed, scored with today\'s formula. It is closer to reality than a forecast, though still not a measurement at the beach.',
+    forecastNote:'"Morning forecast" is what the site showed at about 05:00 that day. Recorded since 15 Sep 2026.',
+    csv:'Download as a spreadsheet', grades:['Epic','Good','Fair','Poor','Very poor','Flat'],
+    morning:'morning', noSession:'No sessions logged yet.', uM:'m', uS:'s', uMs:'m/s'},
+  ru:{back:'← К прогнозу',title:'История',lead:'Лучший дневной балл за каждый день по каждому пляжу. Нажмите на квадрат, чтобы увидеть часы.',
+    actual:'Как было',forecast:'Прогноз утром',dateFmt:'ru-RU',noData:'Данных пока нет',
+    fc:'Прогноз',ac:'Было',wave:'Волна',period:'Период',wind:'Ветер',tide:'Прилив',hour:'Час',
+    sessions:'Сессии',site:'сайт',felt:'ощущение',model:'модели',
+    actualNote:'«Как было»: данные моделей за уже прошедший день, посчитанные сегодняшней формулой. Это ближе к правде, чем прогноз, хотя замером у берега это не является.',
+    forecastNote:'«Прогноз утром»: то, что сайт показывал около 05:00 в тот день. Записывается с 15 сентября 2026.',
+    csv:'Скачать таблицей', grades:['Отлично','Хорошо','Средне','Слабо','Очень слабо','Плоско'],
+    morning:'утро', noSession:'Сессий пока нет.', uM:'м', uS:'с', uMs:'м/с'},
+  th:{back:'← กลับไปที่พยากรณ์',title:'ประวัติ',lead:'คะแนนช่วงกลางวันที่ดีที่สุดของแต่ละวัน แยกตามชายหาด แตะช่องเพื่อดูรายชั่วโมง',
+    actual:'สภาพจริง',forecast:'พยากรณ์ตอนเช้า',dateFmt:'th-TH',noData:'ยังไม่มีข้อมูล',
+    fc:'พยากรณ์',ac:'จริง',wave:'คลื่น',period:'คาบ',wind:'ลม',tide:'น้ำขึ้นลง',hour:'ชั่วโมง',
+    sessions:'การเล่นเซิร์ฟ',site:'เว็บ',felt:'ความรู้สึก',model:'โมเดล',
+    actualNote:'«สภาพจริง» คือข้อมูลโมเดลของวันที่ผ่านไปแล้ว คิดด้วยสูตรปัจจุบัน ใกล้ความจริงกว่าพยากรณ์ แม้ยังไม่ใช่การวัดที่ชายหาด',
+    forecastNote:'«พยากรณ์ตอนเช้า» คือสิ่งที่เว็บแสดงราว 05:00 ของวันนั้น บันทึกตั้งแต่ 15 ก.ย. 2026',
+    csv:'ดาวน์โหลดเป็นตาราง', grades:['ยอดเยี่ยม','ดี','ปานกลาง','อ่อน','อ่อนมาก','เรียบ'],
+    morning:'เช้า', noSession:'ยังไม่มีบันทึก', uM:'ม.', uS:'วิ', uMs:'ม./วิ'}
+};
+let LANG=document.documentElement.lang, REGION='phuket', KIND='actual', SEL=null, SELH=null;
+{ const h=location.hash.slice(1); if(REGIONS[h]) REGION=h; }
+const t=k=>T[LANG][k];
+const nameOf=sp=>sp.nm[LANG]||sp.nm.en;
+const DAYS={}; let INDEX=null, SESS=[];
+const colorOf=v=>gradeOf(v).color;
+const fill=v=>`background:color-mix(in srgb,${colorOf(v)} 18%,transparent);color:${colorOf(v)}`;
+const f1=v=>v==null?'–':(LANG==='ru'?String(Math.round(v*10)/10).replace('.',','):String(Math.round(v*10)/10));
+const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+
+async function load(){
+  INDEX=await fetch('history/index.json',{cache:'no-cache'}).then(r=>r.json()).catch(()=>({days:[]}));
+  SESS=await fetch('history/sessions.json',{cache:'no-cache'}).then(r=>r.json()).catch(()=>[]);
+  await Promise.all(INDEX.days.map(d=>fetch('history/days/'+d.date+'.json').then(r=>r.json()).then(j=>DAYS[d.date]=j).catch(()=>{})));
+  render();
+}
+const rowsOf=(date,id,kind)=>{ const d=DAYS[date]; return d&&d[kind]&&d[kind].spots[id]||null; };
+const best=rows=>rows&&rows.length?Math.max(...rows.map(r=>r[8]??0)):null;
+const sessOf=(date,id)=>SESS.filter(s=>s.date===date&&s.spot===id);
+const dateLabel=(date,opt)=>new Date(date+'T12:00:00').toLocaleDateString(t('dateFmt'),opt);
+
+function render(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
+  document.getElementById('back').textContent=t('back');
+  document.getElementById('title').textContent=t('title');
+  document.getElementById('lead').textContent=t('lead');
+  document.getElementById('sessTitle').textContent=t('sessions');
+  document.getElementById('region').innerHTML=Object.keys(REGIONS).map(k=>
+    `<button data-r="${k}" class="${k===REGION?'on':''}">${REGIONS[k].name[LANG]||REGIONS[k].name.en}</button>`).join('');
+  document.querySelectorAll('#region button').forEach(b=>b.onclick=()=>{REGION=b.dataset.r;SEL=null;history.replaceState(null,'','#'+REGION);render();});
+  document.querySelectorAll('#kind button').forEach(b=>{b.textContent=t(b.dataset.k);b.classList.toggle('on',b.dataset.k===KIND);
+    b.onclick=()=>{KIND=b.dataset.k;render();};});
+
+  const spots=spotsOf(REGION), days=INDEX?INDEX.days:[];
+  const grid=document.getElementById('grid');
+  if(!days.length){ grid.innerHTML=`<div class="empty">${t('noData')}</div>`; }
+  else grid.innerHTML=`<table><tr><th></th>${spots.map(sp=>`<th><span>${nameOf(sp)}</span></th>`).join('')}</tr>${
+    days.map(d=>`<tr><td class="date"><b>${d.date.slice(8,10)}.${d.date.slice(5,7)}</b><br>${dateLabel(d.date,{weekday:'short'})}</td>${
+      spots.map(sp=>{
+        const v=best(rowsOf(d.date,sp.id,KIND)), s=sessOf(d.date,sp.id).length;
+        const sel=SEL&&SEL.date===d.date&&SEL.id===sp.id?' sel':'';
+        return v==null?`<td><button class="c none${sel}" disabled>·</button></td>`
+          :`<td><button class="c${sel}" data-d="${d.date}" data-s="${sp.id}" style="${fill(v)}">${shown(v)}${s?'<i></i>':''}</button></td>`;
+      }).join('')}</tr>`).join('')}</table>`;
+  grid.querySelectorAll('button[data-d]').forEach(b=>b.onclick=()=>{SEL={date:b.dataset.d,id:b.dataset.s};SELH=null;render();
+    document.getElementById('detail').scrollIntoView({behavior:'smooth',block:'nearest'});});
+
+  document.getElementById('legend').innerHTML=TUNE.grades.map((g,i)=>{ const lo=Math.max(0,g.min), hi=TUNE.grades[i-1]?TUNE.grades[i-1].min-1:10;
+      return `<span><b style="background:${g.color}"></b>${lo===hi?lo:lo+'–'+hi} ${t('grades')[i]}</span>`; }).join('')+
+    `<span><b style="background:var(--acc);border-radius:50%"></b>${t('sessions')}</span>`;
+
+  renderDetail(); renderSessions();
+  document.getElementById('foot').innerHTML=`${KIND==='actual'?t('actualNote'):t('forecastNote')}<br>
+    ${t('csv')}: ${[...new Set(days.map(d=>d.date.slice(0,7)))].map(m=>`<a href="history/csv/${m}.csv">${m}</a>`).join(', ')}`;
+}
+
+function renderDetail(){
+  const box=document.getElementById('detail');
+  if(!SEL){ box.hidden=true; return; }
+  const sp=ALL_SPOTS.find(s=>s.id===SEL.id); box.hidden=false;
+  const fc=rowsOf(SEL.date,SEL.id,'forecast'), ac=rowsOf(SEL.date,SEL.id,'actual');
+  const {dayFrom,dayTo}=REGIONS[REGION], hours=[]; for(let h=dayFrom;h<=dayTo;h++) hours.push(h);
+  const cell=(rows,kind)=>hours.map(h=>{
+    const r=rows&&rows.find(x=>x[0]===h);
+    if(!r||r[8]==null) return `<div class="s none">·</div>`;
+    const sel=SELH&&SELH.h===h&&SELH.kind===kind?' sel':'';
+    return `<div class="s${sel}" data-h="${h}" data-k="${kind}" style="${fill(r[8])}">${shown(r[8])}</div>`;
+  }).join('');
+  let pick=SELH&&(SELH.kind==='forecast'?fc:ac)?.find(x=>x[0]===SELH.h);
+  if(!pick){ const rows=ac||fc; pick=rows&&rows.reduce((a,b)=>(b[8]??0)>(a[8]??0)?b:a,rows[0]); }
+  const sess=sessOf(SEL.date,SEL.id);
+  box.innerHTML=`<div class="det">
+    <h2>${nameOf(sp)}</h2>
+    <p class="sub">${dateLabel(SEL.date,{weekday:'long',day:'numeric',month:'long'})}</p>
+    <div class="hours"><span></span>${hours.map(h=>`<span class="hh">${h}</span>`).join('')}
+      <span class="lab">${t('fc')}</span>${cell(fc,'forecast')}
+      <span class="lab">${t('ac')}</span>${cell(ac,'actual')}</div>
+    ${pick?`<div class="cond">
+      <span>${t('hour')}</span><b>${String(pick[0]).padStart(2,'0')}:00 · ${f1(pick[8])} / 10</b>
+      <span>${t('wave')}</span><b>${f1(pick[1])} ${t('uM')} · ${f1(pick[2])} ${t('uS')}</b>
+      <span>${t('wind')}</span><b>${pick[5]==null?'':dirs[Math.round(pick[5]/22.5)%16]+' '}${f1(pick[4])} ${t('uMs')}</b>
+      <span>${t('tide')}</span><b>${pick[7]==null?'–':Math.round(pick[7]*100)+'%'}</b></div>`:''}
+    ${sess.map(s=>`<div class="note"><b>${s.time==='morning'?t('morning'):s.time}</b> · ${
+      s.site!=null?t('site')+' '+s.site+' · ':''}${s.felt!=null?t('felt')+' '+s.felt+' · ':''}${s.note[LANG]||s.note.en}</div>`).join('')}
+  </div>`;
+  box.querySelectorAll('.s[data-h]').forEach(c=>c.onclick=()=>{SELH={h:+c.dataset.h,kind:c.dataset.k};renderDetail();});
+}
+
+function renderSessions(){
+  const box=document.getElementById('sessions');
+  if(!SESS.length){ box.innerHTML=`<div class="empty">${t('noSession')}</div>`; return; }
+  box.innerHTML=[...SESS].sort((a,b)=>b.date.localeCompare(a.date)).map(s=>{
+    const sp=ALL_SPOTS.find(x=>x.id===s.spot), m=best(rowsOf(s.date,s.spot,'actual'));
+    const pill=(v,lab)=>v==null?`<span class="pill" style="color:var(--dim2)">–<em>${lab}</em></span>`
+      :`<span class="pill" style="${fill(v)}">${typeof v==='number'&&v%1?shown(v):v}<em>${lab}</em></span>`;
+    return `<div class="srow"><div><b>${sp?nameOf(sp):s.spot}</b> · ${dateLabel(s.date,{day:'numeric',month:'short'})} · ${s.time==='morning'?t('morning'):s.time}
+      <small>${s.note[LANG]||s.note.en}</small></div>${pill(s.site,t('site'))}${pill(m,t('model'))}${pill(s.felt,t('felt'))}</div>`;
+  }).join('');
+}
+
+document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('lang',LANG)}catch{}render();});
+load();
+</script>
+</body>
+</html>
