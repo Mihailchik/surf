@@ -793,7 +793,10 @@ const TUNE={
   danger:{gust:14}
 };
 const GRADES=TUNE.grades;
-const gradeOf=v=>GRADES.find(g=>Math.round(v??0)>=g.min)||GRADES[GRADES.length-1];
+/* Scores are rounded DOWN everywhere: 7.9 shows as 7. Better to under-promise
+   and let the beach be a nice surprise. Number and colour use the same value. */
+const shown=v=>Math.floor((v??0)+1e-9);
+const gradeOf=v=>GRADES.find(g=>shown(v)>=g.min)||GRADES[GRADES.length-1];
 const scoreColor=v=>gradeOf(v).color;
 const gradeWord=v=>t(gradeOf(v).key);
 
@@ -1115,7 +1118,7 @@ function timing(sp,rows,i0){
       const day=rows[p.idx].t.slice(0,10);
       const pre=(day===today||day===lastDay)?'':t('tomorrow')+' ';
       lastDay=day;
-      return `${pre}<b>${p.hhmm}</b> <span style="color:${scoreColor(p.v)}">${p.v.toFixed(0)}</span>`;
+      return `${pre}<b>${p.hhmm}</b> <span style="color:${scoreColor(p.v)}">${shown(p.v)}</span>`;
     }).join(' · '):`<span style="color:var(--dim2)">${t('noPeak')}</span>`;
   return `<div class="tim">
     <div class="trow"><span>${t('tPeak')}</span><div>${pk}</div></div>
@@ -1176,7 +1179,7 @@ function dayRows(sp,rows,n){
       <div class="dbar" style="background:color-mix(in srgb,${scoreColor(sc)} 13%,var(--card))">
         <i style="width:${Math.max(6,sc*10)}%;background:${scoreColor(sc)}"></i>
         <em>${fmt(avg(rs.map(r=>r.swell)),1)} ${t('uM')} · ${fmt(avg(rs.map(r=>r.wind)),0)} ${t('uMs')} · ${t('peak')} ${bi.t.slice(11,16)}</em></div>
-      <div class="dsc" style="color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
+      <div class="dsc" style="color:${scoreColor(sc)}">${shown(sc)}</div>
       </summary>${detail}</details>`}).join('')+'</div>';
 }
 
@@ -1200,11 +1203,11 @@ function card(sp,rows,pinned){
       ><span class="q"><i>${t('period')}</i><b>${fmt(r.period,1)} ${t('uS')}</b></span
       ><span class="q"><i>${t('wind')}</i><b>${dirRu(r.wdir??0)} ${fmt(r.wind,0)}</b></span
       ><span class="q"><i>${t('water')}</i><b>${fmt(r.sst,0)}°</b></span>`
-    : best?t('bestWindow',best.t.slice(5,10).split('-').reverse().join('.'),best.t.slice(11,16),best.score.toFixed(0)):'–';
+    : best?t('bestWindow',best.t.slice(5,10).split('-').reverse().join('.'),best.t.slice(11,16),shown(best.score)):'–';
   return `<div class="card ${pinned?'pin':''}" data-id="${sp.id}" id="c-${sp.id}">
     <div class="chead">
       <div class="score" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
-        color:${scoreColor(s)}"><b>${s.toFixed(0)}</b></div>
+        color:${scoreColor(s)}"><b>${shown(s)}</b></div>
       <div class="cname"><h3>${nameOf(sp)}</h3><p>${sub}</p></div>
       ${mapLink(sp)}
       ${pinned?'':'<div class="chev">›</div>'}
@@ -1374,7 +1377,7 @@ function islandReport(){
 function byScoreThenName(a,b){
   // сравниваем по видимому баллу: 4.4 и 3.6 оба показаны как «4»,
   // и порядок между ними выглядел бы случайным
-  const d=Math.round(b.pick.score??0)-Math.round(a.pick.score??0);
+  const d=shown(b.pick.score)-shown(a.pick.score);
   if(d) return d;
   return nameOf(a.sp).localeCompare(nameOf(b.sp),LOCALE[LANG]);
 }
@@ -1433,7 +1436,7 @@ function render(){
     const hasCam=!!x.sp.cam;
     return `<div class="srow${hasCam?'':' nolink'}" ${hasCam?`data-go="${x.sp.id}"`:''}>
       <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
-        color:${scoreColor(s)}">${s.toFixed(0)}</div>
+        color:${scoreColor(s)}">${shown(s)}</div>
       <div class="sname">${nameOf(x.sp)}</div>
       <div class="sdat">${fmt(x.pick.swell,1)} ${t('uM')} · ${fmt(x.pick.period,1)} ${t('uS')} · ${
         dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)}</div>
@@ -1445,7 +1448,7 @@ function render(){
     <div class="sumtop">
       <div class="vhead">
         <span class="vscore" style="background:color-mix(in srgb,${scoreColor(sc)} 15%,transparent);
-          color:${scoreColor(sc)}">${sc.toFixed(0)}</span>
+          color:${scoreColor(sc)}">${shown(sc)}</span>
         <span class="vbig" style="color:${scoreColor(sc)}">${word}</span>
         <span class="gwhen">${dark?t('scoreFor',bi.t.slice(11,16)):t('scoreNow')}</span>
       </div>
@@ -1469,7 +1472,7 @@ function render(){
       const rows=DATA[x.id], i=nowIdx(rows);
       const best=bestDaylight(rows,i,240);
       return `<button class="chip" data-pick="${x.id}">${nameOf(x)}
-        <i style="color:${scoreColor(best?best.score:0)}">${best?best.score.toFixed(0):'–'}</i></button>`;
+        <i style="color:${scoreColor(best?best.score:0)}">${best?shown(best.score):'–'}</i></button>`;
     }).join('');
     document.getElementById('main').innerHTML=
       `<div class="chips" id="chips">${chips}</div>`+
@@ -1488,7 +1491,7 @@ function render(){
         const sc=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0], r=x.rows[x.i];
         return `<details class="rowx lazy" id="c-${x.sp.id}" data-k="row" data-s="${x.sp.id}" data-i0="${x.i}" data-r="${x.rows.indexOf(r)}"><summary class="srow">
           <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(sc)} 14%,transparent);
-            color:${scoreColor(sc)}">${sc.toFixed(0)}</div>
+            color:${scoreColor(sc)}">${shown(sc)}</div>
           <div class="sname">${nameOf(x.sp)}</div>
           <div class="sdat">${fmt(x.pick.swell,1)} ${t('uM')} · ${fmt(x.pick.period,1)} ${t('uS')} · ${
             dirRu(x.pick.wdir??0)} ${fmt(x.pick.wind,0)}</div>
@@ -1659,7 +1662,7 @@ document.addEventListener('toggle',e=>{
   if(!rows) return;
   const i0=+d.dataset.i0, r=rows[+d.dataset.r]||rows[i0];
   // the badge shows a whole number; the unrounded score is here for an honest look
-  const exact=r.score==null?'':`<p class="exact">${t('exact')}: <b style="color:${scoreColor(r.score)}">${fmt(r.score,1)}</b> / 10</p>`;
+  const exact=r.score==null?'':`<p class="exact">${t('exact')}: <b style="color:${scoreColor(r.score)}">${(Math.floor(r.score*10+1e-9)/10).toFixed(1)}</b> / 10</p>`;
   const html = d.dataset.k==='day'  ? hourStrip(rows,i0)+timing(sp,rows,i0)+why(sp,r)+sources(r)
              : d.dataset.k==='row'  ? exact+(sp.beach?`<p class="beach">${t('beach')}: <b>${sp.beach[LANG]||sp.beach.en}</b></p>`:'')+camBlock(sp)+timing(sp,rows,i0)+hourStrip(rows,i0)+why(sp,r)+sources(r)
              : exact+hourStrip(rows,i0)+why(sp,r)+sources(r);

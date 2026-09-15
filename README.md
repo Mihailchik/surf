@@ -66,7 +66,8 @@ shown at the end of the list but never enters the top or the verdict
 
 Each hour gets a number 0–10 and a word from a six-step scale. The word and
 colour follow the number as displayed, so the same number always has the same
-colour:
+colour. The number is rounded down (7.9 shows as 7) so a beach is never worse
+than promised:
 
 | shown | grade | meaning |
 |---|---|---|
@@ -109,6 +110,8 @@ Calibration log:
 - 14 Sep 2026: the site showed 3 at Nai Harn for 0.7 m at 13 s, the same as
   for 0.7 m at 5 s on 8 Sep, yet one was great and the other poor. Height is
   now scaled by period (`TUNE.swellPeriod`): 13 s scores 6, 5 s scores 2.
+- 15 Sep 2026: Kata showed 8 in the morning and it was not an 8. Scores are
+  now rounded down everywhere instead of to the nearest.
 
 ## Known limits
 

@@ -106,6 +106,9 @@ html[lang="en"] [data-l="en"],html[lang="ru"] [data-l="ru"],html[lang="th"] [dat
   <b data-l="en">Flat</b><b data-l="ru">Плоско</b><b data-l="th">ทะเลเรียบ</b>
   <span data-l="en">Nothing to catch.</span><span data-l="ru">Ловить нечего.</span><span data-l="th">ไม่มีคลื่นให้เล่น</span>
 </div>
+<p data-l="en">The number is always rounded down: 7.9 shows as 7. The beach should be a little better than promised. Open a beach to see the exact score.</p>
+<p data-l="ru">Число всегда округляется вниз: 7,9 показывается как 7. Пусть пляж окажется чуть лучше обещанного. Точный балл виден, если раскрыть пляж.</p>
+<p data-l="th">ตัวเลขปัดลงเสมอ: 7.9 แสดงเป็น 7 ให้ชายหาดดีกว่าที่บอกไว้เล็กน้อย เปิดดูชายหาดเพื่อเห็นคะแนนละเอียด</p>
 
 <!-- ===== factors ===== -->
 <h2><span data-l="en">Four things, one number</span><span data-l="ru">Четыре вещи, одно число</span><span data-l="th">สี่อย่าง รวมเป็นหนึ่งคะแนน</span></h2>
@@ -237,7 +240,7 @@ document.getElementById('windOn').innerHTML=beach+`<g transform="translate(70,0)
 /* Scores below come from the site's own formula for Kata */
 const L=document.documentElement;
 const EX=[
-  {s:9, c:'go', h:40,g:190,ch:0,w:1,
+  {s:8, c:'go', h:40,g:190,ch:0,w:1,
    en:['Long swell, calm','0.7 m · 14 s · wind 1.5 m/s offshore','Modest height, but long period and no wind: clean, powerful and rare waves.'],
    ru:['Длинный свелл, штиль','0,7 м · 14 с · ветер 1,5 м/с с берега','Высота скромная, но длинный период и нет ветра: чистые, мощные, редкие волны.'],
    th:['สเวลยาว ไม่มีลม','0.7 ม. · 14 วิ · ลม 1.5 ม./วิ จากฝั่ง','สูงไม่มาก แต่คาบยาวและไม่มีลม: คลื่นสะอาด มีพลัง มาห่างๆ']},
@@ -245,10 +248,10 @@ const EX=[
    en:['Short waves, offshore wind','1.0 m · 6 s · wind 3 m/s offshore','Weak and frequent waves, but the wind keeps them tidy. Worth going.'],
    ru:['Короткая волна, ветер с берега','1,0 м · 6 с · ветер 3 м/с с берега','Волны частые и слабые, но ветер держит их аккуратными. Ехать стоит.'],
    th:['คลื่นสั้น ลมจากฝั่ง','1.0 ม. · 6 วิ · ลม 3 ม./วิ จากฝั่ง','คลื่นถี่และอ่อน แต่ลมช่วยให้เป็นระเบียบ คุ้มที่จะไป']},
-  {s:6, c:'ok', h:36,g:190,ch:5,w:-1,
-   en:['Long swell, strong onshore wind','0.7 m · 14 s · wind 8 m/s from the sea','Good swell spoiled by wind: still rideable, but messy. It would be a 9 on a calm day.'],
-   ru:['Длинный свелл, сильный ветер с моря','0,7 м · 14 с · ветер 8 м/с с моря','Хороший свелл испорчен ветром: кататься можно, но каша. В штиль было бы 9.'],
-   th:['สเวลยาว ลมทะเลแรง','0.7 ม. · 14 วิ · ลม 8 ม./วิ จากทะเล','สเวลดีแต่ลมทำเสีย: ยังเล่นได้แต่ยุ่ง ถ้าไม่มีลมจะได้ 9']},
+  {s:5, c:'fair', h:36,g:190,ch:5,w:-1,
+   en:['Long swell, strong onshore wind','0.7 m · 14 s · wind 8 m/s from the sea','Good swell spoiled by wind: still rideable, but messy. It would be an 8 on a calm day.'],
+   ru:['Длинный свелл, сильный ветер с моря','0,7 м · 14 с · ветер 8 м/с с моря','Хороший свелл испорчен ветром: кататься можно, но каша. В штиль было бы 8.'],
+   th:['สเวลยาว ลมทะเลแรง','0.7 ม. · 14 วิ · ลม 8 ม./วิ จากทะเล','สเวลดีแต่ลมทำเสีย: ยังเล่นได้แต่ยุ่ง ถ้าไม่มีลมจะได้ 8']},
   {s:4, c:'mid', h:22,g:56,ch:0,w:1,
    en:['Short waves, calm','0.7 m · 5 s · wind 1.5 m/s','Same height as the first example, but short period: small and weak. You can skip it.'],
    ru:['Короткая волна, штиль','0,7 м · 5 с · ветер 1,5 м/с','Высота как в первом примере, но период короткий: мелко и слабо. Можно не ехать.'],
@@ -257,16 +260,16 @@ const EX=[
    en:['Short waves, strong onshore wind','1.0 m · 6 s · wind 8 m/s from the sea','Choppy wash with nothing clean to ride.'],
    ru:['Короткая волна, сильный ветер с моря','1,0 м · 6 с · ветер 8 м/с с моря','Рябь и каша, чистых волн нет.'],
    th:['คลื่นสั้น ลมทะเลแรง','1.0 ม. · 6 วิ · ลม 8 ม./วิ จากทะเล','น้ำเป็นระลอกยุ่งๆ ไม่มีคลื่นดีๆ ให้เล่น']},
-  {s:3, c:'mid', h:8,g:120,ch:0,w:1,
+  {s:2, c:'bad', h:8,g:120,ch:0,w:1,
    en:['Perfect wind, no waves','0.25 m · 8 s · wind 1 m/s offshore','Wind and direction are ideal, the wave is too small. Size caps the score.'],
    ru:['Идеальный ветер, волны нет','0,25 м · 8 с · ветер 1 м/с с берега','Ветер и направление идеальные, волна слишком мелкая. Размер ограничивает балл.'],
    th:['ลมดีมาก ไม่มีคลื่น','0.25 ม. · 8 วิ · ลม 1 ม./วิ จากฝั่ง','ลมและทิศทางดีมาก คลื่นเล็กเกินไป ขนาดจำกัดคะแนน']},
-  {s:7, c:'ok', h:62,g:220,ch:0,w:1,danger:1,
+  {s:6, c:'ok', h:62,g:220,ch:0,w:1,danger:1,
    en:['Too big','3.6 m · 15 s · wind 2 m/s','The score is still decent, but a red warning appears: bigger than this beach handles. Experienced surfers only.'],
    ru:['Слишком большая','3,6 м · 15 с · ветер 2 м/с','Балл ещё приличный, но появляется красное предупреждение: больше, чем держит пляж. Только для опытных.'],
    th:['ใหญ่เกินไป','3.6 ม. · 15 วิ · ลม 2 ม./วิ','คะแนนยังพอใช้ แต่มีคำเตือนสีแดง: ใหญ่เกินกว่าที่หาดนี้รับได้ สำหรับนักเซิร์ฟที่มีประสบการณ์เท่านั้น']}
 ];
-const grade={go:['Epic','Отлично','ยอดเยี่ยม'],ok:['Good','Хорошо','ดี'],fair:['Fair','Средне','ปานกลาง'],mid:['Poor','Слабо','อ่อน']};
+const grade={go:['Epic','Отлично','ยอดเยี่ยม'],ok:['Good','Хорошо','ดี'],fair:['Fair','Средне','ปานกลาง'],mid:['Poor','Слабо','อ่อน'],bad:['Very poor','Очень слабо','อ่อนมาก']};
 document.getElementById('examples').innerHTML=EX.map(e=>`
   <div class="card">
     <div class="ex">
