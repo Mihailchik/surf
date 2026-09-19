@@ -321,6 +321,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);color:var(--bad)}
 .err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
   color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
+.reserve{margin:10px 0 0;padding:9px 12px;border-radius:11px;font-size:12.5px;line-height:1.45;background:color-mix(in srgb,var(--acc) 10%,var(--card));color:var(--tx)}
 .outage{margin:14px 0;padding:16px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-align:center}
 .outage b{font-size:16px}.outage p{margin:6px 0;font-size:13.5px;color:var(--dim)}.outage .dim{font-size:12.5px;color:var(--dim2)}
 .retry{margin-top:8px;font:inherit;font-size:13px;font-weight:650;border:0;border-radius:9px;padding:8px 14px;background:var(--acc);color:#fff;cursor:pointer}
@@ -467,6 +468,9 @@ const I18N={
   srcDown:'Not responding: {0}.',
   noWind:'Scores are counted without wind.',
   noSea:'No tide or water temperature.',
+  spareHead:'Open-Meteo, the main forecast source, is down right now, so the reserve sources are in use:',
+  spareWave:'waves from NOAA WaveWatch III, one reading for the whole coast',
+  spareWind:'wind from MET Norway',
   waveWW3:'Waves come from NOAA WaveWatch III instead: one open-sea point for the whole coast, so less precise.',
   fewSpots:'No data for: {0}.',
   staleData:'No connection. Data below is from {0} and may be out of date.',
@@ -561,6 +565,9 @@ const I18N={
   srcDown:'Не отвечают: {0}.',
   noWind:'Баллы посчитаны без ветра.',
   noSea:'Нет данных о приливе и температуре воды.',
+  spareHead:'Основной источник прогноза, Open-Meteo, сейчас недоступен, работаем на резервных:',
+  spareWave:'волны из NOAA WaveWatch III, общие для всего побережья',
+  spareWind:'ветер из MET Norway',
   waveWW3:'Волны взяты из NOAA WaveWatch III: одна точка в открытом море на всё побережье, поэтому точность ниже.',
   fewSpots:'Нет данных по пляжам: {0}.',
   staleData:'Нет связи. Данные ниже от {0}, могли устареть.',
@@ -655,6 +662,9 @@ const I18N={
   srcDown:'ไม่ตอบสนอง: {0}',
   noWind:'คะแนนคิดโดยไม่มีข้อมูลลม',
   noSea:'ไม่มีข้อมูลน้ำขึ้นลงและอุณหภูมิน้ำ',
+  spareHead:'แหล่งพยากรณ์หลัก Open-Meteo ใช้งานไม่ได้ตอนนี้ จึงใช้แหล่งสำรอง:',
+  spareWave:'คลื่นจาก NOAA WaveWatch III ค่าเดียวสำหรับทั้งชายฝั่ง',
+  spareWind:'ลมจาก MET Norway',
   waveWW3:'ข้อมูลคลื่นมาจาก NOAA WaveWatch III แทน: จุดเดียวในทะเลเปิดสำหรับทั้งชายฝั่ง จึงแม่นยำน้อยกว่า',
   fewSpots:'ไม่มีข้อมูลของ: {0}',
   staleData:'ไม่มีการเชื่อมต่อ ข้อมูลด้านล่างจาก {0} อาจไม่เป็นปัจจุบัน',
@@ -1275,15 +1285,19 @@ function markVisibleChip(){
 
 /* Which sources failed, in plain words, above the beaches. */
 function troubleNote(){
-  const down=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.label);
+  const windSpare=STATUS.wind&&!STATUS.wind.ok&&STATUS.metno&&STATUS.metno.ok;
   const lost=SPOTS.filter(s=>!DATA||!DATA[s.id]||!DATA[s.id].length).map(nameOf);
-  const parts=[];
-  if(down.length) parts.push(t('srcDown',down.join(', ')));
-  if(STATUS.wind&&!STATUS.wind.ok&&!(STATUS.metno&&STATUS.metno.ok)) parts.push(t('noWind'));
-  if(STATUS.sea&&!STATUS.sea.ok) parts.push(t('noSea'));
-  if(WAVE_FALLBACK==='ww3') parts.push(t('waveWW3'));
-  if(lost.length&&DATA) parts.push(t('fewSpots',lost.join(', ')));
-  return parts.length?`<div class="stale">${parts.join(' ')}</div>`:'';
+  // running on reserve sources is normal operation, said calmly
+  const spare=[];
+  if(WAVE_FALLBACK==='ww3') spare.push(t('spareWave'));
+  if(windSpare) spare.push(t('spareWind'));
+  // things that have no reserve
+  const gaps=[];
+  if(STATUS.wind&&!STATUS.wind.ok&&!windSpare) gaps.push(t('noWind'));
+  if(STATUS.sea&&!STATUS.sea.ok) gaps.push(t('noSea'));
+  if(lost.length&&DATA) gaps.push(t('fewSpots',lost.join(', ')));
+  return (spare.length?`<div class="reserve">${t('spareHead')} ${spare.join('; ')}.</div>`:'')+
+    (gaps.length?`<div class="stale">${gaps.join(' ')}</div>`:'');
 }
 /* Nothing to score: say so, list what is down, show cameras, offer a retry. */
 function renderOutage(){
