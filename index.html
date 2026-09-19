@@ -856,6 +856,16 @@ function ww3AsMarine(ww,days){
   const hourly={time,wave_height_ww3:h,wave_period_ww3:p,wave_direction_ww3:d};
   return spotPoints(days).pts.map(()=>({hourly}));
 }
+/* Reserve core: NOAA WaveWatch III waves and MET Norway wind, one reading for
+   the coast. Used when Open-Meteo is slow or down. */
+async function spareCore(){
+  const [ww,met]=await Promise.all([
+    loadWW3(),
+    jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+REG().wxLat.toFixed(2)+'&lon='+REG().wxLon.toFixed(2)).catch(()=>null)
+  ]);
+  if(!ww||!Object.keys(ww).length) throw new Error('no reserve waves');
+  return {m:ww3AsMarine(ww,10), w:null, tSea:null, met, waveModels:['ww3'], fallback:'ww3'};
+}
 async function fetchCore(days=10){
   const {base}=spotPoints(days);
   const [m,w,tSea]=await Promise.all([
@@ -908,7 +918,7 @@ function build(core,extra){
   if(g) WEATHER=g;
   if(oc&&ocw) OCEANDATA={wave:[].concat(oc),wind:[].concat(ocw)};
   WAVE_FALLBACK=core.fallback||null;
-  return buildSpots(SPOTS, spotPoints().pts, core, metIndex(mn), ww3, core.waveModels);
+  return buildSpots(SPOTS, spotPoints().pts, core, metIndex(mn||core.met), ww3, core.waveModels);
 }
 
 function nowIdx(rows){
@@ -1290,7 +1300,7 @@ function troubleNote(){
   // running on reserve sources is normal operation, said calmly
   const spare=[];
   if(WAVE_FALLBACK==='ww3') spare.push(t('spareWave'));
-  if(windSpare) spare.push(t('spareWind'));
+  if(windSpare||(WAVE_FALLBACK==='ww3'&&!(STATUS.wind&&STATUS.wind.ok))) spare.push(t('spareWind'));
   // things that have no reserve
   const gaps=[];
   if(STATUS.wind&&!STATUS.wind.ok&&!windSpare) gaps.push(t('noWind'));
@@ -1513,22 +1523,31 @@ async function boot(force){
     const extraP=fetchExtra();
     const fullP=fetchCore(10);
     const quickP=fetchCore(2);
-    quickP.catch(()=>{}); extraP.catch(()=>{});
-    // paint the first core answer that succeeds; a failed short request must
-    // not abort the load while the full one is still on its way
-    const first=await new Promise((res,rej)=>{
-      let fails=0;
-      const fail=e=>{ if(++fails===2) rej(e); };
-      quickP.then(c=>res({c,full:false}),fail);
-      fullP.then(c=>res({c,full:true}),fail);
+    // reserve starts at once, independent of Open-Meteo: NOAA waves + MET Norway wind
+    const spareP=spareCore();
+    [extraP,fullP,quickP,spareP].forEach(p=>p.catch(()=>{}));
+    // Open-Meteo: the first of the short and the full request that succeeds
+    const omP=new Promise((res,rej)=>{
+      let fails=0; const fail=e=>{ if(++fails===2) rej(e); };
+      quickP.then(res,fail); fullP.then(res,fail);
     });
+    omP.catch(()=>{});
+    // first paint: Open-Meteo if it answers within 3 s, otherwise the reserve
+    const waitOM=Promise.race([new Promise(r=>setTimeout(r,3000)), omP.catch(()=>{})]);
+    const first=await Promise.any([omP, waitOM.then(()=>spareP)]);
     if(moved()) return;
-    DATA=build(first.c,null); LAST_OK=Date.now(); STALE=false; render();
+    DATA=build(first,null); LAST_OK=Date.now(); STALE=false; render();
     if(!CAMS_ON) setTimeout(startCams,1500);
-    const [core,extra]=await Promise.all([fullP, extraP]);
+    // then the best data that arrives: full Open-Meteo, else keep the reserve
+    const core=await fullP.catch(()=>omP).catch(()=>spareP);
+    const extra=await extraP.catch(()=>null);
     if(moved()) return;
     EXTRA_PENDING=false;
-    DATA=build(core,extra); LAST_OK=Date.now(); STALE=false; cacheSave(DATA); render(); startCams();
+    DATA=build(core,extra); LAST_OK=Date.now(); STALE=false;
+    if(!core.fallback) cacheSave(DATA);
+    render(); startCams();
+    // on the reserve: keep trying Open-Meteo every minute
+    if(core.fallback) setTimeout(()=>boot(true),60000);
   }catch(e){
     if(moved()) return;
     EXTRA_PENDING=false;
