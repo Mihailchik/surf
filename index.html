@@ -876,6 +876,7 @@ async function spareCore(){
     loadWW3(),
     jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+REG().wxLat.toFixed(2)+'&lon='+REG().wxLon.toFixed(2)).catch(()=>null)
   ]);
+  if(!WEATHER&&met){ WEATHER=metWeather(met); wxbar(); }
   if(!ww||!Object.keys(ww).length) throw new Error('no reserve waves');
   return {m:ww3AsMarine(ww,10), w:null, tSea:null, met, waveModels:['ww3'], fallback:'ww3'};
 }
@@ -928,7 +929,7 @@ async function fetchExtra(){
 }
 function build(core,extra){
   const {g,mn,ww3,oc,ocw}=extra||{};
-  if(g) WEATHER=g;
+  if(g) WEATHER=g; else if(!WEATHER&&mn) WEATHER=metWeather(mn);
   if(oc&&ocw) OCEANDATA={wave:[].concat(oc),wind:[].concat(ocw)};
   WAVE_FALLBACK=core.fallback||null;
   return buildSpots(SPOTS, spotPoints().pts, core, metIndex(mn||core.met), ww3, core.waveModels);
@@ -1119,6 +1120,29 @@ function card(sp,rows,pinned){
     <div class="cbody">${body}</div></div>`;
 }
 
+/* Weather bar from MET Norway when Open-Meteo is down: temperature, sky, wind
+   and rain; sunrise and sunset are computed, UV stays empty. */
+const MET_SKY=[['thunder',95],['heavysnow',75],['snow',71],['sleet',66],['heavyrain',65],['lightrain',61],
+  ['rain',63],['fog',45],['partlycloudy',2],['cloudy',3],['fair',1],['clearsky',0]];
+function metWeather(mn){
+  const p=mn&&mn.properties&&mn.properties.timeseries[0]; if(!p) return null;
+  const d=p.data.instant.details, sym=(p.data.next_1_hours||p.data.next_6_hours||{}).summary?.symbol_code||'';
+  const code=(MET_SKY.find(([k])=>sym.includes(k))||[,null])[1];
+  return {src:'metno', current:{temperature_2m:d.air_temperature, apparent_temperature:null, weather_code:code,
+    wind_speed_10m:d.wind_speed, wind_direction_10m:d.wind_from_direction, wind_gusts_10m:null,
+    precipitation:p.data.next_1_hours?.details?.precipitation_amount??0}, daily:null};
+}
+/* Sunrise and sunset, NOAA's simplified formula; good to a couple of minutes. */
+function sunTimes(lat,lon){
+  const now=new Date(), J=Math.floor(now/864e5)+2440587.5-2451545+0.0008, rad=Math.PI/180;
+  const n=Math.round(J-lon/360), M=(357.5291+0.98560028*(n-lon/360))%360;
+  const C=1.9148*Math.sin(M*rad)+0.02*Math.sin(2*M*rad), L=(M+C+282.9372)%360;
+  const T=2451545+n-lon/360+0.0053*Math.sin(M*rad)-0.0069*Math.sin(2*L*rad);
+  const dec=Math.asin(Math.sin(L*rad)*Math.sin(23.44*rad));
+  const w=Math.acos((Math.sin(-0.83*rad)-Math.sin(lat*rad)*Math.sin(dec))/(Math.cos(lat*rad)*Math.cos(dec)))/rad;
+  const hm=jd=>new Date((jd-2440587.5)*864e5).toLocaleTimeString('en-GB',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit'});
+  return [hm(T-w/360),hm(T+w/360)];
+}
 function wxbar(){
   const bar=document.getElementById('wxbar');
   if((!WEATHER||!WEATHER.current) && EXTRA_PENDING){
@@ -1129,21 +1153,22 @@ function wxbar(){
     bar.innerHTML=`<span class="wx" style="color:var(--bad);grid-column:1/-1">${t('wxUnavailable')}</span>`;
     return;
   }
-  const c=WEATHER.current, d=WEATHER.daily;
+  const c=WEATHER.current, d=WEATHER.daily, r0=v=>v==null?'–':Math.round(v);
   const [ico]=WMO[c.weather_code]||['·']; const txt=t('wmo')[c.weather_code]||'–';
   const now=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
   const date=now.toLocaleDateString(LOCALE[LANG],{weekday:'short',day:'numeric',month:'short'});
+  const [rise,set]=d?[d.sunrise[0].slice(11,16),d.sunset[0].slice(11,16)]:sunTimes(REG().wxLat,REG().wxLon);
   // exactly two lines, no horizontal scroll
   bar.innerHTML=`
     <span class="wx"><b>${date[0].toUpperCase()+date.slice(1)}</b></span>
     <span class="wx"><i class="ico">${ico}</i>${txt}</span>
-    <span class="wx"><b>${Math.round(c.temperature_2m)}°</b>
-      <span class="mut">${t('feels')} ${Math.round(c.apparent_temperature)}°</span>${
+    <span class="wx"><b>${r0(c.temperature_2m)}°</b>${c.apparent_temperature==null?'':`
+      <span class="mut">${t('feels')} ${r0(c.apparent_temperature)}°</span>`}${
       c.precipitation>0?` <b style="color:var(--acc)">${c.precipitation} ${t('uMm')}</b>`:''}</span>
-    <span class="wx">${t('wind')} <b>${dirRu(c.wind_direction_10m)} ${c.wind_speed_10m.toFixed(0)}</b><span
-      class="mut">${t('gustShort',c.wind_gusts_10m.toFixed(0))}</span></span>
-    <span class="wx"><i class="ico">☀</i><b>${d.sunrise[0].slice(11,16)}–${d.sunset[0].slice(11,16)}</b></span>
-    <span class="wx"><span class="mut">${t('uv')}</span> <b>${Math.round(d.uv_index_max[0])}</b></span>`;
+    <span class="wx">${t('wind')} <b>${c.wind_direction_10m==null?'':dirRu(c.wind_direction_10m)+' '}${r0(c.wind_speed_10m)}</b>${
+      c.wind_gusts_10m==null?'':`<span class="mut">${t('gustShort',r0(c.wind_gusts_10m))}</span>`}</span>
+    <span class="wx"><i class="ico">☀</i><b>${rise}–${set}</b></span>
+    <span class="wx"><span class="mut">${t('uv')}</span> <b>${d?r0(d.uv_index_max[0]):'–'}</b></span>`;
 }
 
 /* Which sources answered and which did not. */
