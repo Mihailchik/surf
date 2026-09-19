@@ -373,7 +373,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 
 </div>
 
-<script src="core.js?v=20260919b"></script>
+<script src="core.js?v=20260919cb"></script>
 <script>
 let REGION='phuket';
 {
@@ -467,6 +467,7 @@ const I18N={
   srcDown:'Not responding: {0}.',
   noWind:'Scores are counted without wind.',
   noSea:'No tide or water temperature.',
+  waveWW3:'Waves come from NOAA WaveWatch III instead: one open-sea point for the whole coast, so less precise.',
   fewSpots:'No data for: {0}.',
   staleData:'No connection. Data below is from {0} and may be out of date.',
   offline:'offline',
@@ -560,6 +561,7 @@ const I18N={
   srcDown:'Не отвечают: {0}.',
   noWind:'Баллы посчитаны без ветра.',
   noSea:'Нет данных о приливе и температуре воды.',
+  waveWW3:'Волны взяты из NOAA WaveWatch III: одна точка в открытом море на всё побережье, поэтому точность ниже.',
   fewSpots:'Нет данных по пляжам: {0}.',
   staleData:'Нет связи. Данные ниже от {0}, могли устареть.',
   offline:'нет связи',
@@ -653,6 +655,7 @@ const I18N={
   srcDown:'ไม่ตอบสนอง: {0}',
   noWind:'คะแนนคิดโดยไม่มีข้อมูลลม',
   noSea:'ไม่มีข้อมูลน้ำขึ้นลงและอุณหภูมิน้ำ',
+  waveWW3:'ข้อมูลคลื่นมาจาก NOAA WaveWatch III แทน: จุดเดียวในทะเลเปิดสำหรับทั้งชายฝั่ง จึงแม่นยำน้อยกว่า',
   fewSpots:'ไม่มีข้อมูลของ: {0}',
   staleData:'ไม่มีการเชื่อมต่อ ข้อมูลด้านล่างจาก {0} อาจไม่เป็นปัจจุบัน',
   offline:'ออฟไลน์',
@@ -773,7 +776,8 @@ async function loadWW3(){
   const pad=n=>String(n).padStart(2,'0');
   const iso=d=>`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:00:00Z`;
   const t0=iso(new Date()), t1=iso(new Date(Date.now()+6*864e5));
-  const idx=`%5B(${t0}):1:(${t1})%5D%5B(0.0)%5D%5B(${REG().wxLat})%5D%5B(${REG().wxLon})%5D`;
+  const P=REG().ww3;
+  const idx=`%5B(${t0}):1:(${t1})%5D%5B(0.0)%5D%5B(${P.lat})%5D%5B(${P.lon})%5D`;
   const url='https://pae-paha.pacioos.hawaii.edu/erddap/griddap/ww3_global.json?'+
     ['Thgt','Tper','Tdir'].map(v=>v+idx).join(',');
   const j=await jget(url);
@@ -783,7 +787,8 @@ async function loadWW3(){
     // ERDDAP returns UTC
     const k=new Date(r[ci('time')]).toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'})
       .slice(0,13).replace(' ','T');
-    out[k]={h:r[ci('Thgt')], p:r[ci('Tper')], d:r[ci('Tdir')]};
+    const h=r[ci('Thgt')];
+    out[k]={h:h==null?null:h*P.k, p:r[ci('Tper')], d:r[ci('Tdir')]};
   }
   return out;
 }
@@ -828,6 +833,19 @@ async function wavesByModel(base){
   }
   return out;
 }
+/* WW3 series shaped like an Open-Meteo marine answer: one location per spot
+   point, hourly from 00:00 today so it lines up with the wind grid. */
+function ww3AsMarine(ww,days){
+  const today=new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,10);
+  const time=[], h=[], p=[], d=[];
+  for(let i=0;i<days*24;i++){
+    const dt=new Date(today+'T00:00:00Z'); dt.setUTCHours(i);
+    const k=dt.toISOString().slice(0,13), v=ww[k];
+    time.push(k+':00'); h.push(v?v.h:null); p.push(v?v.p:null); d.push(v?v.d:null);
+  }
+  const hourly={time,wave_height_ww3:h,wave_period_ww3:p,wave_direction_ww3:d};
+  return spotPoints(days).pts.map(()=>({hourly}));
+}
 async function fetchCore(days=10){
   const {base}=spotPoints(days);
   const [m,w,tSea]=await Promise.all([
@@ -840,8 +858,11 @@ async function fetchCore(days=10){
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
         '&hourly=sea_surface_temperature,sea_level_height_msl',undefined,20000))
   ]);
-  // waves are the one thing a score cannot do without; wind and sea may be missing
+  // waves are the one thing a score cannot do without; wind and sea may be missing.
+  // Open-Meteo waves down: take them from NOAA WaveWatch III, a separate provider.
   if(!m){
+    const ww=await loadWW3().catch(()=>null);
+    if(ww&&Object.keys(ww).length) return {m:ww3AsMarine(ww,days),w,tSea,waveModels:['ww3'],fallback:'ww3'};
     const errs=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.err||'').join(' ');
     throw new Error(/429/.test(errs)?'HTTP 429':'sources unavailable');
   }
@@ -876,7 +897,8 @@ function build(core,extra){
   const {g,mn,ww3,oc,ocw}=extra||{};
   if(g) WEATHER=g;
   if(oc&&ocw) OCEANDATA={wave:[].concat(oc),wind:[].concat(ocw)};
-  return buildSpots(SPOTS, spotPoints().pts, core, metIndex(mn), ww3);
+  WAVE_FALLBACK=core.fallback||null;
+  return buildSpots(SPOTS, spotPoints().pts, core, metIndex(mn), ww3, core.waveModels);
 }
 
 function nowIdx(rows){
@@ -1259,6 +1281,7 @@ function troubleNote(){
   if(down.length) parts.push(t('srcDown',down.join(', ')));
   if(STATUS.wind&&!STATUS.wind.ok&&!(STATUS.metno&&STATUS.metno.ok)) parts.push(t('noWind'));
   if(STATUS.sea&&!STATUS.sea.ok) parts.push(t('noSea'));
+  if(WAVE_FALLBACK==='ww3') parts.push(t('waveWW3'));
   if(lost.length&&DATA) parts.push(t('fewSpots',lost.join(', ')));
   return parts.length?`<div class="stale">${parts.join(' ')}</div>`:'';
 }
@@ -1400,7 +1423,7 @@ function render(){
    for 10 minutes is safe, and it spares the rate limit on reloads and covers
    a lost connection. */
 const CACHE_TTL=10*60*1000;
-let LOADING=false, EXTRA_PENDING=false, CAMS_ON=false, WAVE_RAF=0;
+let WAVE_FALLBACK=null, LOADING=false, EXTRA_PENDING=false, CAMS_ON=false, WAVE_RAF=0;
 /* Loader: a small wave builds on a flat line, rolls right and flattens out.
    Shapes are drawn around a crest at x=207; the loop stops by itself once
    the loader is gone from the page. */

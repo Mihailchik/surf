@@ -32,7 +32,7 @@ const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00:00Z') - new Date(
 async function jget(url, headers = {}) {
   for (let attempt = 1; ; attempt++) {
     try {
-      const r = await fetch(url, { headers: { 'User-Agent': UA, ...headers }, signal: AbortSignal.timeout(60000) });
+      const r = await fetch(url, { headers: { 'User-Agent': UA, ...headers }, signal: AbortSignal.timeout(30000) });
       if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + url.slice(0, 80));
       return await r.json();
     } catch (e) {
@@ -43,9 +43,9 @@ async function jget(url, headers = {}) {
 }
 
 // the main Open-Meteo forecast host can go down while others stay up (19 Sep 2026)
-async function jgetOM(url) {
-  try { return await jget(url); }
-  catch { return jget(url.replace('https://api.open-meteo.com/', 'https://previous-runs-api.open-meteo.com/')); }
+// ask both hosts at once, first good answer wins
+function jgetOM(url) {
+  return Promise.any([jget(url), jget(url.replace('https://api.open-meteo.com/', 'https://previous-runs-api.open-meteo.com/'))]);
 }
 
 // span: extra query string, e.g. '&forecast_days=10' or '&past_days=3&forecast_days=1'

@@ -5,9 +5,13 @@
 /* Location-dependent settings. The page picks one from the URL hash, /#phuket. */
 const REGIONS={
   phuket:{ name:{en:'Phuket',ru:'Пхукет',th:'ภูเก็ต'}, tz:'Asia/Bangkok',
-    dayFrom:6, dayTo:18, wxLat:7.89, wxLon:98.30 },
+    dayFrom:6, dayTo:18, wxLat:7.89, wxLon:98.30,
+    // NOAA WaveWatch III node west of the island (0.5° grid); k scales open-sea
+    // height to what the near-shore Open-Meteo points show (checked 19 Sep 2026)
+    ww3:{lat:7.5, lon:98.0, k:0.75} },
   khaolak:{ name:{en:'Khao Lak',ru:'Као Лак',th:'เขาหลัก'}, tz:'Asia/Bangkok',
-    dayFrom:6, dayTo:18, wxLat:8.70, wxLon:98.24 }
+    dayFrom:6, dayTo:18, wxLat:8.70, wxLon:98.24,
+    ww3:{lat:8.5, lon:98.0, k:0.75} }
 };
 
 /* facing  : direction the beach faces, degrees
@@ -194,7 +198,8 @@ function metIndex(mn){
 
 /* Model medians per spot and hour, then the score. core = {m,w,tSea} as
    returned by Open-Meteo for the points in pts. */
-function buildSpots(spots, pts, core, MET, ww3){
+function buildSpots(spots, pts, core, MET, ww3, waveModels){
+  const WM=waveModels||WAVE_MODELS;
   const {m,w,tSea}=core;
   // wind or sea may be missing when a source is down; waves are required
   const M=[].concat(m), W=w?[].concat(w):[], T=tSea?[].concat(tSea):null;
@@ -209,7 +214,7 @@ function buildSpots(spots, pts, core, MET, ww3){
       const time=mh.time[k], hourKey=time.slice(0,13);
       const met=MET[hourKey]||null;
 
-      const sRaw=WAVE_MODELS.map(md=>({m:md,
+      const sRaw=WM.map(md=>({m:md,
         h:mh['wave_height_'+md]?.[k], p:mh['wave_period_'+md]?.[k],
         d:mh['wave_direction_'+md]?.[k],
         sw:mh['swell_wave_height_'+md]?.[k], swp:mh['swell_wave_period_'+md]?.[k]}));
@@ -229,7 +234,7 @@ function buildSpots(spots, pts, core, MET, ww3){
         swellRange:range(sH), windRange:range(wS),
         sst:th.sea_surface_temperature?.[k],
         tideRaw:th.sea_level_height_msl?.[k],
-        windWave:median(WAVE_MODELS.map(md=>mh['wind_wave_height_'+md]?.[k])),
+        windWave:median(WM.map(md=>mh['wind_wave_height_'+md]?.[k])),
         rain:median(WIND_MODELS.map(md=>wh['precipitation_'+md]?.[k])),
         wind:median(wS), wdir:circMean(wRaw.map(x=>x.d)),
         gust:median(wRaw.map(x=>x.g)),
