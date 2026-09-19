@@ -42,6 +42,12 @@ async function jget(url, headers = {}) {
   }
 }
 
+// the main Open-Meteo forecast host can go down while others stay up (19 Sep 2026)
+async function jgetOM(url) {
+  try { return await jget(url); }
+  catch { return jget(url.replace('https://api.open-meteo.com/', 'https://previous-runs-api.open-meteo.com/')); }
+}
+
 // span: extra query string, e.g. '&forecast_days=10' or '&past_days=3&forecast_days=1'
 async function fetchRegion(region, span, withMet) {
   const spots = C.spotsOf(region);
@@ -49,7 +55,7 @@ async function fetchRegion(region, span, withMet) {
   const [m, w, tSea, mn] = await Promise.all([
     jget('https://marine-api.open-meteo.com/v1/marine?' + base +
       '&hourly=wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,wind_wave_height&models=' + C.WAVE_MODELS.join(',')),
-    jget('https://api.open-meteo.com/v1/forecast?' + base +
+    jgetOM('https://api.open-meteo.com/v1/forecast?' + base +
       '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&wind_speed_unit=ms&models=' + C.WIND_MODELS.join(',')),
     jget('https://marine-api.open-meteo.com/v1/marine?' + base + '&hourly=sea_surface_temperature,sea_level_height_msl').catch(() => null),
     withMet ? jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=' +
