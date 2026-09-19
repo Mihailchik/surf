@@ -373,7 +373,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 
 </div>
 
-<script src="core.js?v=20260919"></script>
+<script src="core.js?v=20260919b"></script>
 <script>
 let REGION='phuket';
 {
@@ -802,19 +802,43 @@ const spotPoints=(days=10)=>pointsOf(SPOTS,'&forecast_days='+days);
 /* Open-Meteo needs ~1.8-2.2s for the 10-day run and ~1.4s for 2 days. The
    first screen only needs now and the next daylight window, so a 2-day
    request goes first and the full 10 days replaces it when it arrives. */
+/* One request per wave model instead of one for all four: a slow or failed
+   model no longer takes the others down with it. Any model that answers is
+   enough to score; the median simply uses fewer models. Single-model answers
+   come without the _model suffix, so it is added back here. */
+async function wavesByModel(base){
+  const url='https://marine-api.open-meteo.com/v1/marine?'+base+
+    '&hourly=wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,wind_wave_height&models=';
+  // wait for all models, but no longer than 4 s after the first one arrived
+  const ok=await new Promise(res=>{
+    const got=[]; let left=WAVE_MODELS.length, timer=null;
+    const done=()=>{ clearTimeout(timer); res(got.slice()); };
+    WAVE_MODELS.forEach(md=>jget(url+md,undefined,20000).then(j=>{
+        got.push([md,[].concat(j)]);
+        if(!timer) timer=setTimeout(done,4000);
+      }).catch(()=>{}).finally(()=>{ if(--left===0) done(); }));
+  });
+  if(!ok.length) throw new Error(t('noData').trim()||'no waves');
+  const n=ok[0][1].length, out=[];
+  for(let i=0;i<n;i++){
+    const hourly={time:ok[0][1][i].hourly.time};
+    for(const [md,locs] of ok) for(const [k,v] of Object.entries(locs[i].hourly))
+      if(k!=='time') hourly[k+'_'+md]=v;
+    out.push({hourly});
+  }
+  return out;
+}
 async function fetchCore(days=10){
   const {base}=spotPoints(days);
   const [m,w,tSea]=await Promise.all([
-    safe('wave',t('srcWave'),()=>
-      jget('https://marine-api.open-meteo.com/v1/marine?'+base+
-        '&hourly=wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,wind_wave_height&models='+WAVE_MODELS.join(','))),
+    safe('wave',t('srcWave'),()=>wavesByModel(base)),
     safe('wind',t('srcWind'),()=>
       jgetOM('https://api.open-meteo.com/v1/forecast?'+base+
         '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation&wind_speed_unit=ms&models='+WIND_MODELS.join(','))),
     // sea level and water temp exist only in best_match
     safe('sea',t('srcSea'),()=>
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
-        '&hourly=sea_surface_temperature,sea_level_height_msl'))
+        '&hourly=sea_surface_temperature,sea_level_height_msl',undefined,20000))
   ]);
   // waves are the one thing a score cannot do without; wind and sea may be missing
   if(!m){
@@ -1264,7 +1288,9 @@ function render(){
   if(STALE){
     const age=LAST_OK?new Date(LAST_OK).toLocaleTimeString(LOCALE[LANG],
       {timeZone:REG().tz,hour:'2-digit',minute:'2-digit'}):'–';
-    sb.innerHTML=`<div class="stale">${t(STALE_REASON==='rateLimit'?'staleLimit':'staleData',age)}</div>`;
+    const down=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.label+(x.err?' ('+x.err+')':''));
+    sb.innerHTML=`<div class="stale">${t(STALE_REASON==='rateLimit'?'staleLimit':'staleData',age)}${
+      down.length?' '+t('srcDown',down.join(', ')):''}</div>`;
   } else sb.innerHTML=troubleNote();
   const have=SPOTS.filter(s=>DATA[s.id]&&DATA[s.id].length);
   const pinned=have.filter(s=>s.pin), rest=have.filter(s=>!s.pin);
