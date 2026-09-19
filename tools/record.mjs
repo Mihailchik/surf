@@ -61,7 +61,35 @@ async function fetchRegion(region, span, withMet) {
     withMet ? jget('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=' +
       C.REGIONS[region].wxLat.toFixed(2) + '&lon=' + C.REGIONS[region].wxLon.toFixed(2)).catch(() => null) : null
   ]);
-  return C.buildSpots(spots, pts, { m, w, tSea }, C.metIndex(mn), null);
+  // NOAA WaveWatch III joins the wave median, as on the page
+  const ww = await loadWW3(region, m[0].hourly.time).catch(() => null);
+  let models = null;
+  if (ww) {
+    models = C.WAVE_MODELS.concat('ww3');
+    for (const loc of m) {
+      const h = loc.hourly;
+      h.wave_height_ww3 = h.time.map(t => ww[t]?.h ?? null);
+      h.wave_period_ww3 = h.time.map(t => ww[t]?.p ?? null);
+      h.wave_direction_ww3 = h.time.map(t => ww[t]?.d ?? null);
+    }
+  }
+  return C.buildSpots(spots, pts, { m, w, tSea }, C.metIndex(mn), null, models);
+}
+
+// WW3 series for the region's node over the given local hours, keyed like Open-Meteo times
+async function loadWW3(region, times) {
+  const P = C.REGIONS[region].ww3;
+  const utc = t => new Date(new Date(t + ':00+07:00').getTime()).toISOString().slice(0, 13) + ':00:00Z';
+  const idx = `%5B(${utc(times[0])}):1:(${utc(times[times.length - 1])})%5D%5B(0.0)%5D%5B(${P.lat})%5D%5B(${P.lon})%5D`;
+  const j = await jget('https://pae-paha.pacioos.hawaii.edu/erddap/griddap/ww3_global.json?' +
+    ['Thgt', 'Tper', 'Tdir'].map(v => v + idx).join(','));
+  const cols = j.table.columnNames, ci = n => cols.indexOf(n), out = {};
+  for (const r of j.table.rows) {
+    const k = new Date(r[ci('time')]).toLocaleString('sv-SE', { timeZone: 'Asia/Bangkok' }).slice(0, 13).replace(' ', 'T') + ':00';
+    const hgt = r[ci('Thgt')];
+    out[k] = { h: hgt == null ? null : hgt * P.k, p: r[ci('Tper')], d: r[ci('Tdir')] };
+  }
+  return out;
 }
 
 // daylight rows of one date, compact

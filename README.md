@@ -15,11 +15,11 @@ source is fetched straight from the browser and works without registration.
 | Source | Provides |
 |---|---|
 | Open-Meteo Marine | swell height, period, direction, wind wave: DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave 0.16°, ECMWF WAM |
-| Open-Meteo Forecast | wind, gusts, precipitation: ICON, GFS, ECMWF, ARPEGE, JMA |
+| Open-Meteo Forecast | wind, gusts, precipitation: ECMWF, GFS, ICON |
 | Open-Meteo Marine | tide and sea temperature |
 | Open-Meteo Forecast | general weather, sunrise, UV |
-| MET Norway | wind, independent of Open-Meteo |
-| NOAA WaveWatch III (PacIOOS ERDDAP) | total wave height, independent of Open-Meteo |
+| MET Norway | wind, a separate provider, part of the wind median |
+| NOAA WaveWatch III (PacIOOS ERDDAP) | waves, a separate provider, part of the wave median (one open-sea node per region, scaled by 0.75 to near-shore) |
 | Open-Meteo | wave and wind at three ocean watchpoints |
 
 Each value is the **median** across models, not the mean — a single outlier
@@ -35,6 +35,12 @@ treats wind as neutral and says so. Beaches with no data are left out and
 listed. With no waves at all the page says the forecast did not come through,
 lists what is down, shows the live cameras and retries every minute. After 5 s
 of loading it says the server is slow instead of spinning silently.
+
+All sources go into one pot: whichever wave source answers first is drawn at
+once, and the page redraws as the rest arrive. Two providers per quantity (waves:
+Open-Meteo and NOAA; wind: Open-Meteo and MET Norway) matter more than many
+models from one provider, which fail together. If Open-Meteo never answers, the
+page runs on NOAA and MET Norway alone and says the precision is lower.
 
 Open-Meteo's main forecast host (`api.open-meteo.com`) went down on
 19 Sep 2026 while the marine host kept working. Wind and weather now fall back

@@ -374,7 +374,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 
 </div>
 
-<script src="core.js?v=20260919cb"></script>
+<script src="core.js?v=20260919db"></script>
 <script>
 let REGION='phuket';
 {
@@ -439,7 +439,7 @@ const I18N={
   agreeMid:'sources disagree by {0}×', agreeOk:'sources agree',
   bySource:'by source: wave {0}–{1} m, wind {2}–{3} m/s',
   bestWindow:'best window {0} {1}, {2}/10',
-  footer:'<b>Wave:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Plus NOAA WaveWatch III for comparison.<br><b>Wind:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br>The wave model grid is about 9 km, so neighbouring beaches share a node. The difference comes from each spot profile. Forecast runs 10 days.',
+  footer:'<b>Wave:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. NOAA WaveWatch III, a separate provider, joins the median.<br><b>Wind:</b> ECMWF, GFS, ICON, MET Norway.<br><b>Tide and water:</b> Open-Meteo Marine.<br>The wave model grid is about 9 km, so neighbouring beaches share a node. The difference comes from each spot profile. Forecast runs 10 days.',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'clear',1:'mostly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',
    51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'heavy rain',66:'rain',67:'heavy rain',
@@ -497,7 +497,7 @@ const I18N={
   danger:'careful',
   scoreNow:'right now', scoreFor:'for {0}',
   camsLabel:'Cameras',
-  srcWave:'Waves · Open-Meteo (4 models)', srcWind:'Wind · Open-Meteo (5 models)',
+  srcWave:'Waves · Open-Meteo (4 models)', srcWind:'Wind · Open-Meteo (3 models)',
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
  },
@@ -536,7 +536,7 @@ const I18N={
   agreeMid:'источники расходятся в {0} раза', agreeOk:'источники сходятся',
   bySource:'по источникам: волна {0}–{1} м, ветер {2}–{3} м/с',
   bestWindow:'лучшее окно {0} {1}, {2}/10',
-  footer:'<b>Волна:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. Плюс NOAA WaveWatch III для сверки.<br><b>Ветер:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br>Сетка волновой модели около 9 км, поэтому соседние пляжи берут один узел. Разницу даёт профиль спота. Прогноз на 10 дней.',
+  footer:'<b>Волна:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM. NOAA WaveWatch III, отдельный поставщик, тоже входит в медиану.<br><b>Ветер:</b> ECMWF, GFS, ICON, MET Norway.<br><b>Прилив и вода:</b> Open-Meteo Marine.<br>Сетка волновой модели около 9 км, поэтому соседние пляжи берут один узел. Разницу даёт профиль спота. Прогноз на 10 дней.',
   dirs:['С','ССВ','СВ','ВСВ','В','ВЮВ','ЮВ','ЮЮВ','Ю','ЮЮЗ','ЮЗ','ЗЮЗ','З','ЗСЗ','СЗ','ССЗ'],
   wmo:{0:'ясно',1:'почти ясно',2:'переменная',3:'пасмурно',45:'туман',48:'туман',
    51:'морось',53:'морось',55:'морось',61:'дождь',63:'дождь',65:'ливень',66:'дождь',67:'ливень',
@@ -594,7 +594,7 @@ const I18N={
   danger:'осторожно',
   scoreNow:'сейчас', scoreFor:'на {0}',
   camsLabel:'Камеры',
-  srcWave:'Волна · Open-Meteo (4 модели)', srcWind:'Ветер · Open-Meteo (5 моделей)',
+  srcWave:'Волна · Open-Meteo (4 модели)', srcWind:'Ветер · Open-Meteo (3 модели)',
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
  },
@@ -633,7 +633,7 @@ const I18N={
   agreeMid:'แหล่งข้อมูลต่างกัน {0} เท่า', agreeOk:'แหล่งข้อมูลตรงกัน',
   bySource:'ตามแหล่งข้อมูล: คลื่น {0}–{1} ม. · ลม {2}–{3} m/s',
   bestWindow:'ช่วงที่ดีที่สุด {0} {1} · {2}/10',
-  footer:'<b>คลื่น:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM และ NOAA WaveWatch III สำหรับเทียบ<br><b>ลม:</b> ICON, GFS, ECMWF, ARPEGE, JMA, MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะหาด พยากรณ์ 10 วัน',
+  footer:'<b>คลื่น:</b> DWD GWAM, MeteoFrance WAM, NOAA GFS-Wave, ECMWF WAM และ NOAA WaveWatch III จากผู้ให้บริการอีกราย รวมอยู่ในค่ากลาง<br><b>ลม:</b> ECMWF, GFS, ICON, MET Norway<br><b>น้ำขึ้นลงและอุณหภูมิน้ำ:</b> Open-Meteo Marine<br>ความละเอียดโมเดลคลื่นราว 9 กม. หาดที่ติดกันจึงใช้จุดเดียวกัน ความต่างมาจากลักษณะหาด พยากรณ์ 10 วัน',
   dirs:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'],
   wmo:{0:'ท้องฟ้าแจ่มใส',1:'แจ่มใสเป็นส่วนใหญ่',2:'มีเมฆบางส่วน',3:'เมฆมาก',45:'หมอก',48:'หมอก',
    51:'ฝนละออง',53:'ฝนละออง',55:'ฝนละออง',61:'ฝนตก',63:'ฝนตก',65:'ฝนตกหนัก',66:'ฝนตก',67:'ฝนตกหนัก',
@@ -691,7 +691,7 @@ const I18N={
   danger:'ระวัง',
   scoreNow:'ตอนนี้', scoreFor:'เวลา {0}',
   camsLabel:'กล้อง',
-  srcWave:'คลื่น · Open-Meteo (4 โมเดล)', srcWind:'ลม · Open-Meteo (5 โมเดล)',
+  srcWave:'คลื่น · Open-Meteo (4 โมเดล)', srcWind:'ลม · Open-Meteo (3 โมเดล)',
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
  }
@@ -858,6 +858,19 @@ function ww3AsMarine(ww,days){
 }
 /* Reserve core: NOAA WaveWatch III waves and MET Norway wind, one reading for
    the coast. Used when Open-Meteo is slow or down. */
+/* Add NOAA WaveWatch III to Open-Meteo's wave models as one more voice in the
+   median, lined up by hour. */
+function withWW3(om,spare){
+  if(om.fallback) return om;
+  const sh=spare.m[0].hourly, at={}; sh.time.forEach((t,i)=>at[t]=i);
+  const m=om.m.map(loc=>{
+    const h={...loc.hourly}, pick=k=>h.time.map(t=>at[t]==null?null:sh[k][at[t]]);
+    h.wave_height_ww3=pick('wave_height_ww3'); h.wave_period_ww3=pick('wave_period_ww3');
+    h.wave_direction_ww3=pick('wave_direction_ww3');
+    return {hourly:h};
+  });
+  return {...om, m, met:om.met||spare.met, waveModels:WAVE_MODELS.concat('ww3')};
+}
 async function spareCore(){
   const [ww,met]=await Promise.all([
     loadWW3(),
@@ -1162,7 +1175,7 @@ function sources(r){
     meteofrance_seamless:'ARPEGE (MF)',jma_seamless:'JMA',metno:'MET Norway ⧉', ww3:'NOAA WW3 ⧉'};
   const wave=r.raw.wave.filter(x=>x.h!=null).map(x=>`<tr><td>${NAME[x.m]}</td>
       <td>${fmt(x.h,2)}</td><td>${fmt(x.p,1)}</td><td>${x.d==null?'–':Math.round(x.d)+'°'}</td></tr>`).join('');
-  const totals=r.ww3?[{n:NAME['ww3'],v:r.ww3.h}]:[];
+  const totals=r.raw.wave.some(x=>x.m==='ww3')||!r.ww3?[]:[{n:NAME['ww3'],v:r.ww3.h}];
   // как каждая модель делит волну на свелл и ветровую: величины несравнимые
   const splits=r.raw.wave.filter(x=>x.sw!=null&&x.sw>0.01)
     .map(x=>`<span class="spl">${NAME[x.m]} <b>${fmt(x.sw,2)}</b> / ${fmt(x.swp,0)} ${t('uS')}</span>`);
@@ -1299,8 +1312,9 @@ function troubleNote(){
   const lost=SPOTS.filter(s=>!DATA||!DATA[s.id]||!DATA[s.id].length).map(nameOf);
   // running on reserve sources is normal operation, said calmly
   const spare=[];
-  if(WAVE_FALLBACK==='ww3') spare.push(t('spareWave'));
-  if(windSpare||(WAVE_FALLBACK==='ww3'&&!(STATUS.wind&&STATUS.wind.ok))) spare.push(t('spareWind'));
+  const omDown=STATUS.wave&&!STATUS.wave.ok;
+  if(WAVE_FALLBACK==='ww3'&&omDown) spare.push(t('spareWave'));
+  if(windSpare||(WAVE_FALLBACK==='ww3'&&omDown&&!(STATUS.wind&&STATUS.wind.ok))) spare.push(t('spareWind'));
   // things that have no reserve
   const gaps=[];
   if(STATUS.wind&&!STATUS.wind.ok&&!windSpare) gaps.push(t('noWind'));
@@ -1532,14 +1546,17 @@ async function boot(force){
       quickP.then(res,fail); fullP.then(res,fail);
     });
     omP.catch(()=>{});
-    // first paint: Open-Meteo if it answers within 3 s, otherwise the reserve
-    const waitOM=Promise.race([new Promise(r=>setTimeout(r,3000)), omP.catch(()=>{})]);
-    const first=await Promise.any([omP, waitOM.then(()=>spareP)]);
+    // one pot: whichever wave source answers first is painted at once
+    const first=await Promise.any([omP, spareP]);
     if(moved()) return;
     DATA=build(first,null); LAST_OK=Date.now(); STALE=false; render();
     if(!CAMS_ON) setTimeout(startCams,1500);
-    // then the best data that arrives: full Open-Meteo, else keep the reserve
-    const core=await fullP.catch(()=>omP).catch(()=>spareP);
+    // then everything that arrived: Open-Meteo per-beach models plus NOAA in
+    // one median; NOAA alone if Open-Meteo never answered
+    const om=await fullP.catch(()=>omP).catch(()=>null);
+    const spare=await spareP.catch(()=>null);
+    const core=om&&spare?withWW3(om,spare):om||spare;
+    if(!core) throw new Error('sources unavailable');
     const extra=await extraP.catch(()=>null);
     if(moved()) return;
     EXTRA_PENDING=false;

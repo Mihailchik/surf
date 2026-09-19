@@ -69,7 +69,10 @@ const ALL_SPOTS=[
 const spotsOf=r=>ALL_SPOTS.filter(x=>(x.region||'phuket')===r);
 
 const WAVE_MODELS=['gwam','meteofrance_wave','ncep_gfswave016','ecmwf_wam025'];
-const WIND_MODELS=['icon_seamless','gfs_seamless','ecmwf_ifs025','meteofrance_seamless','jma_seamless'];
+/* Three wind models are enough for the median and the spread; more models from
+   the same provider add no reliability, they fail together. MET Norway joins
+   the wind median as an independent provider, NOAA WaveWatch III the waves. */
+const WIND_MODELS=['ecmwf_ifs025','gfs_seamless','icon_seamless'];
 
 const avg=a=>{a=a.filter(x=>x!=null&&!isNaN(x));return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
 /* Median, not mean: one outlier model must not drag the result. */
