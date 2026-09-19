@@ -373,7 +373,7 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 
 </div>
 
-<script src="core.js"></script>
+<script src="core.js?v=20260919"></script>
 <script>
 let REGION='phuket';
 {
@@ -752,21 +752,14 @@ async function jget(u,opt,ms=10000){
 }
 /* Open-Meteo's main forecast host went down on 19 Sep 2026 while marine kept
    working. previous-runs-api serves the same models in the same format (latest
-   run by default). If the main host is silent for 2.5 s the spare is asked too
-   and the first answer wins. After a failure the main host is skipped for 10
-   minutes, so the next load goes straight to the spare. */
+   run by default), so both are asked at once and the first good answer wins. */
 const OM_MAIN='https://api.open-meteo.com/', OM_SPARE='https://previous-runs-api.open-meteo.com/';
 function jgetOM(u){
-  const spare=()=>jget(u.replace(OM_MAIN,OM_SPARE));
-  if(Date.now()-(+(LS.get('om_down')||0))<600000) return spare();
   return new Promise((res,rej)=>{
-    let fails=0, asked=false;
+    let fails=0;
     const fail=e=>{ if(++fails===2) rej(e); };
-    const askSpare=()=>{ if(asked) return; asked=true; spare().then(res,fail); };
-    const timer=setTimeout(askSpare,2500);
-    jget(u,undefined,8000).then(res,e=>{
-      LS.set('om_down',String(Date.now())); clearTimeout(timer); askSpare(); fail(e);
-    });
+    jget(u).then(res,fail);
+    jget(u.replace(OM_MAIN,OM_SPARE)).then(res,fail);
   });
 }
 /* Each source loads independently; a failure is marked, not fatal. */
@@ -1446,6 +1439,8 @@ async function boot(force){
     // a long wait should not look like a frozen page
     setTimeout(()=>{ const l=document.querySelector('#main .loader');
       if(l&&!DATA) l.insertAdjacentHTML('afterend',`<p class="slow">${t('slowLoad')}</p>`); },5000);
+    // safety net: whatever hangs, after 20 s the page says so instead of spinning
+    setTimeout(()=>{ if(!DATA&&document.querySelector('#main .loader')) renderOutage(); },20000);
   }
   if(!WEATHER){ EXTRA_PENDING=true; wxbar(); }
   // a region switch mid-load must not paint the old region's data
