@@ -155,7 +155,9 @@ function scoreHour(sp,h){
   const dirS=clamp(1-(sdir==null?45:angDiff(sdir,sp.facing))/95,0,1)*10;
   const wOff=angDiff(wdir==null?sp.facing:wdir,(sp.facing+180)%360);
   let wind;
-  if(wsp==null||wsp<1.2) wind=8.5;
+  // unknown wind is neutral; only a real calm earns the calm bonus
+  if(wsp==null) wind=5;
+  else if(wsp<1.2) wind=8.5;
   else if(wOff<55) wind=clamp(10-(wsp-3)*0.35,5,10);
   else if(wOff<115) wind=clamp(7.5-wsp*0.55,1.5,7.5);
   else wind=clamp(7-wsp*1.15,0,7);
@@ -194,13 +196,15 @@ function metIndex(mn){
    returned by Open-Meteo for the points in pts. */
 function buildSpots(spots, pts, core, MET, ww3){
   const {m,w,tSea}=core;
-  const M=[].concat(m), W=[].concat(w), T=tSea?[].concat(tSea):null;
+  // wind or sea may be missing when a source is down; waves are required
+  const M=[].concat(m), W=w?[].concat(w):[], T=tSea?[].concat(tSea):null;
   MET=MET||{};
   const idx={}; pts.forEach((p,i)=>idx[p]=i);
   const out={};
   for(const sp of spots){
     const i=idx[sp.lat.toFixed(2)+','+sp.lon.toFixed(2)];
-    const mh=M[i].hourly, wh=W[i].hourly, th=T?T[i].hourly:{}, rows=[];
+    if(i==null||!M[i]||!M[i].hourly) continue;   // no data for this spot: leave it out
+    const mh=M[i].hourly, wh=W[i]?.hourly||{}, th=T&&T[i]?T[i].hourly:{}, rows=[];
     for(let k=0;k<mh.time.length;k++){
       const time=mh.time[k], hourKey=time.slice(0,13);
       const met=MET[hourKey]||null;

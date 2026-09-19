@@ -321,6 +321,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);color:var(--bad)}
 .err{background:color-mix(in srgb,var(--bad) 12%,var(--card));border:1px solid var(--bad);
   color:var(--bad);padding:11px 13px;border-radius:11px;font-size:12.5px;margin:10px 0}
+.outage{margin:14px 0;padding:16px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-align:center}
+.outage b{font-size:16px}.outage p{margin:6px 0;font-size:13.5px;color:var(--dim)}.outage .dim{font-size:12.5px;color:var(--dim2)}
+.retry{margin-top:8px;font:inherit;font-size:13px;font-weight:650;border:0;border-radius:9px;padding:8px 14px;background:var(--acc);color:#fff;cursor:pointer}
+.slow{text-align:center;font-size:12.5px;color:var(--dim2);margin:0 0 6px}
 .loader{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 0 8px;
   color:var(--dim);font-size:13px}
 .wave{width:170px;height:auto;display:block}
@@ -455,6 +459,15 @@ const I18N={
   iTyphoonText:'This coast sits outside the typhoon belt. Cyclones form in the Bay of Bengal and the western Pacific. A cyclone in the bay can still push extra swell here, and that shows up in the ocean points above as a jump in wind and wave. There is no cyclone feed here: the open sources GDACS and JTWC block browsers, and inventing a warning is worse than showing none.',
   licence:"Data: Open-Meteo and MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a>. NOAA WaveWatch III via PacIOOS, public domain. Camera streams belong to their owners. Visits are counted with Google Analytics. Forecasts can be wrong, do not rely on this alone.",
   noConnection:'No connection, data did not load.',
+  outTitle:'Sorry, the waves flooded the forecast server',
+  outText:'The forecast did not come through. We are pumping it out and will try again by ourselves in a minute.',
+  outCams:'Meanwhile, the live cameras:',
+  retry:'Try again',
+  slowLoad:'The forecast server is slower than usual, still waiting…',
+  srcDown:'Not responding: {0}.',
+  noWind:'Scores are counted without wind.',
+  noSea:'No tide or water temperature.',
+  fewSpots:'No data for: {0}.',
   staleData:'No connection. Data below is from {0} and may be out of date.',
   offline:'offline',
   rateLimit:'Request limit reached, try again in a couple of minutes.',
@@ -539,6 +552,15 @@ const I18N={
   iTyphoonText:'Это побережье вне тайфунного пояса. Циклоны рождаются в Бенгальском заливе и западной части Тихого океана. Циклон в заливе может подогнать лишний свелл, и это видно в океанских точках выше как скачок ветра и волны. Своей ленты по циклонам тут нет: открытые источники GDACS и JTWC не пускают браузер, а выдумывать предупреждение хуже, чем не показывать его.',
   licence:"Данные: Open-Meteo и MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a>. NOAA WaveWatch III через PacIOOS, общественное достояние. Камеры принадлежат владельцам. Посещения считает Google Analytics. Прогноз может врать, не полагайся на него одного.",
   noConnection:'Нет связи, данные не загрузились.',
+  outTitle:'Сорян, волны залили сервер прогноза',
+  outText:'Прогноз не пришёл. Уже откачиваем, сайт сам попробует снова через минуту.',
+  outCams:'Пока можно посмотреть камеры:',
+  retry:'Попробовать снова',
+  slowLoad:'Сервер прогноза сегодня медленнее обычного, ждём…',
+  srcDown:'Не отвечают: {0}.',
+  noWind:'Баллы посчитаны без ветра.',
+  noSea:'Нет данных о приливе и температуре воды.',
+  fewSpots:'Нет данных по пляжам: {0}.',
   staleData:'Нет связи. Данные ниже от {0}, могли устареть.',
   offline:'нет связи',
   rateLimit:'Лимит запросов исчерпан, попробуй через пару минут.',
@@ -623,6 +645,15 @@ const I18N={
   iTyphoonText:'ชายฝั่งนี้อยู่นอกแนวไต้ฝุ่น พายุหมุนก่อตัวในอ่าวเบงกอลและแปซิฟิกตะวันตก พายุในอ่าวเบงกอลอาจส่งคลื่นเพิ่มมาได้ ซึ่งจะเห็นได้จากจุดสังเกตด้านบน ที่นี่ไม่มีฟีดพายุโดยตรง เพราะแหล่งข้อมูลเปิด (GDACS, JTWC) ไม่อนุญาตให้เบราว์เซอร์เข้าถึง',
   licence:"ข้อมูล: Open-Meteo และ MET Norway, <a href='https://creativecommons.org/licenses/by/4.0/' target='_blank' rel='noopener'>CC BY 4.0</a> · NOAA WaveWatch III ผ่าน PacIOOS สาธารณสมบัติ กล้องเป็นของเจ้าของแต่ละราย นับผู้เข้าชมด้วย Google Analytics พยากรณ์อาจคลาดเคลื่อน",
   noConnection:'ไม่มีการเชื่อมต่อ โหลดข้อมูลไม่ได้',
+  outTitle:'ขออภัย คลื่นท่วมเซิร์ฟเวอร์พยากรณ์',
+  outText:'พยากรณ์โหลดไม่สำเร็จ เรากำลังสูบน้ำออก เว็บจะลองใหม่เองในอีกหนึ่งนาที',
+  outCams:'ระหว่างนี้ดูกล้องสดได้:',
+  retry:'ลองอีกครั้ง',
+  slowLoad:'เซิร์ฟเวอร์พยากรณ์ช้ากว่าปกติ กำลังรอ…',
+  srcDown:'ไม่ตอบสนอง: {0}',
+  noWind:'คะแนนคิดโดยไม่มีข้อมูลลม',
+  noSea:'ไม่มีข้อมูลน้ำขึ้นลงและอุณหภูมิน้ำ',
+  fewSpots:'ไม่มีข้อมูลของ: {0}',
   staleData:'ไม่มีการเชื่อมต่อ ข้อมูลด้านล่างจาก {0} อาจไม่เป็นปัจจุบัน',
   offline:'ออฟไลน์',
   rateLimit:'ใช้โควตาคำขอหมดแล้ว ลองใหม่ในอีกสองสามนาที',
@@ -711,7 +742,7 @@ function extrema(rows,key,from,to){
 }
 
 
-async function jget(u,opt,ms=15000){
+async function jget(u,opt,ms=10000){
   const c=new AbortController(), timer=setTimeout(()=>c.abort(),ms);
   try{
     const r=await fetch(u,{...opt,signal:c.signal});
@@ -792,7 +823,8 @@ async function fetchCore(days=10){
       jget('https://marine-api.open-meteo.com/v1/marine?'+base+
         '&hourly=sea_surface_temperature,sea_level_height_msl'))
   ]);
-  if(!m||!w){
+  // waves are the one thing a score cannot do without; wind and sea may be missing
+  if(!m){
     const errs=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.err||'').join(' ');
     throw new Error(/429/.test(errs)?'HTTP 429':'sources unavailable');
   }
@@ -1106,7 +1138,7 @@ function sources(r){
    against its own 10-day median, and the ocean watchpoints.        */
 function islandReport(){
   // reference beach for the region: first pinned one
-  const ref=DATA[(SPOTS.find(x=>x.pin)||SPOTS[0]).id];
+  const ref=DATA[(SPOTS.find(x=>x.pin&&DATA[x.id])||SPOTS.find(x=>DATA[x.id])).id];
   const days={};
   ref.forEach(r=>{ if(isDay(r)&&r.swell!=null) (days[r.t.slice(0,10)]=days[r.t.slice(0,10)]||[]).push(r); });
   const keys=Object.keys(days).sort();
@@ -1202,6 +1234,36 @@ function markVisibleChip(){
   cards.forEach(c=>chipObserver.observe(c));
 }
 
+/* Which sources failed, in plain words, above the beaches. */
+function troubleNote(){
+  const down=Object.values(STATUS).filter(x=>!x.ok&&!x.optional).map(x=>x.label);
+  const lost=SPOTS.filter(s=>!DATA||!DATA[s.id]||!DATA[s.id].length).map(nameOf);
+  const parts=[];
+  if(down.length) parts.push(t('srcDown',down.join(', ')));
+  if(STATUS.wind&&!STATUS.wind.ok&&!(STATUS.metno&&STATUS.metno.ok)) parts.push(t('noWind'));
+  if(STATUS.sea&&!STATUS.sea.ok) parts.push(t('noSea'));
+  if(lost.length&&DATA) parts.push(t('fewSpots',lost.join(', ')));
+  return parts.length?`<div class="stale">${parts.join(' ')}</div>`:'';
+}
+/* Nothing to score: say so, list what is down, show cameras, offer a retry. */
+function renderOutage(){
+  const down=Object.values(STATUS).filter(x=>!x.ok).map(x=>x.label);
+  const cams=SPOTS.filter(s=>s.cam);
+  document.getElementById('summary').innerHTML='';
+  document.getElementById('rest').innerHTML='';
+  document.getElementById('restlbl').textContent='';
+  document.getElementById('stale').innerHTML='';
+  document.getElementById('main').innerHTML=`<div class="outage">
+      <b>${t('outTitle')}</b><p>${t('outText')}</p>
+      ${down.length?`<p class="dim">${t('srcDown',down.join(', '))}</p>`:''}
+      <button class="retry" onclick="boot(true)">${t('retry')}</button></div>
+    ${cams.length?`<div class="sect">${t('outCams')}</div>`+cams.map(sp=>
+      `<div class="card pin" data-id="${sp.id}"><div class="chead"><div class="cname"><h3>${nameOf(sp)}</h3></div></div>
+       <div class="cbody">${camBlock(sp)}</div></div>`).join(''):''}`;
+  startCams();
+  wxbar();
+  document.getElementById('upd').innerHTML=statusPill();
+}
 function render(){
   if(!DATA) return;
   wxbar();
@@ -1210,8 +1272,10 @@ function render(){
     const age=LAST_OK?new Date(LAST_OK).toLocaleTimeString(LOCALE[LANG],
       {timeZone:REG().tz,hour:'2-digit',minute:'2-digit'}):'–';
     sb.innerHTML=`<div class="stale">${t(STALE_REASON==='rateLimit'?'staleLimit':'staleData',age)}</div>`;
-  } else sb.innerHTML='';
-  const pinned=SPOTS.filter(s=>s.pin), rest=SPOTS.filter(s=>!s.pin);
+  } else sb.innerHTML=troubleNote();
+  const have=SPOTS.filter(s=>DATA[s.id]&&DATA[s.id].length);
+  const pinned=have.filter(s=>s.pin), rest=have.filter(s=>!s.pin);
+  if(!pinned.length&&rest.length) pinned.push(rest.shift());
   const ref=DATA[pinned[0].id], dark=!isDay(ref[nowIdx(ref)]);
 
   const tops=pinned.map(sp=>{
@@ -1379,6 +1443,9 @@ async function boot(force){
     document.getElementById('main').innerHTML=
       `<div class="loader"><svg class="wave" viewBox="0 270 1024 100" aria-hidden="true"><path class="wl" stroke-width="24"/><path class="wc" stroke-width="20"/><path class="ws" stroke-width="20"/></svg>${t('loading')}</div>`+'<div class="skel"></div>'.repeat(3);
     startWave();
+    // a long wait should not look like a frozen page
+    setTimeout(()=>{ const l=document.querySelector('#main .loader');
+      if(l&&!DATA) l.insertAdjacentHTML('afterend',`<p class="slow">${t('slowLoad')}</p>`); },5000);
   }
   if(!WEATHER){ EXTRA_PENDING=true; wxbar(); }
   // a region switch mid-load must not paint the old region's data
@@ -1412,9 +1479,8 @@ async function boot(force){
     if(!DATA && cached){
       DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean; LAST_OK=cached.at;
     }
-    if(DATA){ render(); startCams(); } else
-      document.getElementById('main').innerHTML=`<div class="err">${t(STALE_REASON)}</div>`;
-    setTimeout(()=>boot(true),120000);
+    if(DATA){ render(); startCams(); } else renderOutage();
+    setTimeout(()=>boot(true),60000);
   }finally{
     LOADING=false;
     if(moved()) boot(true);

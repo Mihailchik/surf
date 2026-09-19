@@ -27,8 +27,20 @@ cannot drag the result. Directions are averaged as vectors. The spread between
 sources is shown next to the result; when it is wide, the forecast is unreliable
 and the page says so.
 
-Sources load independently with a 15 s timeout. A failed one does not break the
-page — it is marked in the header (`sources 7/8`) and drops out of the median.
+Sources load independently with a 10 s timeout. A failed one does not break the
+page: it is marked in the header (`sources 7/8`), named in a note above the
+beaches, and drops out of the median. Only waves are required. Without the
+Open-Meteo wind models the score uses MET Norway wind, and without any wind it
+treats wind as neutral and says so. Beaches with no data are left out and
+listed. With no waves at all the page says the forecast did not come through,
+lists what is down, shows the live cameras and retries every minute. After 5 s
+of loading it says the server is slow instead of spinning silently.
+
+Open-Meteo's main forecast host (`api.open-meteo.com`) went down on
+19 Sep 2026 while the marine host kept working. Wind and weather now fall back
+to `previous-runs-api.open-meteo.com`, which serves the same models: it is asked
+if the main host is silent for 2.5 s, and used directly for 10 minutes after a
+failure. The history recorder uses the same fallback.
 
 The slowest part is not traffic but Open-Meteo's compute time: 1.4-2.2 s per
 request, whatever the size. The page shows what arrives, as it arrives: the
