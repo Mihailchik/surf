@@ -1,5 +1,9 @@
 # Surf
 
+<p align="center">
+  <img src="./surf-logo-icon-smooth.svg" alt="Surf logo" width="180">
+</p>
+
 Wave, wind, tide and live cams for Andaman Sea beaches in Phuket and Khao Lak.
 One page, one question: is it worth going right now?
 
