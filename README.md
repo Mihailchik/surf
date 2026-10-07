@@ -25,6 +25,10 @@ source is fetched straight from the browser and works without registration.
 | MET Norway | wind, a separate provider, part of the wind median |
 | NOAA WaveWatch III (PacIOOS ERDDAP) | waves, a separate provider, part of the wave median (one open-sea node per region, scaled by 0.75 to near-shore) |
 | Open-Meteo | wave and wind at three ocean watchpoints |
+| Open-Meteo Forecast | weather tab and cloud by layer for the sunset score: ECMWF, GFS, ICON, JMA, GEM, UKMO |
+| Open-Meteo Air Quality | aerosol depth for the sunset score |
+| MET Norway | weather and cloud by layer, a separate provider |
+| wttr.in | weather for 3 days (World Weather Online data), a separate provider |
 
 Each value is the **median** across models, not the mean — a single outlier
 cannot drag the result. Directions are averaged as vectors. The spread between
@@ -49,8 +53,8 @@ page runs on NOAA and MET Norway alone and says the precision is lower.
 Open-Meteo's main forecast host (`api.open-meteo.com`) went down on
 19 Sep 2026 while the marine host kept working. Wind and weather now fall back
 to `previous-runs-api.open-meteo.com`, which serves the same models: it is asked
-if the main host is silent for 2.5 s, and used directly for 10 minutes after a
-failure. The history recorder uses the same fallback.
+if the main host fails or is silent for 2.5 s, and asked first for 10 minutes
+after a failure, on later page loads too. The history recorder asks both.
 
 The slowest part is not traffic but Open-Meteo's compute time: 1.4-2.2 s per
 request, whatever the size. The page shows what arrives, as it arrives: the
@@ -58,13 +62,98 @@ weather bar as soon as its request answers, then beaches from a 2-day request
 (now and the next daylight window), then the full 10 days and the secondary
 sources. Camera players start only after the data is on screen, so they do not
 compete with it on a phone connection.
-Results are cached in the browser for 10 minutes.
+The last good forecast is kept in the browser. On the next visit it is on
+screen at once and the fresh one replaces it when it arrives; a forecast older
+than 12 hours is not shown. Coming back to the tab within 30 minutes asks
+nothing, and a hidden tab asks nothing at all.
+
+### Requests
+
+Open-Meteo counts every point of a request as a call, against 600 a minute and
+10 000 a day per visitor. The models are coarser than the distance between
+beaches: the 13 points around Phuket fall into 3 to 6 grid cells, depending on
+the model. `tools/grid.mjs` finds which beaches share a cell and writes
+`grid.js`; the page asks for one point per cell and hands the answer to every
+beach in it. The numbers are the same as with a full request (checked point by
+point on 7 Oct 2026). Run the tool after adding a beach; a beach it does not
+know is simply asked by itself.
+
+A page load used to cost about 190 calls; it is about 70 on a first visit and
+about 40 after that. What went: the 2-day quick request when a forecast is
+already on screen, the second Open-Meteo host on every request, and repeated
+requests for NOAA WaveWatch III and MET Norway.
+
+### When something does not answer
+
+| What is down | What the page does |
+|---|---|
+| one wave or wind model | the median uses the rest; the header counts sources |
+| Open-Meteo main forecast host | the spare host answers, see above |
+| all of Open-Meteo, forecast under 6 h old on screen | keeps that forecast and says from when; it is better than the reserve |
+| all of Open-Meteo, nothing recent | NOAA WaveWatch III and MET Norway, with a note that precision is lower |
+| every wave source | outage screen with the live cameras, retry every minute |
+| rate limit (HTTP 429) | last forecast stays, retries after 1, 2, 5, then 10 minutes |
+| no network | last forecast with its time |
+| weather or sunset providers | see Weather and sunset below |
+
+Every source that fails is sent to Google Analytics as a `src_fail` event with
+its name, so the owner can see how often visitors really go without it.
 
 ### Cameras
 
 Kata (SSS Dive & Surf), Patong (Patong Tower), Karon (Marina Phuket Resort) —
 direct links to the original streams, no keys. Other beaches have no public
 camera pointing at the water.
+
+## Weather and sunset
+
+Two more tabs, loaded on first open.
+
+**Weather** is a 10-day outlook from eight sources on three providers: six
+models through Open-Meteo (ECMWF, GFS, ICON, JMA, GEM, UKMO), MET Norway, and
+wttr.in with World Weather Online data for the first 3 days. Each day shows the
+median and, when opened, every source by itself.
+
+Open-Meteo is one host and has gone down before, so the other two are asked on
+every load, each by itself. When Open-Meteo is silent the tab opens after 3 s
+on MET Norway and wttr.in and says so. The sunset score then runs on MET
+Norway's cloud layers, including four requests for the points out west, which
+are made only in that case.
+
+Providers checked on 7 Oct 2026 and left out: UCAR THREDDS (GFS with cloud
+layers), 7timer and aviationweather.gov (airport METAR and TAF) answer without
+a key but send no CORS header, so a browser cannot read them; they would need
+a server-side job such as the history recorder. PacIOOS ERDDAP has GFS and
+allows browsers, but its data requests timed out all day.
+In the wet season a shower passes almost daily, so a rain icon says nothing.
+The rows count what decides a day: millimetres and wet hours in daylight.
+Thresholds live in `WX_TUNE` in `sky.js`. The best wave score of the day sits
+next to the weather.
+
+**Sunset** answers two questions: is it worth going tonight, and where to
+stand.
+
+- The score (0-10, `SUNSET_TUNE` in `sky.js`) is a first estimate and has not
+  been checked against real sunsets yet. It takes cloud by layer over the coast
+  from each model, low and mid cloud 80-420 km out along the sunset line (the
+  light that paints the clouds comes in flat from there), rain and aerosol
+  depth. Every model is scored by itself; the page shows the median and how far
+  the models disagree.
+- Places are in `SUNSET_PLACES`: beaches snapped to the OpenStreetMap
+  coastline, with three standing points for long bays, and OSM viewpoints.
+  `tools/horizon.mjs` walks 30 km west of each point over SRTM elevation tiles
+  and writes `horizon.js`: how many degrees of land stand above the sea horizon
+  in each direction. From that the page tells where the sun sets into the sea
+  today, where a headland takes it early, and in which months each is true.
+  Run the tool after editing the list: `node tools/horizon.mjs`.
+- Sunset time and direction, the Moon, planets and meteor shower nights are
+  computed on the page (Paul Schlyter's low-precision formulas, checked against
+  the astronomy-engine library: sunset within seconds, planets within 0.1°).
+  The eclipse table in `sky.js` was computed with astronomy-engine and runs to
+  2036.
+
+Elevation data is blurred along the shore and knows nothing of trees and
+buildings, so a profile can be wrong by a rock or a hotel.
 
 ## Regions
 
@@ -198,6 +287,18 @@ the Yr name or logo, or implying any affiliation — this site does neither.
 **NOAA WaveWatch III via PacIOOS ERDDAP** — a work of the US government, in the
 public domain. Credited in the footer.
 
+**OpenStreetMap** — sunset places and the coastline they are snapped to come
+from OpenStreetMap, © OpenStreetMap contributors, ODbL. Credited in the footer.
+
+**Elevation** — Mapzen terrain tiles on AWS Open Data, built from SRTM (NASA,
+public domain). Used once by `tools/horizon.mjs`, not by the page.
+
+**wttr.in** — an open-source front end to World Weather Online data, free and
+without a key, also without any promise of uptime. Credited in the footer.
+
+**Aerosols** — Copernicus Atmosphere Monitoring Service, through Open-Meteo's
+air quality API. Credited in the footer.
+
 **Webcams** — the streams belong to SSS Phuket Dive & Surf (Kata), Patong Tower
 (Patong) and Marina Phuket Resort (Karon). They are embedded from the original
 sources and credited on every frame. Nothing is re-hosted, recorded or passed
@@ -208,9 +309,10 @@ remove it.
 addresses, as any external analytics does. Remove the `.hits` block to drop it.
 
 **Google Analytics** — tag `G-72CS4WJ571` in `<head>`. Besides page views it
-gets four events: `tab_open` (10 days or island tab), `beach_open` (a beach
-expanded), `cam_seen` (a camera 5 s on screen) and `cam_tap` (a tap into the
-player; playback itself is not visible to the page). Google
+gets five events: `tab_open` (any tab but the first), `beach_open` (a beach
+expanded), `cam_seen` (a camera 5 s on screen), `cam_tap` (a tap into the
+player; playback itself is not visible to the page) and `src_fail` (a data
+source that did not answer). Google
 sets cookies and sees visitors' IP addresses. There is no consent banner; one
 would be needed before targeting EU visitors.
 
