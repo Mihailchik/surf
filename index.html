@@ -264,11 +264,12 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .glegend{padding:2px 13px 10px;font-size:11.5px;color:var(--dim);line-height:1.45}
 /* Details disclosure. */
 .more{border-top:1px solid var(--line)}
-.more summary{padding:9px 13px;color:var(--acc);cursor:pointer;font-size:12.5px;
+/* direct child only: a folded list may hold rows that are details themselves */
+.more > summary{padding:9px 13px;color:var(--acc);cursor:pointer;font-size:12.5px;
   font-weight:600;list-style:none}
-.more summary::-webkit-details-marker{display:none}
-.more summary::before{content:'▸ '}
-.more[open] summary::before{content:'▾ '}
+.more > summary::-webkit-details-marker{display:none}
+.more > summary::before{content:'▸ '}
+.more[open] > summary::before{content:'▾ '}
 .more .srcbox,.more .why,.more .grid{border-top:1px solid var(--line)}
 
 .days{border-top:1px solid var(--line)}
@@ -385,6 +386,22 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .plh b{color:var(--tx);font-weight:650}
 .plfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 13px;
   border-top:1px solid var(--line);font-size:11.5px;color:var(--dim2)}
+.plmap{position:relative;height:210px;overflow:hidden;background:var(--card2)}
+.plmap img{position:absolute;max-width:none}
+:root[data-theme="dark"] .plmap img{filter:brightness(.78) saturate(.85)}
+.plmap svg{position:absolute;inset:0;width:100%;height:100%}
+.plmap .ray{stroke:#f08a1c;stroke-width:3.5;stroke-linecap:round;fill:none}
+.plmap .ray.bg{stroke:#fff;stroke-width:7;opacity:.75}
+.plmap .ray.off{stroke-dasharray:1 8;opacity:.8}
+.plmap .sun{fill:#f79b3c;stroke:#fff;stroke-width:2.5}
+.plmap .sun.off{opacity:.5}
+.plmap .stop{fill:#fff;stroke:#d43a26;stroke-width:2.5}
+.plmap .me{fill:#0b7fc7;stroke:#fff;stroke-width:3}
+.plmap .zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:1px;border-radius:8px;
+  overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,.3)}
+.plmap .zoom button{width:32px;height:32px;border:0;background:#fff;color:#1c2733;font:700 18px/1 inherit;cursor:pointer;padding:0}
+.plmap .osm{position:absolute;right:0;bottom:0;background:rgba(255,255,255,.82);color:#333;font-size:9.5px;
+  padding:1px 5px;text-decoration:none}
 .pano{display:block;width:100%;height:auto;margin-top:4px}
 .pano .sea{fill:color-mix(in srgb,var(--acc) 24%,transparent)}
 .pano .land{fill:color-mix(in srgb,var(--dim2) 55%,transparent)}
@@ -2273,7 +2290,9 @@ function placesCard(sun){
         <div class="plst" style="color:${best.now.st===0?'var(--go)':'var(--dim)'}">${plStatus(best.now)}${where}</div>
         ${p.kind==='view'?mapLink(best.pt):''}
         <span class="chev">›</span>
-      </summary><div class="rowbody">${body}
+      </summary><div class="rowbody">
+        <div class="plmap" data-lat="${best.pt.lat}" data-lon="${best.pt.lon}" data-az="${sun.az.toFixed(1)}"
+          data-st="${best.now.st}" data-km="${best.now.km||0}"></div>${body}
         <div class="plfoot"><span>${p.kind==='view'?t('plHeight',h):''}</span>${p.kind==='view'?'':mapLink(best.pt)}</div></div></details>`;
   };
   const good=list.filter(x=>x.best.now.st===0), rest=list.filter(x=>x.best.now.st!==0);
@@ -2282,6 +2301,54 @@ function placesCard(sun){
     ${rest.length?`<details class="more" data-o="plrest"><summary>${t('plRest',rest.length)}</summary>
       <div class="sum" style="margin:0;border:0;border-radius:0;box-shadow:none">${rest.map(row).join('')}</div></details>`:''}</div>`;
 }
+/* A small OpenStreetMap picture for an opened sunset place: where to stand
+   and which way to look. Standard 256 px tiles are laid out by hand with a
+   drawing on top, so there is no map library, and nothing is fetched until a
+   place is opened. The point sits off-centre and the view opens toward the
+   sun. Where land takes the sun early the line stops at that land and goes on
+   dotted. Tiles: tile.openstreetmap.org, credited on the picture as its usage
+   policy asks. */
+/* Tiles are drawn at three quarters of their size: closer than level 14, not as
+   close as a full level 15, and sharper on a phone screen. */
+const MAP_Z=[13,17], MAP_Z0=15, MAP_TILE=192;
+function placeMap(el){
+  el.dataset.done='1';
+  const lat=+el.dataset.lat, lon=+el.dataset.lon, az=+el.dataset.az, st=+el.dataset.st, km=+el.dataset.km;
+  const z=clamp(+el.dataset.z||MAP_Z0,MAP_Z[0],MAP_Z[1]), n=2**z, W=el.clientWidth||336, H=el.clientHeight||210;
+  // Web Mercator: the place in pixels of the whole world at this zoom
+  const T=MAP_TILE, px=(lon+180)/360*n*T, py=(1-Math.asinh(Math.tan(lat*RAD))/Math.PI)/2*n*T;
+  const dx=sind(az), dy=-cosd(az);                       // the sunset direction on screen, north up
+  const xp=W*(0.5-dx*0.32), yp=H*(0.5-dy*0.32), ox=px-xp, oy=py-yp;
+  let tiles='';
+  for(let tx=Math.floor(ox/T);tx*T<ox+W;tx++) for(let ty=Math.floor(oy/T);ty*T<oy+H;ty++)
+    tiles+=`<img alt="" decoding="async" src="https://tile.openstreetmap.org/${z}/${tx}/${ty}.png"
+      style="left:${Math.round(tx*T-ox)}px;top:${Math.round(ty*T-oy)}px;width:${T}px;height:${T}px">`;
+  const edge=Math.min(dx<0?xp/-dx:dx>0?(W-xp)/dx:1e9, dy<0?yp/-dy:dy>0?(H-yp)/dy:1e9)-16;
+  const mpp=156543.034*cosd(lat)/n*256/T;                // metres in one pixel on screen
+  const hit=st>0&&km>0?Math.min(km*1000/mpp,edge):edge;  // how far the look goes before land
+  const at=r=>`${(xp+dx*r).toFixed(1)}" y2="${(yp+dy*r).toFixed(1)}`, from=`x1="${xp.toFixed(1)}" y1="${yp.toFixed(1)}"`;
+  const P=r=>`cx="${(xp+dx*r).toFixed(1)}" cy="${(yp+dy*r).toFixed(1)}"`;
+  el.innerHTML=`${tiles}<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">
+      <line class="ray bg" ${from} x2="${at(edge)}"/>
+      <line class="ray${hit<edge?' off':''}" ${from} x2="${at(edge)}"/>
+      ${hit<edge?`<line class="ray" ${from} x2="${at(hit)}"/><circle class="stop" ${P(hit)} r="4.5"/>`:''}
+      <circle class="sun${hit<edge?' off':''}" ${P(edge)} r="9"/>
+      <circle class="me" ${P(0)} r="6.5"/></svg>
+    <div class="zoom"><button data-dz="1" aria-label="zoom in">+</button><button data-dz="-1" aria-label="zoom out">−</button></div>
+    <a class="osm" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>`;
+}
+// the map is drawn when a place is opened, and again after a redraw re-opens it
+document.addEventListener('toggle',e=>{
+  const d=e.target;
+  if(!d.open||!d.dataset||!(d.dataset.o||'').startsWith('pl')) return;
+  const m=d.querySelector(':scope > .rowbody > .plmap:not([data-done])');
+  if(m) placeMap(m);
+},true);
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.plmap .zoom button'); if(!b) return;
+  const m=b.closest('.plmap');
+  m.dataset.z=clamp((+m.dataset.z||MAP_Z0)+(+b.dataset.dz),MAP_Z[0],MAP_Z[1]); placeMap(m);
+});
 /* Moon, planets, meteor showers and the next eclipse, for the evening of sun.day. */
 function skyCard(sun){
   const R=REG(), lat=R.wxLat, lon=R.wxLon, now=Date.now();

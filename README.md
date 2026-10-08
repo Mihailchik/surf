@@ -159,6 +159,11 @@ stand.
   in each direction. From that the page tells where the sun sets into the sea
   today, where a headland takes it early, and in which months each is true.
   Run the tool after editing the list: `node tools/horizon.mjs`.
+- An opened place shows a small OpenStreetMap picture: where to stand and a
+  line to where the sun goes down. Where land takes the sun early, the line
+  stops at that land and goes on dotted. It is tiles laid out by hand with a
+  drawing on top, no map library, and nothing is fetched until a place is
+  opened.
 - Sunset time and direction, the Moon, planets and meteor shower nights are
   computed on the page (Paul Schlyter's low-precision formulas, checked against
   the astronomy-engine library: sunset within seconds, planets within 0.1°).
