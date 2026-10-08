@@ -70,7 +70,15 @@ The slowest part is not traffic but Open-Meteo's compute time: 1.4-2.2 s per
 request, whatever the size. The page shows what arrives, as it arrives: the
 weather bar as soon as its request answers, then beaches from a 2-day request
 (now and the next daylight window), then the full 10 days and the secondary
-sources. Camera players start only after the data is on screen, so they do not
+sources. While a first-time visitor waits, the page shows `wave-pencil.svg`, a looping
+pencil drawing of a wave. It is a generated file with a CSS animation inside:
+do not edit it by hand, do not run it through an SVG optimiser and do not paste
+it into the page; a new colour or drawing means a new file. The page uses it as
+a mask over the accent colour, which gives the site's blue in both themes
+without touching the file. It weighs 85 KB compressed and is asked for only
+when there is no saved forecast to show. Checked in Chrome only.
+
+Camera players start only after the data is on screen, so they do not
 compete with it on a phone connection. The same goes for the analytics library,
 the code of the weather and sunset tabs and the visit counter. The 10 days do
 not wait for the reserve either: NOAA's server gets 1.2 s to join the median,
