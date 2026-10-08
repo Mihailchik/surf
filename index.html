@@ -308,17 +308,6 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .ocsub{font-size:11.5px;color:var(--dim2)}
 .inote{padding:11px 13px;font-size:12.5px;color:var(--dim);line-height:1.55}
 .inote2{padding:8px 13px 11px;font-size:11.5px;color:var(--dim);line-height:1.5}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:9px 2px;scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;position:sticky;top:var(--headH,110px);z-index:20;
-  background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(10px);
-  margin:0 -12px;padding-left:12px;padding-right:12px}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;
-  font-weight:600;padding:8px 11px;border-radius:9px;border:1px solid var(--line);
-  background:var(--card);color:var(--dim);cursor:pointer;white-space:nowrap}
-.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
-.chip i{font-style:normal;font-weight:800;font-size:12px}
-.chip.on i{color:#fff!important;opacity:.9}
 .sect{margin:18px 0 7px;font-size:11px;font-weight:700;color:var(--dim2);
   text-transform:uppercase;letter-spacing:1.2px;padding:0 2px}
 .src{margin:20px 0 0;padding:12px 13px;border-radius:12px;background:var(--card2);
@@ -384,6 +373,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .plname{flex:0 1 auto;min-width:0;font-size:13.5px;font-weight:650;letter-spacing:-.2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plst{flex:1 0 auto;text-align:right;font-size:11.5px;white-space:nowrap}
+.wxm b i{font-style:normal;font-weight:400;color:var(--dim)}
+.outbest{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line)}
+.outbest b{display:block;font-size:14px;font-weight:700;letter-spacing:-.2px}
+.outbest small{display:block;font-size:12px;color:var(--dim)}
 .wxhd{padding-top:7px;padding-bottom:5px;font-size:9.5px;color:var(--dim2);text-transform:uppercase;letter-spacing:.4px}
 .wxwh{flex:0 0 26px;display:flex;justify-content:flex-end;white-space:nowrap}
 .plpt{padding:8px 13px 4px;border-top:1px solid var(--line);background:var(--card)}
@@ -434,7 +427,6 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
     <button class="tab on" data-t="now"></button>
     <button class="tab" data-t="d7"></button>
     <button class="tab" data-t="island"></button>
-    <button class="tab" data-t="wx"></button>
     <button class="tab" data-t="sun"></button>
   </div>
 </header>
@@ -775,7 +767,7 @@ const I18N={
   more:'details', showSources:'every source separately',
   hHour:'hour', hScore:'score', hWave:'wave', hWind:'wind',
   legend:'Bar height and colour: how good that hour is. Wave in metres, wind in m/s. Grey hours are night.',
-  restBeaches:'Other beaches', restForecast:'Other beaches · forecast',
+  restBeaches:'Other beaches',
   colSwell:'height m', colPeriod:'period s', colDir:'dir', colSpeed:'m/s', colGust:'gust',
   median:'median', spread:'spread', sumWave:'these models publish only total wave height. Shown for comparison, left out of the median',
   srcNote:'We take the median, so one bad model cannot drag the result. Directions are added as vectors.<br>⧉ independent of Open-Meteo. ECMWF WAM only gives total height, hence the dashes.',
@@ -804,7 +796,7 @@ const I18N={
   srcOcean:'Ocean watchpoints · Open-Meteo', srcOceanWind:'Ocean wind · Open-Meteo',
   uKm:'km',
   iEvents:'Bigger-than-usual days', iOcean:'What is out in the ocean',
-  iSeason:'Season', iTyphoon:'Typhoons',
+  iSeason:'Season', iTyphoon:'Typhoons', iSky:'Meteor showers and eclipses ahead', iEclipses:'Eclipses',
   noEvents:'The next 10 days are flat, swell holds around {0} m.',
   iEventsNote:'A day lands here if its peak is at least a quarter above the 10 day median ({0} m). The bar shows by how much.',
   oc_nicobar:'West of the Nicobars', oc_bengal:'Bay of Bengal', oc_open:'Open ocean',
@@ -857,19 +849,18 @@ const I18N={
   srcSea:'Tide and water · Open-Meteo', srcWx:'Weather · Open-Meteo',
   srcMet:'Wind · MET Norway (independent)', srcWW3:'Waves · NOAA WaveWatch III (independent)',
   // weather and sunset tabs
-  wx:'Weather', sun:'Sunset',
+  sun:'Sunset',
   stOM:'Open-Meteo (6 models)', stWest:'{0} · cloud out west', stAir:'Open-Meteo · haze',
   skySpareWx:'Open-Meteo is not answering right now. The weather here comes from the other providers, MET Norway and wttr.in, so there are fewer sources per day.',
   skySpareSun:'Open-Meteo is not answering right now. Cloud for the sunset comes from MET Norway alone, so there is no spread between sources to judge by.',
   wxLoading:'Loading weather from several models', wxNone:'The weather did not load. Try again in a minute.',
-  wxHead:'10 days · {0} sources', wxCols:'rain in daylight · wind m/s', skSrc:'Sources', plRest:'Behind land today: {0}',
+  skSrc:'Sources', outHead:'10-day outlook', outBest:'Best day: {0}', outCols:'best wave and where · weather', outBeaches:'By beach', plRest:'Behind land today: {0}',
   skLowAlt:'low in the {0}', skMidAlt:'in the {0}', skHighAlt:'high in the {0}',
   kSun:'sunny', kPart:'sun and clouds', kCloud:'cloudy, dry', kShower:'short showers', kRain:'rainy', kStorm:'heavy rain',
   wxDryDay:'dry', wxRainDay:'{0} mm in {1} h', wxRainMm:'{0} mm',
   wxVoteDry:'A dry day for {0} of {1} sources',
   wxHours:'Rain by the hour, mm',
   wxGust:'gusts {0} m/s',
-  wxWave:'Waves that day: best score <b style="color:{2}">{0}</b> at {1}',
   colSrc:'source', colT:'°C', colRain:'rain mm', colRainH:'wet h',
   ssToday:'Sunset today', ssTomorrow:'Sunset tomorrow', ssNext:'Next days', ssPlaces:'Where to watch', ssSky:'Sky tonight', ssWhy:'What makes a sunset',
   ssLoading:'Loading the cloud forecast',
@@ -908,8 +899,7 @@ const I18N={
   skShowers:'Meteors', skShower:'<b>{0}</b>: peak {1}, up to {2} an hour, {3}–{4}',
   skShowerLow:'<b>{0}</b>: peak {1}, hardly seen from here',
   skMoonBad:', the Moon is in the way',
-  skNoShower:'no shower peaks in the next 30 days',
-  skEclipse:'Next eclipse', ec_sp:'partial solar eclipse', ec_lp:'partial lunar eclipse', ec_lt:'total lunar eclipse',
+  skEclipse:'Eclipse', ec_sp:'partial solar eclipse', ec_lp:'partial lunar eclipse', ec_lt:'total lunar eclipse',
   skEcLine:'<b>{1}</b>, {2}–{3}: {0}, {4}% covered.',
   skEcSunset:' At sunset.', skEcLow:' Low on the horizon.',
   ssWhyText:'<b>Cloud is the screen.</b> High and mid cloud catches red light from below once the sun is down. A sky half covered with it gives the best sunsets.<br><b>The west has to be open.</b> That light arrives almost flat from hundreds of kilometres away. A cloud bank on the western horizon shuts it off. So the score looks at cloud out at sea, along the line to the sun.<br><b>Low cloud is a lid.</b> Grey low cloud overhead or rain hides everything.<br><b>A clear sky is clean and plain.</b> The sun goes into the sea and the sky stays pale.<br><b>Haze mutes colour.</b> Smoke and dust turn the sun into a dim red ball before it reaches the horizon.',
@@ -929,7 +919,7 @@ const I18N={
   more:'подробнее', showSources:'все источники по отдельности',
   hHour:'час', hScore:'балл', hWave:'волна', hWind:'ветер',
   legend:'Столбик: оценка часа. Выше и зеленее лучше. Волна в метрах, ветер в м/с. Серые часы ночные.',
-  restBeaches:'Остальные пляжи', restForecast:'Остальные пляжи · прогноз',
+  restBeaches:'Остальные пляжи',
   colSwell:'высота м', colPeriod:'период с', colDir:'напр.', colSpeed:'м/с', colGust:'порывы',
   median:'медиана', spread:'разброс', sumWave:'эти модели дают только суммарную высоту, без свелла. Для сверки, в медиану не идут',
   srcNote:'Берём медиану: одна кривая модель не утянет результат. Направления складываем векторно.<br>⧉ независимые от Open-Meteo. ECMWF WAM даёт только суммарную высоту, поэтому прочерки.',
@@ -958,7 +948,7 @@ const I18N={
   srcOcean:'Океанские точки · Open-Meteo', srcOceanWind:'Ветер в океане · Open-Meteo',
   uKm:'км',
   iEvents:'Дни выше обычного', iOcean:'Что в океане',
-  iSeason:'Сезон', iTyphoon:'Тайфуны',
+  iSeason:'Сезон', iTyphoon:'Тайфуны', iSky:'Звездопады и затмения впереди', iEclipses:'Затмения',
   noEvents:'Ближайшие 10 дней ровные, свелл держится около {0} м.',
   iEventsNote:'День попадает сюда, если пик минимум на четверть выше медианы за 10 дней ({0} м). Полоса показывает насколько.',
   oc_nicobar:'Западнее Никобар', oc_bengal:'Бенгальский залив', oc_open:'Открытый океан',
@@ -1011,19 +1001,18 @@ const I18N={
   srcSea:'Прилив и вода · Open-Meteo', srcWx:'Погода · Open-Meteo',
   srcMet:'Ветер · MET Norway (независимый)', srcWW3:'Волна · NOAA WaveWatch III (независимый)',
   // weather and sunset tabs
-  wx:'Погода', sun:'Закат',
+  sun:'Закат',
   stOM:'Open-Meteo (6 моделей)', stWest:'{0} · облака на западе', stAir:'Open-Meteo · дымка',
   skySpareWx:'Open-Meteo сейчас не отвечает. Погода собрана из других поставщиков, MET Norway и wttr.in, поэтому источников на день меньше.',
   skySpareSun:'Open-Meteo сейчас не отвечает. Облака для заката взяты только из MET Norway, поэтому разброса между источниками нет.',
   wxLoading:'Загружаю погоду из нескольких моделей', wxNone:'Погода не загрузилась. Попробуй через минуту.',
-  wxHead:'10 дней · источников: {0}', wxCols:'дождь днём · ветер м/с', skSrc:'Источники', plRest:'Сегодня солнце уйдёт за берег: {0}',
+  skSrc:'Источники', outHead:'Расклад на 10 дней', outBest:'Лучший день: {0}', outCols:'лучшая волна и где · погода', outBeaches:'По пляжам', plRest:'Сегодня солнце уйдёт за берег: {0}',
   skLowAlt:'низко на {0}', skMidAlt:'на {0}', skHighAlt:'высоко на {0}',
   kSun:'солнечно', kPart:'солнце и облака', kCloud:'облачно, сухо', kShower:'короткий дождь', kRain:'дождливо', kStorm:'сильные ливни',
   wxDryDay:'сухо', wxRainDay:'{0} мм за {1} ч', wxRainMm:'{0} мм',
   wxVoteDry:'Сухой день у {0} из {1} источников',
   wxHours:'Дождь по часам, мм',
   wxGust:'порывы {0} м/с',
-  wxWave:'Волны в этот день: лучший балл <b style="color:{2}">{0}</b>, {1}',
   colSrc:'источник', colT:'°C', colRain:'дождь мм', colRainH:'часов',
   ssToday:'Закат сегодня', ssTomorrow:'Закат завтра', ssNext:'Следующие дни', ssPlaces:'Где смотреть', ssSky:'Небо сегодня ночью', ssWhy:'От чего зависит закат',
   ssLoading:'Загружаю прогноз облаков',
@@ -1062,8 +1051,7 @@ const I18N={
   skShowers:'Звездопады', skShower:'<b>{0}</b>: пик {1}, до {2} в час, {3}–{4}',
   skShowerLow:'<b>{0}</b>: пик {1}, отсюда почти не видно',
   skMoonBad:', мешает Луна',
-  skNoShower:'в ближайшие 30 дней пиков нет',
-  skEclipse:'Ближайшее затмение', ec_sp:'частное солнечное затмение', ec_lp:'частное лунное затмение', ec_lt:'полное лунное затмение',
+  skEclipse:'Затмение', ec_sp:'частное солнечное затмение', ec_lp:'частное лунное затмение', ec_lt:'полное лунное затмение',
   skEcLine:'<b>{1}</b>, {2}–{3}: {0}, закрыто {4}%.',
   skEcSunset:' На закате.', skEcLow:' Низко у горизонта.',
   ssWhyText:'<b>Облака это экран.</b> Высокие и средние облака ловят красный свет снизу, когда солнце уже село. Лучшие закаты бывают, когда ими закрыта примерно половина неба.<br><b>Запад должен быть открыт.</b> Этот свет идёт почти горизонтально за сотни километров. Стена туч у западного горизонта его перекрывает. Поэтому балл смотрит на облака далеко в море, по линии к солнцу.<br><b>Низкие тучи это крышка.</b> Серая низкая облачность над головой или дождь закрывают всё.<br><b>Чистое небо: аккуратно и просто.</b> Солнце уходит в море, небо остаётся бледным.<br><b>Дымка глушит цвет.</b> Дым и пыль превращают солнце в тусклый красный шар ещё до горизонта.',
@@ -1083,7 +1071,7 @@ const I18N={
   more:'รายละเอียด', showSources:'ดูแหล่งข้อมูลทั้งหมด',
   hHour:'ชม.', hScore:'คะแนน', hWave:'คลื่น', hWind:'ลม',
   legend:'ความสูงและสีของแท่ง คือคะแนนของชั่วโมงนั้น สูงและเขียวคือดี คลื่นเป็นเมตร ลมเป็น m/s ชั่วโมงสีเทาคือกลางคืน',
-  restBeaches:'หาดอื่น ๆ', restForecast:'หาดอื่น ๆ · พยากรณ์',
+  restBeaches:'หาดอื่น ๆ',
   colSwell:'ความสูง ม.', colPeriod:'คาบ วิ.', colDir:'ทิศ', colSpeed:'m/s', colGust:'ลมกระโชก',
   median:'ค่ากลาง', spread:'ช่วงค่า', sumWave:'โมเดลเหล่านี้ให้เฉพาะความสูงรวม ไม่แยก swell ใช้เทียบเท่านั้น',
   srcNote:'ผลลัพธ์ใช้ <b>ค่ากลาง</b> เพื่อไม่ให้โมเดลที่ผิดปกติดึงผลลัพธ์ ทิศทางคำนวณแบบเวกเตอร์<br>⧉ คือแหล่งข้อมูลที่เป็นอิสระจาก Open-Meteo',
@@ -1112,7 +1100,7 @@ const I18N={
   srcOcean:'จุดสังเกตในมหาสมุทร · Open-Meteo', srcOceanWind:'ลมในมหาสมุทร · Open-Meteo',
   uKm:'กม.',
   iEvents:'วันที่คลื่นสูงกว่าปกติ', iOcean:'สถานการณ์ในมหาสมุทร',
-  iSeason:'ฤดูกาล', iTyphoon:'ไต้ฝุ่น',
+  iSeason:'ฤดูกาล', iTyphoon:'ไต้ฝุ่น', iSky:'ฝนดาวตกและอุปราคาที่กำลังจะมาถึง', iEclipses:'อุปราคา',
   noEvents:'10 วันข้างหน้าไม่มีอะไรโดดเด่น คลื่นอยู่ราว {0} ม.',
   iEventsNote:'วันจะขึ้นมาแสดงเมื่อคลื่นสูงกว่าค่ากลาง 10 วัน ({0} ม.) อย่างน้อย 25%',
   oc_nicobar:'ตะวันตกของหมู่เกาะนิโคบาร์', oc_bengal:'อ่าวเบงกอล', oc_open:'มหาสมุทรเปิด',
@@ -1165,19 +1153,18 @@ const I18N={
   srcSea:'น้ำขึ้นลงและอุณหภูมิน้ำ · Open-Meteo', srcWx:'อากาศ · Open-Meteo',
   srcMet:'ลม · MET Norway (อิสระ)', srcWW3:'คลื่น · NOAA WaveWatch III (อิสระ)',
   // weather and sunset tabs
-  wx:'อากาศ', sun:'ซันเซ็ต',
+  sun:'ซันเซ็ต',
   stOM:'Open-Meteo (6 โมเดล)', stWest:'{0} · เมฆทางตะวันตก', stAir:'Open-Meteo · หมอกควัน',
   skySpareWx:'ตอนนี้ Open-Meteo ไม่ตอบสนอง ข้อมูลอากาศมาจากผู้ให้บริการอื่น คือ MET Norway และ wttr.in จำนวนแหล่งข้อมูลต่อวันจึงน้อยลง',
   skySpareSun:'ตอนนี้ Open-Meteo ไม่ตอบสนอง ข้อมูลเมฆสำหรับพระอาทิตย์ตกมาจาก MET Norway เพียงแหล่งเดียว จึงไม่มีช่วงค่าระหว่างแหล่งข้อมูลให้เปรียบเทียบ',
   wxLoading:'กำลังโหลดพยากรณ์อากาศจากหลายโมเดล', wxNone:'โหลดพยากรณ์อากาศไม่สำเร็จ ลองใหม่ในอีกสักครู่',
-  wxHead:'10 วัน · {0} แหล่งข้อมูล', wxCols:'ฝนช่วงกลางวัน · ลม m/s', skSrc:'แหล่งข้อมูล', plRest:'วันนี้ตกหลังแผ่นดิน: {0}',
+  skSrc:'แหล่งข้อมูล', outHead:'ภาพรวม 10 วัน', outBest:'วันที่ดีที่สุด: {0}', outCols:'คลื่นดีที่สุดและที่ไหน · อากาศ', outBeaches:'แยกตามหาด', plRest:'วันนี้ตกหลังแผ่นดิน: {0}',
   skLowAlt:'ต่ำทาง{0}', skMidAlt:'ทาง{0}', skHighAlt:'สูงทาง{0}',
   kSun:'แดดออก', kPart:'แดดสลับเมฆ', kCloud:'เมฆมาก ไม่มีฝน', kShower:'ฝนตกช่วงสั้น', kRain:'ฝนตกเยอะ', kStorm:'ฝนตกหนัก',
   wxDryDay:'ไม่มีฝน', wxRainDay:'{0} มม. ใน {1} ชม.', wxRainMm:'{0} มม.',
   wxVoteDry:'{0} จาก {1} แหล่งข้อมูลบอกว่าไม่มีฝน',
   wxHours:'ฝนรายชั่วโมง มม.',
   wxGust:'ลมกระโชก {0} m/s',
-  wxWave:'คลื่นวันนั้น: คะแนนดีที่สุด <b style="color:{2}">{0}</b> ที่ {1}',
   colSrc:'แหล่งข้อมูล', colT:'°C', colRain:'ฝน มม.', colRainH:'ชม.ฝน',
   ssToday:'พระอาทิตย์ตกวันนี้', ssTomorrow:'พระอาทิตย์ตกพรุ่งนี้', ssNext:'วันถัดไป', ssPlaces:'ดูที่ไหนดี', ssSky:'ท้องฟ้าคืนนี้', ssWhy:'อะไรทำให้พระอาทิตย์ตกสวย',
   ssLoading:'กำลังโหลดพยากรณ์เมฆ',
@@ -1216,8 +1203,7 @@ const I18N={
   skShowers:'ฝนดาวตก', skShower:'<b>{0}</b>: สูงสุด {1} มากถึง {2} ดวง/ชม. {3}–{4}',
   skShowerLow:'<b>{0}</b>: สูงสุด {1} แทบมองไม่เห็นจากที่นี่',
   skMoonBad:' แสงจันทร์รบกวน',
-  skNoShower:'ไม่มีฝนดาวตกในอีก 30 วัน',
-  skEclipse:'อุปราคาครั้งถัดไป', ec_sp:'สุริยุปราคาบางส่วน', ec_lp:'จันทรุปราคาบางส่วน', ec_lt:'จันทรุปราคาเต็มดวง',
+  skEclipse:'อุปราคา', ec_sp:'สุริยุปราคาบางส่วน', ec_lp:'จันทรุปราคาบางส่วน', ec_lt:'จันทรุปราคาเต็มดวง',
   skEcLine:'<b>{1}</b> {2}–{3}: {0} บัง {4}%',
   skEcSunset:' ตรงกับพระอาทิตย์ตก', skEcLow:' อยู่ต่ำใกล้ขอบฟ้า',
   ssWhyText:'<b>เมฆคือจอภาพ</b> เมฆชั้นสูงและชั้นกลางรับแสงสีแดงจากด้านล่างหลังพระอาทิตย์ลับขอบฟ้า ท้องฟ้าที่มีเมฆแบบนี้ราวครึ่งหนึ่งให้พระอาทิตย์ตกที่สวยที่สุด<br><b>ทิศตะวันตกต้องเปิด</b> แสงนั้นเดินทางเกือบขนานพื้นมาจากระยะหลายร้อยกิโลเมตร แนวเมฆที่ขอบฟ้าตะวันตกจะบังแสงไว้ คะแนนจึงดูเมฆไกลออกไปในทะเลตามแนวไปหาดวงอาทิตย์<br><b>เมฆต่ำคือฝาปิด</b> เมฆต่ำสีเทาเหนือศีรษะหรือฝนบังทุกอย่าง<br><b>ฟ้าใสสวยเรียบๆ</b> พระอาทิตย์ตกลงทะเล ท้องฟ้าสีซีด<br><b>หมอกควันทำให้สีจาง</b> ควันและฝุ่นทำให้ดวงอาทิตย์เป็นลูกกลมสีแดงหม่นก่อนถึงขอบฟ้า',
@@ -1697,9 +1683,8 @@ function card(sp,rows,pinned){
       `<details class="more lazy" data-k="more" data-s="${sp.id}" data-i0="${i0}" data-r="${rows.indexOf(r)}"><summary>${t('more')}</summary>
          <div class="lz"></div>
        </details>`;
-  }else if(TAB==='d7') body=dayRows(sp,rows,10);
-  else body='';
-  const best=bestDaylight(rows,i0,TAB==='d7'?240:24);
+  }else body='';
+  const best=bestDaylight(rows,i0,24);
   const sub=TAB==='now'
     ? `<span class="q"><i>${t('wave')}</i><b>${fmt(r.swell,1)} ${t('uM')}</b></span
       ><span class="q"><i>${t('period')}</i><b>${fmt(r.period,1)} ${t('uS')}</b></span
@@ -1891,6 +1876,7 @@ function islandReport(){
       <div class="inote2">${t('iEventsNote',fmt(base,1))}</div></div>
     <div class="card"><div class="ihead">${t('iOcean')}</div>${ocean||'<div class="inote">–</div>'}
       <div class="inote2">${t('iOceanNote')}</div></div>
+    ${typeof showersNear!=='undefined'?skyAheadCard():''}
     <div class="card"><div class="ihead">${t('iSeason')}</div>
       <div class="inote">${t('iSeasonText')}</div></div>
     <div class="card"><div class="ihead">${t('iTyphoon')}</div>
@@ -1906,26 +1892,6 @@ function byScoreThenName(a,b){
   const d=shown(b.pick.score)-shown(a.pick.score);
   if(d) return d;
   return nameOf(a.sp).localeCompare(nameOf(b.sp),LOCALE[LANG]);
-}
-
-/* Полоса пляжей подсвечивает тот, что сейчас на экране. */
-let chipObserver=null;
-function markVisibleChip(){
-  chipObserver?.disconnect();
-  const chips=document.getElementById('chips'); if(!chips) return;
-  const cards=[...document.querySelectorAll('#main .card[data-id]')];
-  chipObserver=new IntersectionObserver(es=>{
-    const vis=es.filter(e=>e.isIntersecting)
-      .sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];
-    if(!vis) return;
-    const id=vis.target.dataset.id;
-    chips.querySelectorAll('.chip').forEach(c=>{
-      const on=c.dataset.pick===id;
-      c.classList.toggle('on',on);
-      if(on) c.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
-    });
-  },{rootMargin:'-140px 0px -70% 0px'});
-  cards.forEach(c=>chipObserver.observe(c));
 }
 
 /* Which sources failed, in plain words, above the beaches. */
@@ -2031,32 +1997,16 @@ function render(){
     ${dng?`<div class="danger">⚠ ${t('danger')}: ${t(dng.key,dng.v)}</div>`:''}
     ${rowsHtml}</div>`;
 
-  if(TAB!=='island'&&!isSky()) document.getElementById('restlbl').textContent=
-    TAB==='now'?t('restBeaches'):t('restForecast');
+  if(TAB==='now') document.getElementById('restlbl').textContent=t('restBeaches');
   if(isSky()) paintSky();
   else if(TAB==='island'){
+    // showers and eclipses need the sky code, which is fetched after the first paint
+    if(typeof showersNear==='undefined'){ loadSkyCode(); setTimeout(()=>{ if(TAB==='island') render(); },200); }
     document.getElementById('main').innerHTML=islandReport();
     document.getElementById('rest').innerHTML='';
     document.getElementById('restlbl').textContent='';
   }else if(TAB==='d7'){
-    // лента: все пляжи подряд, полоса сверху прокручивает к нужному
-    const order=[...tops.map(x=>x.sp), ...restSorted.map(x=>x.sp)];
-    const chips=order.map(x=>{
-      const rows=DATA[x.id], i=nowIdx(rows);
-      const best=bestDaylight(rows,i,240);
-      return `<button class="chip" data-pick="${x.id}">${nameOf(x)}
-        <i style="color:${scoreColor(best?best.score:0)}">${best?shown(best.score):'–'}</i></button>`;
-    }).join('');
-    document.getElementById('main').innerHTML=
-      `<div class="chips" id="chips">${chips}</div>`+
-      order.map(sp=>card(sp,DATA[sp.id],true)).join('');
-    document.getElementById('rest').innerHTML='';
-    document.getElementById('restlbl').textContent='';
-    document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
-      document.getElementById('c-'+b.dataset.pick)
-        ?.scrollIntoView({behavior:'smooth',block:'start'});
-    });
-    syncHeights(); markVisibleChip();
+    paintOutlook();
   }else{
   patchCards(document.getElementById('main'), tops.map(x=>card(x.sp,x.rows,true)).join(''));
   document.getElementById('rest').innerHTML = TAB==='now'
@@ -2090,7 +2040,9 @@ function render(){
    Loaded on first open: several weather models at the region point, cloud
    far out west along today's sunset line, aerosols, and MET Norway. Places,
    the Moon and planets are computed and need no network. */
-const isSky=()=>TAB==='wx'||TAB==='sun';
+const isSky=()=>TAB==='sun';
+/* The 10-day outlook shows weather too, so it asks the same providers. */
+const needsSky=()=>TAB==='sun'||TAB==='d7';
 let SKY=null, SKY_KEY='', SKY_TIMER=0;
 const SKY_YEAR={};
 const SKY_NAME={ecmwf_ifs025:'ECMWF',gfs_seamless:'GFS (NOAA)',icon_seamless:'ICON (DWD)',jma_seamless:'JMA',
@@ -2126,7 +2078,7 @@ function loadSky(){
       S.st[k]=S[k]?'ok':'fail'; S.left--; S.v++;
       if(!S[k]) reportFail('sky_'+k);
       if(S.left===0&&(S.om||S.met)) skyCacheSave(S);
-      if(SKY===S&&isSky()){ clearTimeout(SKY_TIMER); SKY_TIMER=setTimeout(render,S.left?300:0); }
+      if(SKY===S&&needsSky()){ clearTimeout(SKY_TIMER); SKY_TIMER=setTimeout(render,S.left?300:0); }
     }); };
   put('om',jgetOM(om+R.wxLat+'&longitude='+R.wxLon+q+'&forecast_days=10&hourly=temperature_2m,precipitation,cloud_cover,'+
     'cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,sunshine_duration'+
@@ -2143,7 +2095,7 @@ function loadSky(){
     .then(()=>{ if(S.west) S.metWest=null;
       else put('metWest',Promise.all(west.map(p=>met(p[0],p[1]).catch(()=>null))).then(a=>a.some(Boolean)?a:null)); });
   // Open-Meteo slow: after 3 s the tab opens on the other providers
-  setTimeout(()=>{ if(SKY===S&&isSky()&&S.st.om==='wait') render(); },3100);
+  setTimeout(()=>{ if(SKY===S&&needsSky()&&S.st.om==='wait') render(); },3100);
 }
 /* Enough has arrived to draw: Open-Meteo, or everything has answered, or 3 s
    have passed and another provider is in. */
@@ -2162,7 +2114,7 @@ function paintSky(){
   SKY_KEY=key;
   // a redraw must not fold what the reader has opened
   const open=[...main.querySelectorAll('.skytab details[open]')].map(d=>d.dataset.o).filter(Boolean);
-  main.innerHTML=`<div class="skytab">${TAB==='wx'?weatherTab(ready):sunsetTab(ready)}</div>`;
+  main.innerHTML=`<div class="skytab">${sunsetTab(ready)}</div>`;
   open.forEach(o=>{ const d=main.querySelector(`.skytab details[data-o="${o}"]`); if(d) d.open=true; });
 }
 /* Which providers answered, and a calm note when the tab runs without
@@ -2180,67 +2132,116 @@ const monName=i=>{ const d=new Date(2024,i,15);
   return LANG==='th'?d.toLocaleDateString('th-TH',{month:'short'}):d.toLocaleDateString(LOCALE[LANG],{month:'long'}).slice(0,3); };
 const badge=color=>`background:color-mix(in srgb,${color} 14%,transparent);color:${color}`;
 
-/* Best wave score of a local day across the beaches that take part in the top. */
-function waveOfDay(day){
-  if(!DATA) return null;
-  let best=null;
-  for(const sp of SPOTS){
-    if(sp.noTop||!DATA[sp.id]) continue;
-    for(const r of DATA[sp.id])
-      if(r.t.startsWith(day)&&isDay(r)&&r.score!=null&&(!best||r.score>best.r.score)) best={sp,r};
-  }
-  return best;
-}
 const WX_ROWS=()=>[['om',t('stOM')],['met','MET Norway'],['wttr','wttr.in']];
 /* One line naming the providers; a silent one is struck through. */
 const skyLine=rows=>`<div class="inote2">${t('skSrc')}: ${rows.filter(([k])=>SKY.st[k]).map(([k,label])=>
   SKY.st[k]==='fail'?`<s style="color:var(--bad)">${label}</s>`:label).join(' · ')}</div>`;
 const WX_ICON={sun:'☀',part:'⛅',cloud:'☁',shower:'🌦',rain:'🌧',storm:'⛈'};
 const WX_KEY={sun:'kSun',part:'kPart',cloud:'kCloud',shower:'kShower',rain:'kRain',storm:'kStorm'};
-function weatherTab(ready){
-  if(!ready) return skyLoader('wxLoading');
-  const days=weatherDays(SKY,REGION,10);
-  if(!days.length) return `<div class="err">${t('wxNone')}</div>`+skyLine(WX_ROWS());
-  const R=REG(), mm=v=>v<1?'<1':String(Math.round(v));
+
+/* ===== 10 days: the outlook =====
+   One row per day: the best wave of that day and where, with the weather
+   next to it, and on top the best day of the ten. A day opens into its
+   beaches and the weather by source. Every beach by itself is folded below.
+   Waves come from the forecast already loaded; the weather joins when its
+   providers answer, so the tab never waits for it. */
+let OUT_KEY='';
+const todayStr=()=>new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).slice(0,10);
+/* Beaches of a local day, best first, each with its best daylight hour. The
+   reference beach of another region never leads. */
+function beachesOfDay(day){
+  const out=[];
+  for(const sp of SPOTS){
+    const rows=DATA[sp.id]; if(!rows) continue;
+    let best=null;
+    for(const r of rows) if(r.t.startsWith(day)&&isDay(r)&&r.score!=null&&(!best||r.score>best.score)) best=r;
+    if(best) out.push({sp,r:best});
+  }
+  return out.sort((a,b)=>(a.sp.noTop?1:0)-(b.sp.noTop?1:0)||b.r.score-a.r.score);
+}
+function outlookTab(ready){
+  const R=REG(), ref=DATA[SPOTS.find(x=>DATA[x.id]).id], t0=todayStr();
+  const wx={}; if(ready) for(const d of weatherDays(SKY,REGION,10)) wx[d.day]=d;
+  const mm=v=>v<1?'<1':String(Math.round(v));
   const rainTxt=d=>isDryKind(d.kind)?t('wxDryDay')
     :d.rainH!=null&&Math.round(d.rainH)>0?t('wxRainDay',mm(d.rain),Math.round(d.rainH)):t('wxRainMm',mm(d.rain));
-  const waves=days.map(d=>waveOfDay(d.day)), anyWave=waves.some(Boolean);
-  const rows=days.map((d,di)=>{
-    const w=waves[di];
-    const strip=d.hours.some(v=>v!=null&&v>=0.1)
-      ? `<div class="wxcap">${t('wxHours')}</div><div class="wxhours">${d.hours.map((v,i)=>
-          `<div class="wxh"><em>${v!=null&&v>=WX_TUNE.wet?fmt(v,1):''}</em><i>${
-            v!=null&&v>=0.1?`<b style="height:${Math.max(2,Math.round(clamp(v/4,0,1)*24))}px"></b>`:''}</i>${
-            String(R.dayFrom+i).padStart(2,'0')}</div>`).join('')}</div>`
-      : '';
-    const src=[...SKY_MODELS,'metno','wttr'].filter(m=>d.src[m]).map(m=>{ const x=d.src[m];
-      return `<tr><td>${SKY_NAME[m]}</td><td>${WX_ICON[x.kind]||'·'}</td><td>${fmt(x.tMax,0)}/${fmt(x.tMin,0)}</td>
-        <td>${fmt(x.rain,1)}</td><td>${x.rainH==null?'–':x.rainH}</td>
-        <td>${x.wdir==null?'':dirRu(x.wdir)+' '}${fmt(x.wind,0)}</td></tr>`; }).join('');
-    return `<details class="dayx" data-o="wx${d.day}"><summary class="day">
-        <div class="dn"><b>${dayName(d.day,{weekday:'short'})}</b>${dayName(d.day,{day:'numeric',month:'short'})}</div>
-        <div class="wxi">${WX_ICON[d.kind]}</div>
-        <div class="wxm"><b>${t(WX_KEY[d.kind])}</b>
-          <span>${rainTxt(d)} · ${d.wdir==null?'':dirRu(d.wdir)+' '}${fmt(d.wind,0)}</span></div>
-        <div class="wxt"><b>${fmt(d.tMax,0)}°</b><span>${fmt(d.tMin,0)}°</span></div>
-        ${w?`<div class="wxw" style="${badge(scoreColor(w.r.score))}">${shown(w.r.score)}</div>`:anyWave?'<div class="wxw"></div>':''}
+  const wide={weekday:'short',day:'numeric',month:'short'};
+  const list=[...new Set(ref.map(r=>r.t.slice(0,10)))].filter(d=>d>=t0).slice(0,10)
+    .map(day=>({day, beaches:beachesOfDay(day), w:wx[day]})).filter(x=>x.beaches.length||x.w);
+  // what the tab is opened for: which of the ten days is the best, and where
+  const top=list.filter(x=>x.beaches.length).reduce((a,x)=>!a||x.beaches[0].r.score>a.beaches[0].r.score?x:a,null);
+  const flat='margin:0;border:0;border-radius:0;box-shadow:none';
+  const rows=list.map(x=>{
+    const b=x.beaches[0], w=x.w;
+    const beaches=x.beaches.slice(0,5).map(({sp,r})=>`<div class="srow nolink">
+        <div class="sbadge" style="${badge(scoreColor(r.score))}">${shown(r.score)}</div>
+        <div class="sname">${nameOf(sp)}</div>
+        <div class="sdat">${r.t.slice(11,16)} · ${fmt(r.swell,1)} ${t('uM')} · ${fmt(r.period,1)} ${t('uS')} · ${dirRu(r.wdir??0)} ${fmt(r.wind,0)}</div>
+      </div>`).join('');
+    let weather='';
+    if(w){
+      const strip=w.hours.some(v=>v!=null&&v>=0.1)
+        ? `<div class="wxcap">${t('wxHours')}</div><div class="wxhours">${w.hours.map((v,i)=>
+            `<div class="wxh"><em>${v!=null&&v>=WX_TUNE.wet?fmt(v,1):''}</em><i>${
+              v!=null&&v>=0.1?`<b style="height:${Math.max(2,Math.round(clamp(v/4,0,1)*24))}px"></b>`:''}</i>${
+              String(R.dayFrom+i).padStart(2,'0')}</div>`).join('')}</div>`
+        : '';
+      const src=[...SKY_MODELS,'metno','wttr'].filter(m=>w.src[m]).map(m=>{ const v=w.src[m];
+        return `<tr><td>${SKY_NAME[m]}</td><td>${WX_ICON[v.kind]||'·'}</td><td>${fmt(v.tMax,0)}/${fmt(v.tMin,0)}</td>
+          <td>${fmt(v.rain,1)}</td><td>${v.rainH==null?'–':v.rainH}</td>
+          <td>${v.wdir==null?'':dirRu(v.wdir)+' '}${fmt(v.wind,0)}</td></tr>`; }).join('');
+      weather=`<div class="wxcap"><b>${WX_ICON[w.kind]} ${t(WX_KEY[w.kind])}</b> · ${t('wxVoteDry',w.dry,w.n)}${
+          w.gust==null?'':' · '+t('wxGust',fmt(w.gust,0))}</div>${strip}
+        <details class="srcbox" data-o="ws${x.day}"><summary>${t('showSources')}</summary>
+          <table class="stab c6"><thead><tr><th>${t('colSrc')}</th><th></th><th>${t('colT')}</th><th>${t('colRain')}</th>
+            <th>${t('colRainH')}</th><th>${t('wind')}</th></tr></thead><tbody>${src}
+            <tr class="avgrow"><td>${t('median')}</td><td>${WX_ICON[w.kind]}</td><td>${fmt(w.tMax,0)}/${fmt(w.tMin,0)}</td>
+              <td>${fmt(w.rain,1)}</td><td>${w.rainH==null?'–':Math.round(w.rainH)}</td>
+              <td>${w.wdir==null?'':dirRu(w.wdir)+' '}${fmt(w.wind,0)}</td></tr></tbody></table></details>`;
+    }
+    return `<details class="dayx" data-o="od${x.day}"><summary class="day">
+        <div class="dn"><b>${dayName(x.day,{weekday:'short'})}</b>${dayName(x.day,{day:'numeric',month:'short'})}</div>
+        <div class="wxw" ${b?`style="${badge(scoreColor(b.r.score))}">${shown(b.r.score)}`:'>'}</div>
+        <div class="wxm"><b>${b?`${nameOf(b.sp)} <i>${fmt(b.r.swell,1)} ${t('uM')}</i>`:'–'}</b>
+          <span>${w?`${WX_ICON[w.kind]} ${rainTxt(w)} · ${w.wdir==null?'':dirRu(w.wdir)+' '}${fmt(w.wind,0)} ${t('uMs')}`:ready?'':'…'}</span></div>
+        ${w?`<div class="wxt"><b>${fmt(w.tMax,0)}°</b><span>${fmt(w.tMin,0)}°</span></div>`:''}
       </summary><div class="daybody">
-        <div class="wxcap"><b>${t('wxVoteDry',d.dry,d.n)}</b>${d.gust==null?'':' · '+t('wxGust',fmt(d.gust,0))}</div>
-        ${strip}
-        <table class="stab c6"><thead><tr><th>${t('colSrc')}</th><th></th><th>${t('colT')}</th><th>${t('colRain')}</th>
-          <th>${t('colRainH')}</th><th>${t('wind')}</th></tr></thead><tbody>${src}
-          <tr class="avgrow"><td>${t('median')}</td><td>${WX_ICON[d.kind]}</td><td>${fmt(d.tMax,0)}/${fmt(d.tMin,0)}</td>
-            <td>${fmt(d.rain,1)}</td><td>${d.rainH==null?'–':Math.round(d.rainH)}</td>
-            <td>${d.wdir==null?'':dirRu(d.wdir)+' '}${fmt(d.wind,0)}</td></tr></tbody></table>
-        ${w?`<div class="wxcap" style="padding-bottom:9px">${t('wxWave',shown(w.r.score),nameOf(w.sp)+', '+
-          fmt(w.r.swell,1)+' '+t('uM'),scoreColor(w.r.score))}</div>`:''}
+        ${beaches?`<div class="sum" style="${flat}">${beaches}</div>`:''}${weather}
       </div></details>`;
   }).join('');
-  // the column labels say what the numbers are, so the rows need no words
-  const head=`<div class="day wxhd"><div class="dn"></div><div class="wxi"></div><div class="wxm">${t('wxCols')}</div>
-    <div class="wxt">°C</div>${anyWave?`<div class="wxwh">${t('wave')}</div>`:''}</div>`;
-  return `${skySpare('skySpareWx')}<div class="card"><div class="ihead">${t('wxHead',Math.max(...days.map(d=>d.n)))}</div>
-    <div class="days" style="border-top:0">${head}${rows}</div></div>${skyLine(WX_ROWS())}`;
+  const tb=top&&top.beaches[0];
+  const bestLine=!tb?'':`<div class="outbest"><div class="wxw" style="${badge(scoreColor(tb.r.score))}">${shown(tb.r.score)}</div>
+      <div><b>${t('outBest',dayName(top.day,wide))}</b><small>${nameOf(tb.sp)} · ${fmt(tb.r.swell,1)} ${t('uM')} · ${tb.r.t.slice(11,16)}</small></div></div>`;
+  // every beach by itself: folded, the one with the best window first
+  const order=SPOTS.filter(sp=>DATA[sp.id]&&DATA[sp.id].length).map(sp=>{
+    const rows=DATA[sp.id]; return {sp, rows, best:bestDaylight(rows,nowIdx(rows),240)}; })
+    .sort((a,b)=>(a.sp.noTop?1:0)-(b.sp.noTop?1:0)||(b.best?b.best.score:0)-(a.best?a.best.score:0));
+  const byBeach=order.map(({sp,rows,best})=>`<details class="rowx" data-o="ob${sp.id}"><summary class="srow nolink">
+      <div class="sbadge" style="${badge(scoreColor(best?best.score:0))}">${best?shown(best.score):'–'}</div>
+      <div class="plname">${nameOf(sp)}</div>
+      <div class="plst" style="color:var(--dim)">${best?dayName(best.t.slice(0,10),wide)+' · '+best.t.slice(11,16):''}</div>
+      <span class="chev">›</span></summary><div class="rowbody">${dayRows(sp,rows,10)}</div></details>`).join('');
+  // every weather provider silent: say so, and never claim a reserve that did not answer
+  const note=!ready?'':Object.keys(wx).length?skySpare('skySpareWx'):`<div class="reserve" style="margin:10px 0">${t('wxNone')}</div>`;
+  return `${note}<div class="card"><div class="ihead">${t('outHead')}</div>${bestLine}
+      <div class="days"><div class="day wxhd"><div class="dn"></div><div class="wxm">${t('outCols')}</div><div class="wxt">°C</div></div>${rows}</div></div>
+    <div class="card"><div class="ihead">${t('outBeaches')}</div><div class="sum" style="${flat}">${byBeach}</div></div>
+    ${ready?skyLine(WX_ROWS()):''}`;
+}
+function paintOutlook(){
+  const main=document.getElementById('main');
+  document.getElementById('rest').innerHTML='';
+  document.getElementById('restlbl').textContent='';
+  // the weather code and data come when they come; the waves are drawn now
+  const code=typeof weatherDays!=='undefined';
+  if(code) loadSky(); else{ loadSkyCode(); setTimeout(()=>{ if(TAB==='d7') render(); },200); }
+  const ready=code&&skyReady();
+  const key=[REGION,LANG,ready?SKY.v:-1,LAST_OK].join('|');
+  if(key===OUT_KEY&&main.querySelector('.outlook')) return;
+  OUT_KEY=key;
+  const open=[...main.querySelectorAll('.outlook details[open]')].map(d=>d.dataset.o).filter(Boolean);
+  main.innerHTML=`<div class="outlook skytab">${outlookTab(ready)}</div>`;
+  open.forEach(o=>{ const d=main.querySelector(`.outlook details[data-o="${o}"]`); if(d) d.open=true; });
 }
 
 /* The view west from one standing point: land above the sea horizon and where
@@ -2373,22 +2374,34 @@ function skyCard(sun){
   // what is up all night is not repeated for the morning
   const morn=planetsAt(rise-40*6e4,lat,lon,rise).filter(p=>!eve.some(e=>e.body===p.body&&!(e.sets&&e.sets<rise-90*6e4)));
   const list=(a,isEve)=>a.length?a.map(p=>`<div>${line(p,isEve)}</div>`).join(''):`<div class="ocsub">${t('skNoPlanet')}</div>`;
-  const sh=showersNear(now,lat,lon,30).map(x=>{
-    const when=dayName(x.day,{day:'numeric',month:'short'});
-    return `<div>${x.from==null?t('skShowerLow',nameOf(x.s),when)
-      :t('skShower',nameOf(x.s),when,x.rate,hhmm(x.from),hhmm(x.to))+(x.moonUp&&x.moon>0.3?t('skMoonBad'):'')}</div>`; }).join('');
-  const e=nextEclipse(now);
-  const row=(name,body)=>`<div class="ocn"><div class="ocname">${name}</div><div class="ocbody">${body}</div></div>`;
-  let ecl='';
-  if(e){
-    const et=Date.parse(e.t), atSunset=e.k==='sp'&&Math.abs(et-sunsetOf(dayOf(et),lat,lon).t)<90*6e4;
-    ecl=row(t('skEclipse'),t('skEcLine',t('ec_'+e.k),new Date(et).toLocaleDateString(LOCALE[LANG],
-      {timeZone:'Asia/Bangkok',day:'numeric',month:'short',year:'numeric'}),e.a,e.b,Math.round(e.v*100))+
-      (atSunset?t('skEcSunset'):e.alt<0?t('skEcLow'):''));
-  }
+  // showers and eclipses only when they are within SKY_SOON days; the rest is in the region tab
+  const sh=showersNear(now,lat,lon,SKY_SOON).map(x=>`<div>${showerLine(x)}</div>`).join('');
+  const e=nextEclipse(now), soon=e&&Date.parse(e.t)-now<SKY_SOON*864e5;
   return `<div class="card"><div class="ihead">${t('ssSky')}</div>
-    ${row(t('skMoon'),moon)}${row(t('skEve'),list(eve,true))}${row(t('skMorn'),list(morn,false))}
-    ${row(t('skShowers'),sh||`<span class="ocsub">${t('skNoShower')}</span>`)}${ecl}</div>`;
+    ${skyRow(t('skMoon'),moon)}${skyRow(t('skEve'),list(eve,true))}${skyRow(t('skMorn'),list(morn,false))}
+    ${sh?skyRow(t('skShowers'),sh):''}${soon?skyRow(t('skEclipse'),eclipseLine(e,lat,lon)):''}</div>`;
+}
+const SKY_SOON=7;
+const skyRow=(name,body)=>`<div class="ocn"><div class="ocname">${name}</div><div class="ocbody">${body}</div></div>`;
+const showerLine=x=>{
+  const when=dayName(x.day,{day:'numeric',month:'short'});
+  return x.from==null?t('skShowerLow',nameOf(x.s),when)
+    :t('skShower',nameOf(x.s),when,x.rate,hhmm(x.from),hhmm(x.to))+(x.moonUp&&x.moon>0.3?t('skMoonBad'):'');
+};
+function eclipseLine(e,lat,lon){
+  const et=Date.parse(e.t), atSunset=e.k==='sp'&&Math.abs(et-sunsetOf(dayOf(et),lat,lon).t)<90*6e4;
+  return t('skEcLine',t('ec_'+e.k),new Date(et).toLocaleDateString(LOCALE[LANG],
+    {timeZone:'Asia/Bangkok',day:'numeric',month:'short',year:'numeric'}),e.a,e.b,Math.round(e.v*100))+
+    (atSunset?t('skEcSunset'):e.alt<0?t('skEcLow'):'');
+}
+/* For the region tab: every meteor shower of the coming year and the next
+   eclipses seen from here. */
+function skyAheadCard(){
+  const R=REG(), now=Date.now();
+  const sh=showersNear(now,R.wxLat,R.wxLon,364).map(x=>`<div>${showerLine(x)}</div>`).join('');
+  const ec=ECLIPSES.filter(e=>Date.parse(e.t)>now-3*36e5).slice(0,4).map(e=>`<div>${eclipseLine(e,R.wxLat,R.wxLon)}</div>`).join('');
+  return `<div class="card"><div class="ihead">${t('iSky')}</div>
+    ${sh?skyRow(t('skShowers'),sh):''}${ec?skyRow(t('iEclipses'),ec):''}</div>`;
 }
 function sunsetTab(ready){
   const R=REG(), lat=R.wxLat, lon=R.wxLon, now=Date.now(), today=dayOf(now);
@@ -2429,8 +2442,9 @@ function sunsetTab(ready){
       <div class="ihead" style="padding:0 0 8px;border:0">${t(late?'ssTomorrow':'ssToday')} · ${hhmm(sun.t)}</div>
       ${head}
       <div class="sunline">${t('ssTimes',hhmm(sun.golden),hhmm(sun.dusk))}</div></div>${src}</div>
+    ${skyCard(sunsetOf(+localStr(now).slice(11,13)<6?dayOf(now-864e5):today,lat,lon))}
     ${next?`<div class="card"><div class="ihead">${t('ssNext')}</div><div class="days" style="border-top:0">${next}</div></div>`:''}
-    ${placesCard(sun)}${skyCard(sunsetOf(+localStr(now).slice(11,13)<6?dayOf(now-864e5):today,lat,lon))}
+    ${placesCard(sun)}
     <div class="card"><details class="more" data-o="why" style="border-top:0"><summary>${t('ssWhy')}</summary>
       <div class="inote" style="padding-top:0">${t('ssWhyText')}</div></details></div>`;
 }
@@ -2619,9 +2633,8 @@ document.addEventListener('toggle',e=>{
 /* Language-dependent labels. */
 function syncHeights(){
   const h=document.querySelector('header')?.offsetHeight||0;
-  const c=document.querySelector('.chips')?.offsetHeight||0;
   document.documentElement.style.setProperty('--headH',h+'px');
-  document.documentElement.style.setProperty('--stickH',(h+c)+'px');
+  document.documentElement.style.setProperty('--stickH',h+'px');
 }
 addEventListener('resize',syncHeights);
 
@@ -2637,7 +2650,7 @@ function applyLang(){
   document.getElementById('howlink').textContent=t('howLink');
   document.getElementById('histlink').textContent=t('histLink');
   document.getElementById('histlink').href='history.html#'+REGION;
-  const map={now:'now',island:'island',d7:'d7',wx:'wx',sun:'sun'};
+  const map={now:'now',island:'island',d7:'d7',sun:'sun'};
   document.querySelectorAll('.tab').forEach(b=>b.textContent=b.dataset.t==='island'?regName():t(map[b.dataset.t]));
   document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
@@ -2679,8 +2692,6 @@ document.addEventListener('click',e=>{
   if(m){ const pl=m.closest('details[data-o^="pl"]');
     track('map_open',pl?{place:pl.dataset.o.slice(2),kind:'sunset'}:{place:spotOf(m),kind:'beach'}); }
   if(el.closest('.retry')) track('retry_tap',{});
-  const chip=el.closest('.chip');
-  if(chip) trackOnce('chip_tap',{beach:chip.dataset.pick},chip.dataset.pick);
 },true);
 document.addEventListener('toggle',e=>{
   const d=e.target; if(!d.open||!d.dataset) return;
@@ -2689,7 +2700,9 @@ document.addEventListener('toggle',e=>{
   else if(k==='day') trackOnce('day_open',{beach:d.dataset.s,day_ahead:nth(d)},d.dataset.s+nth(d));
   else if(o==='src') trackOnce('sources_open',{where:'sunset'},'sunset');
   else if(o==='why'||o==='plrest') trackOnce('fold_open',{what:o},o);
-  else if(o.startsWith('wx')) trackOnce('wx_day_open',{day_ahead:nth(d)},o);
+  else if(o.startsWith('od')) trackOnce('outlook_day',{day_ahead:nth(d)},o);
+  else if(o.startsWith('ob')) trackOnce('outlook_beach',{beach:o.slice(2)},o);
+  else if(o.startsWith('ws')) trackOnce('sources_open',{where:'weather'},'weather');
   else if(o.startsWith('pl')) trackOnce('place_open',{place:o.slice(2)},o);
   else if(d.classList.contains('srcbox')) trackOnce('sources_open',{where:'wave',beach:spotOf(d)},'wave'+spotOf(d));
 },true);

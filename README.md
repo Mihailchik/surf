@@ -126,11 +126,15 @@ Kata (SSS Dive & Surf), Patong (Patong Tower), Karon (Marina Phuket Resort) —
 direct links to the original streams, no keys. Other beaches have no public
 camera pointing at the water.
 
-## Weather and sunset
+## 10 days, weather and sunset
 
-Two more tabs, loaded on first open.
+**10 days** is the outlook: one row per day with the best wave of that day
+and the beach it is at, and the weather next to it; on top, the best day of
+the ten. A day opens into its five best beaches and the weather by source.
+Every beach by itself is folded below. The waves are drawn at once from the
+forecast already loaded; the weather joins when its providers answer.
 
-**Weather** is a 10-day outlook from eight sources on three providers: six
+**Weather** in that tab comes from eight sources on three providers: six
 models through Open-Meteo (ECMWF, GFS, ICON, JMA, GEM, UKMO), MET Norway, and
 wttr.in with World Weather Online data for the first 3 days. Each day shows the
 median and, when opened, every source by itself.
@@ -148,8 +152,7 @@ a server-side job such as the history recorder. PacIOOS ERDDAP has GFS and
 allows browsers, but its data requests timed out all day.
 In the wet season a shower passes almost daily, so a rain icon says nothing.
 The rows count what decides a day: millimetres and wet hours in daylight.
-Thresholds live in `WX_TUNE` in `sky.js`. The best wave score of the day sits
-next to the weather.
+Thresholds live in `WX_TUNE` in `sky.js`.
 
 **Sunset** answers two questions: is it worth going tonight, and where to
 stand.
@@ -172,6 +175,10 @@ stand.
   stops at that land and goes on dotted. It is tiles laid out by hand with a
   drawing on top, no map library, and nothing is fetched until a place is
   opened.
+- Right under the verdict sits the sky for tonight: the Moon and the planets,
+  plus a meteor shower or an eclipse only when it is within 7 days. Every
+  shower of the coming year and the next four eclipses are listed in the
+  region tab.
 - Sunset time and direction, the Moon, planets and meteor shower nights are
   computed on the page (Paul Schlyter's low-precision formulas, checked against
   the astronomy-engine library: sunset within seconds, planets within 0.1°).
@@ -349,12 +356,12 @@ Events, each with the region:
 |---|---|---|
 | `tab_open` | any tab but the first | `tab` |
 | `beach_open` | a beach expanded | `beach` |
-| `day_open` | a day opened in the 10-day tab | `beach`, `day_ahead` |
-| `chip_tap` | a beach chip in the 10-day tab | `beach` |
+| `outlook_day` | a day opened in the 10-day outlook | `day_ahead` |
+| `outlook_beach` | a beach opened in the 10-day outlook | `beach` |
+| `day_open` | a day opened inside that beach | `beach`, `day_ahead` |
 | `map_open` | a Google Maps pin | `place`, `kind` (beach or sunset) |
 | `cam_seen`, `cam_tap` | a camera 5 s on screen; a tap into the player | `beach` |
-| `sources_open` | the table of every source | `where` (wave or sunset), `beach` |
-| `wx_day_open` | a day opened in Weather | `day_ahead` |
+| `sources_open` | the table of every source | `where` (wave, weather or sunset), `beach` |
 | `place_open` | a place opened in Sunset | `place` |
 | `fold_open` | "what makes a sunset", or the places behind land | `what` |
 | `lang_set`, `theme_set`, `region_open` | language, theme, region switched | `lang`, `theme` |
