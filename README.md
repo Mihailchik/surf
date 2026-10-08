@@ -11,8 +11,18 @@ One page, one question: is it worth going right now?
 
 ## How it works
 
-A single static HTML file. No build step, no backend, no API keys — every
-source is fetched straight from the browser and works without registration.
+A single static HTML file. No backend, no API keys — every source is fetched
+straight from the browser and works without registration.
+
+One step stands in for a build. `index.html` carries a copy of `core.js` and
+`grid.js`: GitHub Pages hands out every file in a separate round trip of about
+0.3 s, and the page could not ask for the forecast until both had arrived.
+**After any change to `core.js` run `node tools/inline.mjs`** and commit
+`index.html` and `history.html` with it (`tools/grid.mjs` runs it by itself).
+`core.js` stays the one place to edit; `history.html` and the recorder load the
+file itself, so a stale copy would make the page score differently from the
+history. A pre-commit check (`.git/hooks/pre-commit`, local to a clone) refuses
+a commit with a stale copy.
 
 ### Sources
 

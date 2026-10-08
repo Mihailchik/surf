@@ -1,6 +1,10 @@
 /* Shared by the site (index.html, history.html) and the daily recorder
    (tools/record.mjs), so the page and the history always score the same way.
-   Plain script with globals: no build step, loads in a browser and in Node's vm. */
+   Plain script with globals, loads in a browser and in Node's vm.
+
+   AFTER ANY CHANGE HERE RUN:  node tools/inline.mjs
+   index.html carries a copy of this file, so the first forecast does not wait
+   for one more download. The tool refreshes that copy. */
 
 /* Location-dependent settings. The page picks one from the URL hash, /#phuket. */
 const REGIONS={
