@@ -1,18 +1,27 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-72CS4WJ571"></script>
+<meta charset="utf-8">
+<!-- Google tag. Events wait in dataLayer; the library itself is fetched by
+     loadGA(), which the page calls once the forecast is on screen. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   // a local test run is not a visit
   if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window['ga-disable-G-72CS4WJ571']=true;
   gtag('js', new Date());
-
+  // who is looking: interface language, theme, and whether the site is installed as an app
+  var up={ui_lang:'en',ui_theme:'light',app_mode:'browser'};
+  try{ up.ui_lang=localStorage.getItem('lang')||'en'; up.ui_theme=localStorage.getItem('theme')||'light'; }catch(e){}
+  try{ if(matchMedia('(display-mode: standalone)').matches||navigator.standalone) up.app_mode='app'; }catch(e){}
+  gtag('set','user_properties',up);
   gtag('config', 'G-72CS4WJ571');
+  function loadGA(){
+    if(window.GA_ON||window['ga-disable-G-72CS4WJ571']) return; window.GA_ON=true;
+    var s=document.createElement('script'); s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id=G-72CS4WJ571'; document.head.appendChild(s);
+  }
 </script>
-<meta charset="utf-8">
 <link rel="preconnect" href="https://marine-api.open-meteo.com" crossorigin>
 <link rel="preconnect" href="https://api.open-meteo.com" crossorigin>
 <link rel="preconnect" href="https://api.met.no" crossorigin>
@@ -417,14 +426,12 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
   <div class="made"><a id="howlink" href="how.html">How the score works</a> · <a id="histlink" href="history.html">History</a></div>
   <div class="made">made by <a href="https://voidstudio.top" target="_blank" rel="noopener">voidstudio.top</a></div>
   <div class="hits"><img alt="" width="56" height="20"
-    src="https://hits.sh/surf.voidstudio.top.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
+    data-src="https://hits.sh/surf.voidstudio.top.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
 
 </div>
 
 <script src="core.js?v=20260919db"></script>
 <script src="grid.js?v=20261007a"></script>
-<script defer src="sky.js?v=20261007d"></script>
-<script defer src="horizon.js?v=20261007a"></script>
 <script>
 let REGION='phuket';
 {
@@ -944,7 +951,8 @@ const paint=()=>{const d=document.documentElement.dataset.theme==='dark';
 paint();
 tglBtn.onclick=()=>{const d=document.documentElement.dataset.theme==='dark';
   if(d) delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme='dark';
-  LS.set('theme',d?'light':'dark'); paint()};
+  LS.set('theme',d?'light':'dark'); paint();
+  gtag('set','user_properties',{ui_theme:d?'light':'dark'}); track('theme_set',{theme:d?'light':'dark'})};
 
 const dirRu=d=>t('dirs')[Math.round(d/22.5)%16];
 const scoreColor=v=>gradeOf(v).color;
@@ -1011,12 +1019,47 @@ function once(key,fn){
   if(hit&&Date.now()-hit.at<30000) return hit.p;
   const p=fn(); ONCE[k]={at:Date.now(),p}; return p;
 }
-/* A source that failed is reported to Google Analytics, once per page load,
-   so the owner sees how often visitors really go without it. */
-const FAILED=new Set();
-function reportFail(src){
-  if(FAILED.has(src)) return; FAILED.add(src);
-  if(typeof gtag==='function') gtag('event','src_fail',{src,region:REGION});
+/* Analytics. Every event carries the region. trackOnce reports a thing once
+   per page view: the page redraws and re-opens what was open, and a visitor
+   opening one card five times is still one interest. */
+const track=(name,p)=>{ if(typeof gtag==='function') gtag('event',name,{...p,region:REGION}); };
+const SEEN=new Set();
+const trackOnce=(name,p,key)=>{ const k=name+':'+(key??''); if(SEEN.has(k)) return; SEEN.add(k); track(name,p); };
+const speedBucket=ms=>ms<1000?'under 1 s':ms<2000?'1-2 s':ms<4000?'2-4 s':ms<8000?'4-8 s':'over 8 s';
+/* A source that failed, once per page load, so the owner sees how often
+   visitors really go without it. */
+const reportFail=src=>trackOnce('src_fail',{src},src);
+/* Nothing that is not the forecast is fetched before the forecast is on
+   screen. The code of the weather and sunset tabs, the analytics library and
+   the visit counter come after the first paint, when the browser is idle. */
+const SKY_FILES=['sky.js?v=20261007d','horizon.js?v=20261007a'];
+let SKY_CODE=false, AFTER_DONE=false;
+function loadSkyCode(){
+  if(SKY_CODE) return; SKY_CODE=true;
+  for(const src of SKY_FILES){ const el=document.createElement('script'); el.src=src; el.async=false; document.head.appendChild(el); }
+}
+function afterPaint(){
+  if(AFTER_DONE) return; AFTER_DONE=true;
+  const idle=window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:2500}):f=>setTimeout(f,400);
+  idle(()=>{
+    loadSkyCode(); loadGA();
+    const h=document.querySelector('.hits img[data-src]');
+    if(h){ h.src=h.dataset.src; h.removeAttribute('data-src'); }
+  });
+}
+// a page that never gets a forecast still loads them, later
+setTimeout(afterPaint,6000);
+/* How long the visitor waited for a forecast and where it came from, and what
+   the page had to fall back to. */
+let PAINTED_AT=0, DATA_FROM='net';
+function firstPaint(){
+  const ms=Math.round(performance.now());
+  if(!PAINTED_AT){ PAINTED_AT=ms; track('first_paint',{ms, speed:speedBucket(ms), from:DATA_FROM}); afterPaint(); }
+  if(DATA_FROM!=='cache') trackOnce('fresh_data',{ms, speed:speedBucket(ms), from:DATA_FROM});
+}
+function reportState(s){
+  s=s||(STALE?(STALE_REASON==='rateLimit'?'rate_limit':'offline'):KEPT?'kept_old':WAVE_FALLBACK==='ww3'?'reserve':null);
+  if(s) trackOnce('page_state',{state:s},s);
 }
 /* Each source loads independently; a failure is marked, not fatal. */
 const STATUS={};
@@ -1621,6 +1664,7 @@ function renderOutage(){
   startCams();
   wxbar();
   document.getElementById('upd').innerHTML=statusPill();
+  reportState('outage'); afterPaint();
 }
 function render(){
   // weather and sunset do not need the wave forecast
@@ -1663,7 +1707,7 @@ function render(){
   const rowsHtml=tops.map(x=>{
     const s=x.pick.score??0, pk=peaksOf(x.rows,x.i)[0];
     const hasCam=!!x.sp.cam;
-    return `<div class="srow${hasCam?'':' nolink'}" ${hasCam?`data-go="${x.sp.id}"`:''}>
+    return `<div class="srow${hasCam?'':' nolink'}" data-sp="${x.sp.id}" ${hasCam?`data-go="${x.sp.id}"`:''}>
       <div class="sbadge" style="background:color-mix(in srgb,${scoreColor(s)} 14%,transparent);
         color:${scoreColor(s)}">${shown(s)}</div>
       <div class="sname">${nameOf(x.sp)}</div>
@@ -1740,6 +1784,7 @@ function render(){
     new Date(LAST_OK||Date.now()).toLocaleTimeString(LOCALE[LANG],{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit'}));
   const cams=SPOTS.filter(x=>x.cam).map(x=>`${nameOf(x)} (${x.cam.by})`).join(', ');
   document.getElementById('src').innerHTML=t('licence')+(cams?' '+t('camsLine',cams):'')+' '+t('licTail');
+  firstPaint(); reportState();
 }
 
 /* ===== Weather and sunset tabs =====
@@ -1806,7 +1851,7 @@ function loadSky(){
 const skyReady=()=>!!SKY&&SKY.reg===REGION&&!!(SKY.om||SKY.left===0||(Date.now()-SKY.at>3000&&(SKY.met||SKY.wttr)));
 function paintSky(){
   const main=document.getElementById('main');
-  if(typeof sunsetOf==='undefined'||typeof HORIZON==='undefined'){ setTimeout(()=>{ if(isSky()) render(); },150); return; }
+  if(typeof sunsetOf==='undefined'||typeof HORIZON==='undefined'){ loadSkyCode(); setTimeout(()=>{ if(isSky()) render(); },150); return; }
   document.getElementById('summary').innerHTML='';
   document.getElementById('rest').innerHTML='';
   document.getElementById('restlbl').textContent='';
@@ -2058,6 +2103,8 @@ let RETRY=0;
    which is one open-sea reading for the whole coast. KEPT says so on the page. */
 const KEEP_FULL=6*60*60*1000;
 let KEPT=false;
+/* How long the full forecast waits for the reserve and the extras, ms. */
+const JOIN_WAIT=1200;
 let WAVE_FALLBACK=null, LOADING=false, EXTRA_PENDING=false, CAMS_ON=false, WAVE_RAF=0;
 /* Loader: a small wave builds on a flat line, rolls right and flattens out.
    Shapes are drawn around a crest at x=207; the loop stops by itself once
@@ -2109,7 +2156,7 @@ async function boot(force){
   const cached=cacheLoad(), age=cached?Date.now()-cached.at:Infinity;
   const fresh=age<CACHE_TTL;
   if(cached && age<CACHE_KEEP && !DATA){
-    DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean;
+    DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean; DATA_FROM='cache';
     LAST_OK=cached.at; STALE=false; render(); startCams();
   }
   // fresh cache and nothing forcing a refresh: no network at all
@@ -2149,23 +2196,37 @@ async function boot(force){
     const first=await Promise.any([omP, spareP]);
     if(moved()) return;
     if(!painted){
-      DATA=build(first,null); LAST_OK=Date.now(); STALE=false; render();
+      DATA=build(first,null); DATA_FROM=first.fallback?'reserve':'net'; LAST_OK=Date.now(); STALE=false; render();
       if(!CAMS_ON) setTimeout(startCams,1500);
     }
     // then everything that arrived: Open-Meteo per-beach models plus NOAA in
     // one median; NOAA alone if Open-Meteo never answered
     const om=await fullP.catch(()=>omP).catch(()=>null);
-    const spare=await spareP.catch(()=>null);
-    const core=om&&spare?withWW3(om,spare):om||spare;
-    if(!core) throw new Error('sources unavailable');
-    const extra=await extraP.catch(()=>null);
+    // With Open-Meteo in hand, the reserve and the extras get JOIN_WAIT to join
+    // the full picture. NOAA's server can take its whole 10 s to give up, and
+    // the 10 days must not wait for that: a late answer is added when it lands.
+    const within=(p,ms)=>Promise.race([p.catch(()=>null), new Promise(r=>setTimeout(r,ms))]);
+    const finish=(spare,extra)=>{
+      const core=om&&spare?withWW3(om,spare):om||spare;
+      if(!core) throw new Error('sources unavailable');
+      KEPT=!!core.fallback&&painted&&!WAVE_FALLBACK&&Date.now()-LAST_OK<KEEP_FULL;
+      if(!KEPT){ DATA=build(core,extra); DATA_FROM=core.fallback?'reserve':'net'; LAST_OK=Date.now(); }
+      STALE=false; RETRY=0;
+      if(!core.fallback) cacheSave(DATA);
+      render(); startCams();
+      return core;
+    };
+    const wait=om?JOIN_WAIT:30000;
+    const [spare1,extra1]=await Promise.all([within(spareP,wait),within(extraP,wait)]);
     if(moved()) return;
-    EXTRA_PENDING=false;
-    KEPT=!!core.fallback&&painted&&!WAVE_FALLBACK&&Date.now()-LAST_OK<KEEP_FULL;
-    if(!KEPT){ DATA=build(core,extra); LAST_OK=Date.now(); }
-    STALE=false; RETRY=0;
-    if(!core.fallback) cacheSave(DATA);
-    render(); startCams();
+    if(extra1!==undefined) EXTRA_PENDING=false;
+    let core=finish(spare1||null,extra1||null);
+    if(spare1===undefined||extra1===undefined){
+      const [spare2,extra2]=await Promise.all([spareP.catch(()=>null),extraP.catch(()=>null)]);
+      if(moved()) return;
+      EXTRA_PENDING=false;
+      if((spare2&&spare1===undefined)||(extra2&&extra1===undefined)) core=finish(spare2,extra2); else wxbar();
+    }
     // on the reserve: keep trying Open-Meteo every minute
     if(core.fallback) setTimeout(()=>boot(true),60000);
   }catch(e){
@@ -2174,7 +2235,7 @@ async function boot(force){
     STALE=true;
     STALE_REASON = /429/.test(e.message) ? 'rateLimit' : 'noConnection';
     if(!DATA && cached){
-      DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean; LAST_OK=cached.at;
+      DATA=cached.data; WEATHER=cached.weather; OCEANDATA=cached.ocean; LAST_OK=cached.at; DATA_FROM='cache';
     }
     if(DATA){ render(); startCams(); } else renderOutage();
     // a rate limit is not cured by asking again every minute
@@ -2262,6 +2323,7 @@ function applyLang(){
 applyLang();
 document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>{
   LANG=b.dataset.l; LS.set('lang',LANG); applyLang(); render();
+  gtag('set','user_properties',{ui_lang:LANG}); track('lang_set',{lang:LANG});
 });
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
@@ -2279,22 +2341,36 @@ document.addEventListener('click',()=>{const m=document.getElementById('regmenu'
 addEventListener('hashchange',()=>{
   const h=(location.hash||'').replace('#','').toLowerCase();
   if(REGIONS[h]&&h!==REGION){ REGION=h; SPOTS=spotsOf(REGION); DATA=null; WEATHER=null; OCEANDATA=null; SKY=null; SKY_KEY='';
-    PICK=null; document.getElementById('main').innerHTML=''; applyLang(); boot(true); }
+    PICK=null; document.getElementById('main').innerHTML=''; applyLang(); boot(true); track('region_open',{}); }
 });
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)boot()});
 
 /* Analytics events. Camera players are cross-origin, so playback itself is
    invisible to us: "seen" means 5 s on screen, "tap" means focus moved into
    the player. */
-const track=(name,p)=>{ if(typeof gtag==='function') gtag('event',name,{...p,region:REGION}); };
-const spotOf=el=>el.closest('[data-id]')?.dataset.id||el.closest('[data-s]')?.dataset.s||'';
+const spotOf=el=>el.closest('[data-id]')?.dataset.id||el.closest('[data-s]')?.dataset.s||el.closest('[data-sp]')?.dataset.sp||'';
+// which of its neighbours a folded block is: the day ahead, for lists of days
+const nth=d=>[...d.parentElement.children].filter(x=>x.tagName==='DETAILS').indexOf(d);
 document.addEventListener('click',e=>{
-  const b=e.target.closest('.tab');
+  const el=e.target, b=el.closest('.tab');
   if(b&&b.dataset.t!=='now') track('tab_open',{tab:b.dataset.t});
+  const m=el.closest('a.map');
+  if(m){ const pl=m.closest('details[data-o^="pl"]');
+    track('map_open',pl?{place:pl.dataset.o.slice(2),kind:'sunset'}:{place:spotOf(m),kind:'beach'}); }
+  if(el.closest('.retry')) track('retry_tap',{});
+  const chip=el.closest('.chip');
+  if(chip) trackOnce('chip_tap',{beach:chip.dataset.pick},chip.dataset.pick);
 },true);
 document.addEventListener('toggle',e=>{
-  const d=e.target;
-  if(d.open&&d.dataset&&(d.dataset.k==='more'||d.dataset.k==='row')) track('beach_open',{beach:d.dataset.s});
+  const d=e.target; if(!d.open||!d.dataset) return;
+  const k=d.dataset.k, o=d.dataset.o||'';
+  if(k==='more'||k==='row') track('beach_open',{beach:d.dataset.s});
+  else if(k==='day') trackOnce('day_open',{beach:d.dataset.s,day_ahead:nth(d)},d.dataset.s+nth(d));
+  else if(o==='src') trackOnce('sources_open',{where:'sunset'},'sunset');
+  else if(o==='why'||o==='plrest') trackOnce('fold_open',{what:o},o);
+  else if(o.startsWith('wx')) trackOnce('wx_day_open',{day_ahead:nth(d)},o);
+  else if(o.startsWith('pl')) trackOnce('place_open',{place:o.slice(2)},o);
+  else if(d.classList.contains('srcbox')) trackOnce('sources_open',{where:'wave',beach:spotOf(d)},'wave'+spotOf(d));
 },true);
 const camSeen={}, camSent=new Set();
 setInterval(()=>{

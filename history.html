@@ -1,16 +1,26 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-72CS4WJ571"></script>
+<!-- Google tag. Events wait in dataLayer; the library itself is fetched by
+     loadGA(), here after the page itself has loaded. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   // a local test run is not a visit
   if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window['ga-disable-G-72CS4WJ571']=true;
   gtag('js', new Date());
-
+  // who is looking: interface language, theme, and whether the site is installed as an app
+  var up={ui_lang:'en',ui_theme:'light',app_mode:'browser'};
+  try{ up.ui_lang=localStorage.getItem('lang')||'en'; up.ui_theme=localStorage.getItem('theme')||'light'; }catch(e){}
+  try{ if(matchMedia('(display-mode: standalone)').matches||navigator.standalone) up.app_mode='app'; }catch(e){}
+  gtag('set','user_properties',up);
   gtag('config', 'G-72CS4WJ571');
+  function loadGA(){
+    if(window.GA_ON||window['ga-disable-G-72CS4WJ571']) return; window.GA_ON=true;
+    var s=document.createElement('script'); s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id=G-72CS4WJ571'; document.head.appendChild(s);
+  }
+  addEventListener('load',function(){ setTimeout(loadGA,0); });
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -232,6 +242,14 @@ function renderSessions(){
 }
 
 document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('lang',LANG)}catch{}render();});
+// analytics: which day and beach people look up, and in which view
+document.addEventListener('click',e=>{
+  const el=e.target, c=el.closest('button[data-d]'), k=el.closest('#kind button'), r=el.closest('#region button'), l=el.closest('#lang button');
+  if(c) gtag('event','hist_cell',{beach:c.dataset.s,region:REGION});
+  if(k) gtag('event','hist_kind',{kind:k.dataset.k,region:REGION});
+  if(r) gtag('event','region_open',{region:r.dataset.r});
+  if(l){ gtag('set','user_properties',{ui_lang:l.dataset.l}); gtag('event','lang_set',{lang:l.dataset.l,region:REGION}); }
+},true);
 load();
 </script>
 </body>

@@ -61,7 +61,10 @@ request, whatever the size. The page shows what arrives, as it arrives: the
 weather bar as soon as its request answers, then beaches from a 2-day request
 (now and the next daylight window), then the full 10 days and the secondary
 sources. Camera players start only after the data is on screen, so they do not
-compete with it on a phone connection.
+compete with it on a phone connection. The same goes for the analytics library,
+the code of the weather and sunset tabs and the visit counter. The 10 days do
+not wait for the reserve either: NOAA's server gets 1.2 s to join the median,
+and a later answer is added when it lands.
 The last good forecast is kept in the browser. On the next visit it is on
 screen at once and the fresh one replaces it when it arrives; a forecast older
 than 12 hours is not shown. Coming back to the tab within 30 minutes asks
@@ -308,13 +311,42 @@ remove it.
 **Visit counter** — hits.sh, a third-party service. It sees visitors' IP
 addresses, as any external analytics does. Remove the `.hits` block to drop it.
 
-**Google Analytics** — tag `G-72CS4WJ571` in `<head>`. Besides page views it
-gets five events: `tab_open` (any tab but the first), `beach_open` (a beach
-expanded), `cam_seen` (a camera 5 s on screen), `cam_tap` (a tap into the
-player; playback itself is not visible to the page) and `src_fail` (a data
-source that did not answer). Google
-sets cookies and sees visitors' IP addresses. There is no consent banner; one
-would be needed before targeting EU visitors.
+**Google Analytics** — tag `G-72CS4WJ571` on all three pages. Google sets
+cookies and sees visitors' IP addresses. There is no consent banner; one would
+be needed before targeting EU visitors. Runs on `localhost` are not counted.
+
+The library is not in the way of the forecast: events wait in `dataLayer`, and
+the script itself is fetched once the forecast is on screen (on the other two
+pages, once the page has loaded). The code of the weather and sunset tabs and
+the hits.sh counter wait for the same moment.
+
+Events, each with the region:
+
+| Event | When | Parameters |
+|---|---|---|
+| `tab_open` | any tab but the first | `tab` |
+| `beach_open` | a beach expanded | `beach` |
+| `day_open` | a day opened in the 10-day tab | `beach`, `day_ahead` |
+| `chip_tap` | a beach chip in the 10-day tab | `beach` |
+| `map_open` | a Google Maps pin | `place`, `kind` (beach or sunset) |
+| `cam_seen`, `cam_tap` | a camera 5 s on screen; a tap into the player | `beach` |
+| `sources_open` | the table of every source | `where` (wave or sunset), `beach` |
+| `wx_day_open` | a day opened in Weather | `day_ahead` |
+| `place_open` | a place opened in Sunset | `place` |
+| `fold_open` | "what makes a sunset", or the places behind land | `what` |
+| `lang_set`, `theme_set`, `region_open` | language, theme, region switched | `lang`, `theme` |
+| `first_paint` | first forecast on screen | `ms`, `speed`, `from` (cache, net or reserve) |
+| `fresh_data` | first forecast from the network on screen | `ms`, `speed`, `from` |
+| `page_state` | the page fell back | `state`: outage, reserve, kept_old, rate_limit, offline |
+| `src_fail` | a data source did not answer | `src` |
+| `retry_tap` | the retry button on the outage screen | |
+| `hist_cell`, `hist_kind` | history page: a day opened, the view switched | `beach`, `kind` |
+
+Everything opened is counted once per page view, except `beach_open`, which
+keeps its old meaning of every opening. User properties: `ui_lang`, `ui_theme`,
+`app_mode` (app when the site runs from the home screen). To see a parameter in
+GA reports it has to be registered there as a custom dimension, `ms` as a
+custom metric.
 
 ### What could actually go wrong
 
