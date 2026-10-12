@@ -421,3 +421,7 @@ when the interface is in Russian.
 Numbers in the articles: wave statistics by month come from the Open-Meteo
 Marine archive for a point off Kata (7.79 N, 98.29 E), October 2021 to December
 2025; sunset times are computed for the 15th of each month.
+
+After a push that adds or changes pages, wait for the deploy and run
+`node tools/indexnow.mjs`: it tells Bing and Yandex which addresses changed.
+The `<key>.txt` file in the root belongs to it and is not a secret.

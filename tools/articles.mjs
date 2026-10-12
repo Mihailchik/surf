@@ -70,6 +70,9 @@ tr.hi td{background:var(--card2);font-weight:600}
 .cta{display:block;background:var(--acc);color:#fff;border-radius:14px;padding:14px 16px;margin:22px 0;font-weight:700}
 .cta span{display:block;font-weight:500;font-size:14px;opacity:.9}
 .faq h3{margin-top:14px}
+.cam{position:relative;background:#000;aspect-ratio:16/9;width:100%;border-radius:14px;overflow:hidden;margin:10px 0 6px}
+.cam iframe{width:100%;height:100%;border:0;display:block}
+.cam img{width:100%;height:100%;object-fit:cover;display:block}
 .list a{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;margin:10px 0;font-weight:650}
 .list a span{display:block;font-weight:400;font-size:14px;color:var(--dim)}
 .foot{margin-top:34px;font-size:13px;color:var(--dim)}`;

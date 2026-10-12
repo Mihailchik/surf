@@ -22,3 +22,5 @@ Data: Open-Meteo, MET Norway, NOAA WaveWatch III through PacIOOS, Copernicus Atm
 - [Волны на Пхукете по месяцам](https://surf.voidstudio.top/ru/volny-po-mesyacam/): wave height by month from 4 years of model data, share of days above 0.6 m and 1 m, swell period, water temperature
 - [Серфинг на Пхукете: сезон и пляжи](https://surf.voidstudio.top/ru/serfing-sezon-i-plyazhi/): the surf season, what each beach needs to work, advice for beginners
 - [Закат на Пхукете: во сколько и откуда смотреть](https://surf.voidstudio.top/ru/zakat-vremya-i-mesta/): sunset time and direction by month, places to watch from
+- [Веб-камеры Пхукета онлайн](https://surf.voidstudio.top/ru/veb-kamery-phuketa/): live cams of Kata, Karon and Patong on one page, how to read the picture
+- [Красные флаги на Пхукете](https://surf.voidstudio.top/ru/krasnye-flagi-i-kupanie/): beach flag meanings, months with dangerous sea, rip currents and what to do
