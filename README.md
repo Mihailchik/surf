@@ -415,8 +415,10 @@ node tools/articles.mjs
 
 It writes `<lang>/<slug>/index.html`, the list at `<lang>/index.html` and
 `sitemap.xml`. Commit the built pages together with the source: there is no
-build on the server. Russian only so far; the footer link to the section shows
-when the interface is in Russian.
+build on the server. Russian and English; the header field `key` ties the two
+versions of one article together (language link, hreflang). The footer link on
+the main page leads to the Russian section for Russian readers and to the
+English one for everyone else.
 
 Numbers in the articles: wave statistics by month come from the Open-Meteo
 Marine archive for a point off Kata (7.79 N, 98.29 E), October 2021 to December

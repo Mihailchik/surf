@@ -454,13 +454,14 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
     <p>Прогноз волн для серфинга на Пхукете: высота и период волны, ветер, прилив и оценка от 0 до 10 по каждому пляжу, живые камеры Каты, Карона и Патонга, расклад на 10 дней и оценка заката.</p>
     <p>พยากรณ์คลื่นสำหรับเล่นเซิร์ฟที่ภูเก็ต: ความสูงและคาบคลื่น ลม น้ำขึ้นน้ำลง คะแนน 0 ถึง 10 ของแต่ละหาด กล้องสดที่กะตะ กะรน และป่าตอง แนวโน้ม 10 วัน และคะแนนพระอาทิตย์ตก</p>
     <p>Data: Open-Meteo, MET Norway, NOAA WaveWatch III, Copernicus. <a href="how.html">How the score works</a> · <a href="history.html">History of forecasts</a></p>
-    <p>Статьи: <a href="ru/volny-po-mesyacam/">Волны на Пхукете по месяцам</a> · <a href="ru/serfing-sezon-i-plyazhi/">Серфинг на Пхукете: сезон и пляжи</a> · <a href="ru/zakat-vremya-i-mesta/">Закат на Пхукете: во сколько и откуда смотреть</a> · <a href="ru/veb-kamery-phuketa/">Веб-камеры Пхукета онлайн</a> · <a href="ru/krasnye-flagi-i-kupanie/">Красные флаги на Пхукете</a></p>
+    <p>Guides: <a href="en/phuket-waves-by-month/">Phuket waves by month</a> · <a href="en/phuket-surf-season-and-beaches/">Surfing in Phuket: season and beaches</a> · <a href="en/phuket-sunset-times-and-spots/">Phuket sunset: time and where to watch</a> · <a href="en/phuket-webcams/">Phuket webcams live</a> · <a href="en/phuket-red-flags/">Red flags on Phuket beaches</a> · <a href="en/is-it-safe-to-swim-in-phuket/">Is it safe to swim in Phuket</a></p>
+    <p>Статьи: <a href="ru/volny-po-mesyacam/">Волны на Пхукете по месяцам</a> · <a href="ru/serfing-sezon-i-plyazhi/">Серфинг на Пхукете: сезон и пляжи</a> · <a href="ru/zakat-vremya-i-mesta/">Закат на Пхукете: во сколько и откуда смотреть</a> · <a href="ru/veb-kamery-phuketa/">Веб-камеры Пхукета онлайн</a> · <a href="ru/krasnye-flagi-i-kupanie/">Красные флаги на Пхукете</a> · <a href="ru/kupanie-meduzy-skaty/">Безопасно ли купаться на Пхукете</a></p>
   </noscript>
   <div id="main"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
   <div class="src" id="src"></div>
-  <div class="made"><a id="howlink" href="how.html">How the score works</a> · <a id="histlink" href="history.html">History</a><span id="artwrap" hidden> · <a href="ru/">Статьи</a></span></div>
+  <div class="made"><a id="howlink" href="how.html">How the score works</a> · <a id="histlink" href="history.html">History</a> · <a id="artlink" href="en/">Guides</a></div>
   <div class="made">made by <a href="https://voidstudio.top" target="_blank" rel="noopener">voidstudio.top</a></div>
   <div class="hits"><img alt="" width="56" height="20"
     data-src="https://hits.sh/surf.voidstudio.top.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
@@ -2672,8 +2673,8 @@ function applyLang(){
   document.getElementById('howlink').textContent=t('howLink');
   document.getElementById('histlink').textContent=t('histLink');
   document.getElementById('histlink').href='history.html#'+REGION;
-  // the articles exist in Russian only so far
-  document.getElementById('artwrap').hidden=LANG!=='ru';
+  // articles exist in Russian and English; Thai readers get the English ones
+  { const a=document.getElementById('artlink'), ru=LANG==='ru'; a.href=ru?'ru/':'en/'; a.textContent=ru?'Статьи':'Guides'; }
   const map={now:'now',island:'island',d7:'d7',sun:'sun'};
   document.querySelectorAll('.tab').forEach(b=>b.textContent=b.dataset.t==='island'?regName():t(map[b.dataset.t]));
   document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));

@@ -17,10 +17,13 @@ Data: Open-Meteo, MET Norway, NOAA WaveWatch III through PacIOOS, Copernicus Atm
 - [How the score works](https://surf.voidstudio.top/how.html): the formula, the weights and where it can be wrong
 - [History](https://surf.voidstudio.top/history.html): what was forecast and what the models say happened, day by day
 
-## Guides (Russian)
+## Guides
 
-- [Волны на Пхукете по месяцам](https://surf.voidstudio.top/ru/volny-po-mesyacam/): wave height by month from 4 years of model data, share of days above 0.6 m and 1 m, swell period, water temperature
-- [Серфинг на Пхукете: сезон и пляжи](https://surf.voidstudio.top/ru/serfing-sezon-i-plyazhi/): the surf season, what each beach needs to work, advice for beginners
-- [Закат на Пхукете: во сколько и откуда смотреть](https://surf.voidstudio.top/ru/zakat-vremya-i-mesta/): sunset time and direction by month, places to watch from
-- [Веб-камеры Пхукета онлайн](https://surf.voidstudio.top/ru/veb-kamery-phuketa/): live cams of Kata, Karon and Patong on one page, how to read the picture
-- [Красные флаги на Пхукете](https://surf.voidstudio.top/ru/krasnye-flagi-i-kupanie/): beach flag meanings, months with dangerous sea, rip currents and what to do
+- [Phuket waves by month](https://surf.voidstudio.top/en/phuket-waves-by-month/): wave height by month from 4 years of model data, share of days above 0.6 m and 1 m, swell period, water temperature
+- [Surfing in Phuket: season and beaches](https://surf.voidstudio.top/en/phuket-surf-season-and-beaches/): the surf season, what each beach needs to work, advice for beginners
+- [Phuket sunset: time and where to watch](https://surf.voidstudio.top/en/phuket-sunset-times-and-spots/): sunset time and direction by month, places to watch from
+- [Phuket webcams live](https://surf.voidstudio.top/en/phuket-webcams/): live cams of Kata, Karon and Patong on one page, how to read the picture
+- [Red flags on Phuket beaches](https://surf.voidstudio.top/en/phuket-red-flags/): beach flag meanings, months with dangerous sea, rip currents and what to do
+- [Is it safe to swim in Phuket](https://surf.voidstudio.top/en/is-it-safe-to-swim-in-phuket/): rip currents, jellyfish and bluebottles, stingrays, sea urchins, first aid
+
+Every guide has a Russian version under https://surf.voidstudio.top/ru/

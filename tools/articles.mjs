@@ -9,7 +9,9 @@
 // they are, there is no build on the server.
 //
 // Header fields: title (the <title>, with the search phrase first), h1,
-// description, date (YYYY-MM-DD), updated (optional), faq: [[question, answer]].
+// description, date (YYYY-MM-DD), updated (optional), faq: [[question, answer]],
+// key: the same word in every translation of one article, which is how the
+// pages find each other for the language link and hreflang.
 // The FAQ is printed at the end of the page and repeated as FAQPage data, which
 // is what search engines and AI assistants quote.
 
@@ -47,6 +49,7 @@ html,body{margin:0;background:var(--bg);color:var(--tx)}
 body{font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .wrap{max-width:640px;margin:0 auto;padding:10px 16px 60px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0 4px;font-size:14px;font-weight:650}
+.top span a{margin-left:14px}
 a{color:var(--acc);text-decoration:none}
 article a{text-decoration:underline;text-underline-offset:2px}
 h1{font-size:27px;line-height:1.2;margin:16px 0 8px;letter-spacing:-.3px}
@@ -64,6 +67,7 @@ th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);whit
 th:first-child,td:first-child{text-align:left}
 th{font-size:12px;font-weight:650;color:var(--dim);white-space:normal;vertical-align:bottom}
 tr:last-child td{border-bottom:0}
+td[style*="white-space:normal"]{min-width:140px}
 tr.hi td{background:var(--card2);font-weight:600}
 .bar{display:inline-block;height:8px;border-radius:4px;background:var(--acc);vertical-align:middle;margin-right:6px}
 .small{font-size:13px;color:var(--dim)}
@@ -138,10 +142,17 @@ function load(lang) {
 }
 
 const urls = [...STATIC.map(([p, f]) => ({ loc: SITE + p, freq: f }))];
+const ALL = Object.fromEntries(Object.keys(L).map(l => [l, load(l)]));
+const LANGS = Object.keys(L).filter(l => ALL[l].length);
+// the same article in the other languages: [[lang, address]]
+const twins = a => LANGS.map(l => [l, l === a.lang ? a : ALL[l].find(o => a.key && o.key === a.key)])
+  .filter(([, o]) => o).map(([l, o]) => [l, `${SITE}/${l}/${o.slug}/`]);
+const alt = list => list.length > 1 ? list.map(([l, u]) => `<link rel="alternate" hreflang="${l}" href="${u}">`).join('\n') + '\n' : '';
+const sw = (list, lang) => list.filter(([l]) => l !== lang).map(([l, u]) => `<a href="${u.replace(SITE, '')}" hreflang="${l}">${l.toUpperCase()}</a>`).join('');
 let count = 0;
 
 for (const lang of Object.keys(L)) {
-  const arts = load(lang);
+  const arts = ALL[lang];
   if (!arts.length) continue;
   const t = L[lang];
   for (const a of arts) {
@@ -154,8 +165,9 @@ for (const lang of Object.keys(L)) {
     if (a.faq?.length) data.push({ '@context': 'https://schema.org', '@type': 'FAQPage',
       mainEntity: a.faq.map(([q, ans]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: strip(ans) } })) });
     const others = arts.filter(o => o !== a);
-    const html = head({ lang, title: a.title, description: a.description, url, extra: data.map(ld).join('\n') + '\n' }) +
-`<div class="top"><a href="/">${t.back}</a><a href="/${lang}/">${t.section}</a></div>
+    const tw = twins(a);
+    const html = head({ lang, title: a.title, description: a.description, url, extra: alt(tw) + data.map(ld).join('\n') + '\n' }) +
+`<div class="top"><a href="/">${t.back}</a><span><a href="/${lang}/">${t.section}</a>${sw(tw, lang)}</span></div>
 <article>
 <h1>${a.h1}</h1>
 <p class="meta">${t.updated} ${day(upd, lang)}</p>
@@ -173,8 +185,8 @@ ${others.length ? `<h2>${t.more}</h2>\n<div class="list">\n${others.map(o => `<a
   }
   const url = `${SITE}/${lang}/`;
   fs.writeFileSync(path.join(ROOT, lang, 'index.html'),
-    head({ lang, title: t.sectionTitle, description: t.sectionDesc, url }) +
-`<div class="top"><a href="/">${t.back}</a></div>
+    head({ lang, title: t.sectionTitle, description: t.sectionDesc, url, extra: alt(LANGS.map(l => [l, `${SITE}/${l}/`])) }) +
+`<div class="top"><a href="/">${t.back}</a><span>${sw(LANGS.map(l => [l, `${SITE}/${l}/`]), lang)}</span></div>
 <h1>${t.section}</h1>
 <div class="list">
 ${arts.map(o => `<a href="/${lang}/${o.slug}/">${o.h1}<span>${esc(o.description)}</span></a>`).join('\n')}
