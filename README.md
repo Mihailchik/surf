@@ -391,3 +391,14 @@ condition in all three cases and is present in the page footer.
 Forecasts are model output and can be wrong — the page shows the spread between
 sources precisely because they often disagree. Do not use it as the sole basis
 for decisions about entering the water.
+
+## Search and link previews
+
+`index.html`, `how.html` and `history.html` carry a canonical link and Open Graph
+tags; `og.png` (1200×630) is the picture messengers show for a shared link.
+`robots.txt` and `sitemap.xml` sit in the root: add every new page to the
+sitemap. `llms.txt` describes the site for AI crawlers.
+
+The forecast is drawn by script, so crawlers that do not run scripts would see
+an empty page. The `<noscript>` block in `index.html` gives them the text; the
+page itself never shows it. Keep the beach list there in step with `REGIONS`.

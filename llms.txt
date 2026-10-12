@@ -1,0 +1,18 @@
+# Surf: Phuket surf forecast
+
+> Free surf forecast for Phuket and Khao Lak, Thailand. One page that answers: is it worth going surfing right now, and at which beach. Each beach gets a score from 0 to 10 from wave height, wave period, wind and swell direction. English, Russian and Thai.
+
+The page is rendered in the browser from live model data, so the numbers are not in the HTML. What it shows:
+
+- Now: score, wave height, period, wind, water temperature, tide and the next peak for Kata, Karon, Patong, Nai Harn, Bang Tao, Nai Yang, Kamala, Kata Noi, Layan, Nai Thon, Surin, Kalim and Khao Lak. Live cams for Kata, Karon and Patong.
+- 10 days: the best wave and the weather for each day, and the best day for each beach.
+- Region: days above the usual, and swell on its way across the Andaman Sea with the size expected at the shore.
+- Sunset: a score from 0 to 10 for tonight and the next days, places to watch from, the moon and planets tonight, meteor showers and eclipses ahead.
+
+Data: Open-Meteo, MET Norway, NOAA WaveWatch III through PacIOOS, Copernicus Atmosphere Monitoring Service. Forecasts can be wrong.
+
+## Pages
+
+- [Forecast](https://surf.voidstudio.top/): the live page
+- [How the score works](https://surf.voidstudio.top/how.html): the formula, the weights and where it can be wrong
+- [History](https://surf.voidstudio.top/history.html): what was forecast and what the models say happened, day by day

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <!-- Google tag. Events wait in dataLayer; the library itself is fetched by
@@ -27,13 +27,24 @@
 <link rel="preconnect" href="https://api.met.no" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f9">
-<title>Surf · Phuket</title>
+<title>Phuket surf forecast today: waves, live cams, sunset · Surf</title>
 <link rel="icon" type="image/svg+xml" href="./surf-logo-icon-smooth.svg">
 <link rel="apple-touch-icon" href="./surf-logo-icon-smooth.svg">
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Phuket%20surf%22%2C%22short_name%22%3A%22Surf%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f2f5f9%22%2C%22theme_color%22%3A%22%230b7fc7%22%2C%22start_url%22%3A%22.%22%7D">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Surf">
-<meta name="description" content="Waves, wind, tide and live cams for Phuket west coast beaches">
+<meta name="description" content="Is it worth surfing in Phuket right now? Wave height, period, wind and tide for Kata, Karon, Patong, Nai Harn and 9 more beaches, scored 0 to 10, with live cams, a 10-day outlook and a sunset score.">
+<link rel="canonical" href="https://surf.voidstudio.top/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Surf">
+<meta property="og:url" content="https://surf.voidstudio.top/">
+<meta property="og:title" content="Phuket surf forecast today: waves, live cams, sunset">
+<meta property="og:description" content="Waves, wind and tide for 13 beaches scored 0 to 10, live cams, a 10-day outlook and a sunset score.">
+<meta property="og:image" content="https://surf.voidstudio.top/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Surf","url":"https://surf.voidstudio.top/","description":"Surf forecast for Phuket and Khao Lak: wave height, period, wind and tide by beach scored 0 to 10, live cams, a 10-day outlook and a sunset score.","applicationCategory":"WeatherApplication","operatingSystem":"Any","inLanguage":["en","ru","th"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"areaServed":{"@type":"Place","name":"Phuket, Thailand"},"publisher":{"@type":"Organization","name":"voidstudio","url":"https://voidstudio.top/"}}</script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* Light is the base theme; dark is toggled and stored. */
@@ -434,6 +445,16 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 <div class="wrap">
   <div id="stale"></div>
   <div id="summary"></div>
+  <!-- Read by crawlers that do not run scripts; the page itself never shows it. -->
+  <noscript>
+    <h1>Phuket surf forecast today</h1>
+    <p>Surf answers one question: is it worth going surfing in Phuket right now, and where. Each beach gets a score from 0 to 10 from wave height, wave period, wind and swell direction, with the tide and the next peak of the day. The forecast is free, updates through the day and is available in English, Russian and Thai.</p>
+    <p>Beaches: Kata, Karon, Patong, Nai Harn, Bang Tao, Nai Yang, Kamala, Kata Noi, Layan, Nai Thon, Surin, Kalim, and Khao Lak north of the island. Live cams: Kata, Karon and Patong.</p>
+    <p>Also on the page: a 10-day outlook with the best wave and the weather for each day, swell on its way across the Andaman Sea, a sunset score from 0 to 10 with places to watch from, the moon and planets tonight, meteor showers and eclipses ahead.</p>
+    <p>Прогноз волн для серфинга на Пхукете: высота и период волны, ветер, прилив и оценка от 0 до 10 по каждому пляжу, живые камеры Каты, Карона и Патонга, расклад на 10 дней и оценка заката.</p>
+    <p>พยากรณ์คลื่นสำหรับเล่นเซิร์ฟที่ภูเก็ต: ความสูงและคาบคลื่น ลม น้ำขึ้นน้ำลง คะแนน 0 ถึง 10 ของแต่ละหาด กล้องสดที่กะตะ กะรน และป่าตอง แนวโน้ม 10 วัน และคะแนนพระอาทิตย์ตก</p>
+    <p>Data: Open-Meteo, MET Norway, NOAA WaveWatch III, Copernicus. <a href="how.html">How the score works</a> · <a href="history.html">History of forecasts</a></p>
+  </noscript>
   <div id="main"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
   <div class="sect" id="restlbl"></div>
   <div id="rest"></div>
@@ -753,7 +774,7 @@ const LS={
 /* English by default; choice is kept in localStorage. */
 const I18N={
  en:{
-  title:'Surf', now:'Now', island:'Phuket', d7:'10 days',
+  title:'Surf', docTitle:'{0} surf forecast today: waves, live cams, sunset · Surf', now:'Now', island:'Phuket', d7:'10 days',
   go:'GO', ok:'WORTH IT', weak:'WEAK', no:'SKIP',
   darkNow:'dark now. ', bestIs:'best is {0}', windowAt:'window {0} {1}',
   loading:'Loading forecast', howLink:'How the score works', histLink:'History', exact:'Exact score', today:'today', tomorrow:'tomorrow', peak:'peak', beach:'Beach', outOf:'of 10',
@@ -905,7 +926,7 @@ const I18N={
   ssWhyText:'<b>Cloud is the screen.</b> High and mid cloud catches red light from below once the sun is down. A sky half covered with it gives the best sunsets.<br><b>The west has to be open.</b> That light arrives almost flat from hundreds of kilometres away. A cloud bank on the western horizon shuts it off. So the score looks at cloud out at sea, along the line to the sun.<br><b>Low cloud is a lid.</b> Grey low cloud overhead or rain hides everything.<br><b>A clear sky is clean and plain.</b> The sun goes into the sea and the sky stays pale.<br><b>Haze mutes colour.</b> Smoke and dust turn the sun into a dim red ball before it reaches the horizon.',
  },
  ru:{
-  title:'Surf', now:'Сейчас', island:'Пхукет', d7:'10 дней',
+  title:'Surf', docTitle:'{0}: прогноз волн для серфинга, камеры, закат · Surf', now:'Сейчас', island:'Пхукет', d7:'10 дней',
   go:'ЕХАТЬ', ok:'МОЖНО', weak:'СЛАБО', no:'НЕ СТОИТ',
   darkNow:'сейчас темно. ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
   loading:'Загружаю прогноз', howLink:'Как считаются баллы', histLink:'История', exact:'Точный балл', today:'сегодня', tomorrow:'завтра', peak:'пик', beach:'Пляж', outOf:'из 10',
@@ -1057,7 +1078,7 @@ const I18N={
   ssWhyText:'<b>Облака это экран.</b> Высокие и средние облака ловят красный свет снизу, когда солнце уже село. Лучшие закаты бывают, когда ими закрыта примерно половина неба.<br><b>Запад должен быть открыт.</b> Этот свет идёт почти горизонтально за сотни километров. Стена туч у западного горизонта его перекрывает. Поэтому балл смотрит на облака далеко в море, по линии к солнцу.<br><b>Низкие тучи это крышка.</b> Серая низкая облачность над головой или дождь закрывают всё.<br><b>Чистое небо: аккуратно и просто.</b> Солнце уходит в море, небо остаётся бледным.<br><b>Дымка глушит цвет.</b> Дым и пыль превращают солнце в тусклый красный шар ещё до горизонта.',
  },
  th:{
-  title:'Surf', now:'ตอนนี้', island:'ภูเก็ต', d7:'10 วัน',
+  title:'Surf', docTitle:'พยากรณ์คลื่นเซิร์ฟ{0}วันนี้ กล้องสด พระอาทิตย์ตก · Surf', now:'ตอนนี้', island:'ภูเก็ต', d7:'10 วัน',
   go:'ไปเลย', ok:'พอไหว', weak:'คลื่นเล็ก', no:'ไม่ควรไป',
   darkNow:'ตอนนี้มืดแล้ว · ', bestIs:'ดีที่สุดคือ {0}', windowAt:'ช่วงเวลา {0} {1}',
   loading:'กำลังโหลดพยากรณ์', howLink:'คะแนนคำนวณอย่างไร', histLink:'ประวัติ', exact:'คะแนนละเอียด', today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', beach:'ชายหาด', outOf:'จาก 10',
@@ -2646,7 +2667,7 @@ function applyLang(){
        `<a href="#${k}" class="${k===REGION?'on':''}">${REGIONS[k].name[LANG]||REGIONS[k].name.en}</a>`).join('')}</div>`;
   document.getElementById('regbtn').onclick=e=>{e.stopPropagation();
     const m=document.getElementById('regmenu'); m.hidden=!m.hidden;};
-  document.title='Surf · '+regName();
+  document.title=t('docTitle',regName());
   document.getElementById('howlink').textContent=t('howLink');
   document.getElementById('histlink').textContent=t('histLink');
   document.getElementById('histlink').href='history.html#'+REGION;
