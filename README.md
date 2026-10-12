@@ -427,3 +427,9 @@ Marine archive for a point off Kata (7.79 N, 98.29 E), October 2021 to December
 After a push that adds or changes pages, wait for the deploy and run
 `node tools/indexnow.mjs`: it tells Bing and Yandex which addresses changed.
 The `<key>.txt` file in the root belongs to it and is not a secret.
+
+## Numbers
+
+`node tools/stats.mjs` prints visits (Google Analytics) and search impressions
+(Search Console) for the surf site; `node tools/stats.mjs 7` for the last week.
+It only reads. The key file it needs is kept outside the repository.
