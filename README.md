@@ -402,3 +402,22 @@ sitemap. `llms.txt` describes the site for AI crawlers.
 The forecast is drawn by script, so crawlers that do not run scripts would see
 an empty page. The `<noscript>` block in `index.html` gives them the text; the
 page itself never shows it. Keep the beach list there in step with `REGIONS`.
+
+## Articles
+
+Sources live in `articles/<lang>/<slug>.html`: a JSON header in an HTML comment
+(`title`, `h1`, `description`, `date`, `faq`), then the body as plain HTML.
+After adding or editing one run:
+
+```
+node tools/articles.mjs
+```
+
+It writes `<lang>/<slug>/index.html`, the list at `<lang>/index.html` and
+`sitemap.xml`. Commit the built pages together with the source: there is no
+build on the server. Russian only so far; the footer link to the section shows
+when the interface is in Russian.
+
+Numbers in the articles: wave statistics by month come from the Open-Meteo
+Marine archive for a point off Kata (7.79 N, 98.29 E), October 2021 to December
+2025; sunset times are computed for the 15th of each month.
