@@ -21,18 +21,20 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const SITE = 'https://surf.voidstudio.top';
 const GA = 'G-72CS4WJ571';
+// Last substantive navigation/template update, not the build date.
+const PAGE_UPDATED = '2026-11-10';
 // pages that are not articles, kept in the sitemap
 const STATIC = [['/', 'hourly'], ['/how.html', 'monthly'], ['/history.html', 'daily']];
 
 const L = {
-  ru: { back: '← Прогноз сейчас', section: 'Статьи', sectionTitle: 'Серфинг и море на Пхукете: статьи · Surf',
+  ru: { back: '← Прогноз сейчас', section: 'Статьи', sectionTitle: 'Пляжи Пхукета: волны, веб-камеры, серфинг и закаты · Surf',
         sectionDesc: 'Волны по месяцам, сезон серфинга, пляжи и закаты Пхукета: коротко и с цифрами.',
         cta: 'Что на пляжах прямо сейчас', ctaSub: 'Волна, ветер, прилив и камеры по каждому пляжу',
-        faq: 'Коротко', more: 'Ещё статьи', updated: 'Обновлено', how: 'Как считаются баллы', locale: 'ru-RU' },
-  en: { back: '← Forecast now', section: 'Guides', sectionTitle: 'Surfing and the sea in Phuket: guides · Surf',
+        faq: 'Коротко', more: 'Ещё по теме', contents: 'В этой статье', hubTitle: 'Пляжи и море на Пхукете', hubLead: 'Выберите, что нужно для поездки: сезон волн, пляж для серфинга, камера перед выходом или место для заката.', updated: 'Обновлено', how: 'Как считаются баллы', locale: 'ru-RU' },
+  en: { back: '← Forecast now', section: 'Guides', sectionTitle: 'Phuket beach guides: waves, webcams, surfing and sunsets · Surf',
         sectionDesc: 'Waves by month, the surf season, beaches and sunsets in Phuket, short and with numbers.',
         cta: 'What the beaches look like right now', ctaSub: 'Wave, wind, tide and live cams for every beach',
-        faq: 'In short', more: 'More guides', updated: 'Updated', how: 'How the score works', locale: 'en-GB' }
+        faq: 'In short', more: 'Related guides', contents: 'On this page', hubTitle: 'Phuket beach and sea guides', hubLead: 'Plan a beach visit: check the wave season, choose a surf beach, look at a webcam or find a sunset spot.', updated: 'Updated', how: 'How the score works', locale: 'en-GB' }
 };
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -79,6 +81,11 @@ tr.hi td{background:var(--card2);font-weight:600}
 .cam img{width:100%;height:100%;object-fit:cover;display:block}
 .list a{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;margin:10px 0;font-weight:650}
 .list a span{display:block;font-weight:400;font-size:14px;color:var(--dim)}
+.contents{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:16px 0 22px;font-size:14px}
+.contents b{display:block;margin-bottom:6px}
+.contents ul{margin:0}
+h2[id]{scroll-margin-top:16px}
+a:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 .foot{margin-top:34px;font-size:13px;color:var(--dim)}`;
 
 const head = ({ lang, title, description, url, extra = '' }) => `<!doctype html>
@@ -141,7 +148,7 @@ function load(lang) {
   }).sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || a.slug.localeCompare(b.slug));
 }
 
-const urls = [...STATIC.map(([p, f]) => ({ loc: SITE + p, freq: f }))];
+const urls = [...STATIC.map(([p, f]) => ({ loc: SITE + p, freq: f, ...(p === '/' ? { mod: PAGE_UPDATED } : {}) }))];
 const ALL = Object.fromEntries(Object.keys(L).map(l => [l, load(l)]));
 const LANGS = Object.keys(L).filter(l => ALL[l].length);
 // the same article in the other languages: [[lang, address]]
@@ -157,21 +164,37 @@ for (const lang of Object.keys(L)) {
   const t = L[lang];
   for (const a of arts) {
     const url = `${SITE}/${lang}/${a.slug}/`;
-    const upd = a.updated || a.date;
+    const upd = [a.updated || a.date, PAGE_UPDATED].sort().at(-1);
+    const sections = [];
+    let body = a.body.replace(/<h2>(.*?)<\/h2>/g, (_, title) => {
+      const id = 'section-' + (sections.length + 1);
+      sections.push({ id, title });
+      return `<h2 id="${id}">${title}</h2>`;
+    });
+    const contents = sections.length ? `<nav class="contents" aria-label="${t.contents}"><b>${t.contents}</b><ul>${sections.map(s => `<li><a href="#${s.id}">${s.title}</a></li>`).join('')}</ul></nav>` : '';
+    body = body.replace(/(<p class="lead">[\s\S]*?<\/p>)/, '$1\n' + contents);
     const data = [{ '@context': 'https://schema.org', '@type': 'Article', headline: a.h1, description: a.description,
       inLanguage: lang, datePublished: a.date, dateModified: upd, mainEntityOfPage: url, image: SITE + '/og.png',
       author: { '@type': 'Organization', name: 'voidstudio', url: 'https://voidstudio.top/' },
       publisher: { '@type': 'Organization', name: 'Surf', url: SITE + '/' } }];
+    data.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Surf', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: t.section, item: `${SITE}/${lang}/` },
+      { '@type': 'ListItem', position: 3, name: a.h1, item: url }
+    ] });
     if (a.faq?.length) data.push({ '@context': 'https://schema.org', '@type': 'FAQPage',
       mainEntity: a.faq.map(([q, ans]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: strip(ans) } })) });
-    const others = arts.filter(o => o !== a);
+    const related = { waves: ['surf', 'flags', 'cams'], surf: ['waves', 'cams', 'flags'], sunset: ['cams', 'swim', 'waves'], cams: ['flags', 'surf', 'sunset'], flags: ['swim', 'cams', 'waves'], swim: ['flags', 'cams', 'waves'] };
+    const priority = related[a.key] || [];
+    const others = arts.filter(o => o !== a).sort((x, y) =>
+      (priority.includes(x.key) ? priority.indexOf(x.key) : 99) - (priority.includes(y.key) ? priority.indexOf(y.key) : 99));
     const tw = twins(a);
     const html = head({ lang, title: a.title, description: a.description, url, extra: alt(tw) + data.map(ld).join('\n') + '\n' }) +
 `<div class="top"><a href="/">${t.back}</a><span><a href="/${lang}/">${t.section}</a>${sw(tw, lang)}</span></div>
 <article>
 <h1>${a.h1}</h1>
 <p class="meta">${t.updated} ${day(upd, lang)}</p>
-${a.body}
+${body}
 ${a.faq?.length ? `<section class="faq">\n<h2>${t.faq}</h2>\n${a.faq.map(([q, ans]) => `<h3>${q}</h3>\n<p>${ans}</p>`).join('\n')}\n</section>` : ''}
 </article>
 <a class="cta" href="/">${t.cta} →<span>${t.ctaSub}</span></a>
@@ -185,15 +208,16 @@ ${others.length ? `<h2>${t.more}</h2>\n<div class="list">\n${others.map(o => `<a
   }
   const url = `${SITE}/${lang}/`;
   fs.writeFileSync(path.join(ROOT, lang, 'index.html'),
-    head({ lang, title: t.sectionTitle, description: t.sectionDesc, url, extra: alt(LANGS.map(l => [l, `${SITE}/${l}/`])) }) +
+    head({ lang, title: t.sectionTitle, description: t.sectionDesc, url, extra: alt(LANGS.map(l => [l, `${SITE}/${l}/`])) + ld({ '@context': 'https://schema.org', '@type': 'CollectionPage', name: t.hubTitle, description: t.sectionDesc, url, inLanguage: lang, mainEntity: { '@type': 'ItemList', itemListElement: arts.map((a, i) => ({ '@type': 'ListItem', position: i + 1, name: a.h1, url: `${SITE}/${lang}/${a.slug}/` })) } }) }) +
 `<div class="top"><a href="/">${t.back}</a><span>${sw(LANGS.map(l => [l, `${SITE}/${l}/`]), lang)}</span></div>
-<h1>${t.section}</h1>
+<h1>${t.hubTitle}</h1>
+<p class="lead">${t.hubLead}</p>
 <div class="list">
 ${arts.map(o => `<a href="/${lang}/${o.slug}/">${o.h1}<span>${esc(o.description)}</span></a>`).join('\n')}
 </div>
 <a class="cta" href="/">${t.cta} →<span>${t.ctaSub}</span></a>
 ` + foot(lang));
-  urls.push({ loc: url, freq: 'weekly' });
+  urls.push({ loc: url, freq: 'weekly', mod: PAGE_UPDATED });
 }
 
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
@@ -202,3 +226,27 @@ fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
   '\n</urlset>\n');
 
 console.log(`${count} articles, ${urls.length} addresses in sitemap.xml`);
+
+// Keep crawlable guide navigation in the initial HTML, independent of forecasts.
+const short = {
+  en: { title: 'Before you go', all: 'All guides', cams: 'Live webcams', waves: 'Waves by month', sunset: 'Sunset spots' },
+  ru: { title: 'Перед поездкой', all: 'Все статьи', cams: 'Веб-камеры', waves: 'Волны по месяцам', sunset: 'Места для заката' }
+};
+const panels = (compact) => LANGS.map(lang => {
+  const t = short[lang];
+  const arts = compact ? ['cams', 'waves', 'sunset'].map(key => ALL[lang].find(a => a.key === key)).filter(Boolean) : ALL[lang];
+  return `<nav class="${compact ? 'guide-shortcuts' : 'guide-panel'}" data-guide-lang="${lang}" lang="${lang}" aria-label="${t.title}">
+${compact ? '' : `<h2>${L[lang].hubTitle}</h2>`}
+<div class="guide-links">${arts.map(a => `<a href="/${lang}/${a.slug}/">${compact ? t[a.key] : a.h1}${compact ? '' : `<span>${esc(a.description)}</span>`}</a>`).join('')}</div>
+<a class="guide-all" href="/${lang}/">${t.all} →</a>
+</nav>`;
+}).join('\n');
+const home = path.join(ROOT, 'index.html');
+let main = fs.readFileSync(home, 'utf8');
+for (const [name, compact] of [['shortcuts', true], ['guides', false]]) {
+  const begin = `<!-- articles:${name}:begin -->`, end = `<!-- articles:${name}:end -->`;
+  const start = main.indexOf(begin), finish = main.indexOf(end);
+  if (start < 0 || finish < start) throw new Error(`Missing article navigation markers: ${name}`);
+  main = main.slice(0, start) + begin + '\n' + panels(compact) + '\n' + main.slice(finish);
+}
+fs.writeFileSync(home, main);

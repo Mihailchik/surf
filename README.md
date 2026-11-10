@@ -413,8 +413,11 @@ After adding or editing one run:
 node tools/articles.mjs
 ```
 
-It writes `<lang>/<slug>/index.html`, the list at `<lang>/index.html` and
-`sitemap.xml`. Commit the built pages together with the source: there is no
+It writes `<lang>/<slug>/index.html`, the list at `<lang>/index.html`,
+`sitemap.xml`, and the guide links in `index.html` between the `articles:*`
+markers. The homepage links are regular HTML and switch between English and
+Russian with the interface language. Articles include a table of contents,
+breadcrumb structured data and related guides ordered by topic. Commit the built pages together with the source: there is no
 build on the server. Russian and English; the header field `key` ties the two
 versions of one article together (language link, hreflang). The footer link on
 the main page leads to the Russian section for Russian readers and to the
