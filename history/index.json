@@ -1,10 +1,15 @@
 {
- "updated": "2026-11-13T02:27:52.586Z",
+ "updated": "2026-11-14T02:00:14.786Z",
  "days": [
+  {
+   "date": "2026-11-14",
+   "forecast": true,
+   "actual": false
+  },
   {
    "date": "2026-11-13",
    "forecast": true,
-   "actual": false
+   "actual": true
   },
   {
    "date": "2026-11-12",
