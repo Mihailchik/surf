@@ -229,8 +229,8 @@ console.log(`${count} articles, ${urls.length} addresses in sitemap.xml`);
 
 // Keep crawlable guide navigation in the initial HTML, independent of forecasts.
 const short = {
-  en: { title: 'Before you go', all: 'All guides', cams: 'Live webcams', waves: 'Waves by month', sunset: 'Sunset spots' },
-  ru: { title: 'Перед поездкой', all: 'Все статьи', cams: 'Веб-камеры', waves: 'Волны по месяцам', sunset: 'Места для заката' }
+  en: { title: 'Before you go', all: 'All guides', cams: 'Live cams', waves: 'Wave season', sunset: 'Sunset spots' },
+  ru: { title: 'Перед поездкой', all: 'Все статьи', cams: 'Камеры онлайн', waves: 'Сезон волн', sunset: 'Где закат' }
 };
 const panels = (compact) => LANGS.map(lang => {
   const t = short[lang];

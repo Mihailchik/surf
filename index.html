@@ -329,9 +329,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 html[lang="ru"] [data-guide-lang="en"]{display:none}
 html[lang="ru"] [data-guide-lang="ru"]{display:block}
 .guide-shortcuts{margin:10px 0 14px;font-size:12px}
-.guide-shortcuts .guide-links{display:flex;flex-wrap:wrap;gap:6px}
+.guide-shortcuts .guide-links{display:flex;gap:6px}
 .guide-links a,.guide-all{color:var(--acc);text-decoration:none}
-.guide-shortcuts .guide-links a{padding:7px 10px;border:1px solid var(--line);border-radius:20px;background:var(--card);font-weight:650}
+.guide-shortcuts .guide-links a{flex:1 1 auto;min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:20px;background:var(--card);font-weight:650;
+  text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .guide-all{display:inline-block;margin-top:9px;font-size:12px;font-weight:650}
 .guide-panel{margin:22px 0 12px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
 .guide-panel h2{font-size:17px;line-height:1.3;margin:0 0 12px;letter-spacing:-.2px}
@@ -464,12 +465,12 @@ html[lang="ru"] [data-guide-lang="ru"]{display:block}
   <!-- articles:shortcuts:begin -->
 <nav class="guide-shortcuts" data-guide-lang="ru" lang="ru" aria-label="Перед поездкой">
 
-<div class="guide-links"><a href="/ru/veb-kamery-phuketa/">Веб-камеры</a><a href="/ru/volny-po-mesyacam/">Волны по месяцам</a><a href="/ru/zakat-vremya-i-mesta/">Места для заката</a></div>
+<div class="guide-links"><a href="/ru/veb-kamery-phuketa/">Камеры онлайн</a><a href="/ru/volny-po-mesyacam/">Сезон волн</a><a href="/ru/zakat-vremya-i-mesta/">Где закат</a></div>
 <a class="guide-all" href="/ru/">Все статьи →</a>
 </nav>
 <nav class="guide-shortcuts" data-guide-lang="en" lang="en" aria-label="Before you go">
 
-<div class="guide-links"><a href="/en/phuket-webcams/">Live webcams</a><a href="/en/phuket-waves-by-month/">Waves by month</a><a href="/en/phuket-sunset-times-and-spots/">Sunset spots</a></div>
+<div class="guide-links"><a href="/en/phuket-webcams/">Live cams</a><a href="/en/phuket-waves-by-month/">Wave season</a><a href="/en/phuket-sunset-times-and-spots/">Sunset spots</a></div>
 <a class="guide-all" href="/en/">All guides →</a>
 </nav>
 <!-- articles:shortcuts:end -->
