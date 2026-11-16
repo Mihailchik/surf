@@ -194,6 +194,9 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .cam iframe{width:100%;height:100%;border:0;display:block}
 .cam img{width:100%;height:100%;object-fit:cover;display:block}
 .camtag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);
+a.cam{display:block;color:#fff;text-decoration:none}
+.camplay{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);
+  font-size:12px;font-weight:650;padding:6px 11px;border-radius:16px;z-index:2}
   font-size:10px;padding:3px 7px;border-radius:6px;color:#fff;display:flex;align-items:center;
   gap:5px;pointer-events:none;z-index:2}
 .dot{width:6px;height:6px;border-radius:50%;background:#ff4444;animation:pulse 1.8s infinite}
@@ -822,7 +825,7 @@ const I18N={
   darkNow:'dark now. ', bestIs:'best is {0}', windowAt:'window {0} {1}',
   loading:'Loading forecast', howLink:'How the score works', histLink:'History', exact:'Exact score', today:'today', tomorrow:'tomorrow', peak:'peak', beach:'Beach', outOf:'of 10',
   wave:'wave', period:'period', wind:'wind', water:'water',
-  noCam:'no camera', camNone:'no public camera',
+  noCam:'no camera', camNone:'no public camera', camPhoto:'photo', camVideo:'live video',
   tPeak:'peak', tTide:'tide', tNow:'now',
   tideHigh:'max', tideLow:'min',
   rising:'conditions improving', falling:'conditions worsening', atPeak:'best right now', flat:'holding steady',
@@ -974,7 +977,7 @@ const I18N={
   darkNow:'сейчас темно. ', bestIs:'лучше всего {0}', windowAt:'окно {0} {1}',
   loading:'Загружаю прогноз', howLink:'Как считаются баллы', histLink:'История', exact:'Точный балл', today:'сегодня', tomorrow:'завтра', peak:'пик', beach:'Пляж', outOf:'из 10',
   wave:'волна', period:'период', wind:'ветер', water:'вода',
-  noCam:'камеры нет', camNone:'публичных камер нет',
+  noCam:'камеры нет', camNone:'публичных камер нет', camPhoto:'фото', camVideo:'видео',
   tPeak:'пик', tTide:'прилив', tNow:'сейчас',
   tideHigh:'макс', tideLow:'мин',
   rising:'условия улучшаются', falling:'условия ухудшаются', atPeak:'сейчас лучший момент', flat:'без изменений',
@@ -1126,7 +1129,7 @@ const I18N={
   darkNow:'ตอนนี้มืดแล้ว · ', bestIs:'ดีที่สุดคือ {0}', windowAt:'ช่วงเวลา {0} {1}',
   loading:'กำลังโหลดพยากรณ์', howLink:'คะแนนคำนวณอย่างไร', histLink:'ประวัติ', exact:'คะแนนละเอียด', today:'วันนี้', tomorrow:'พรุ่งนี้', peak:'สูงสุด', beach:'ชายหาด', outOf:'จาก 10',
   wave:'คลื่น', period:'คาบคลื่น', wind:'ลม', water:'น้ำ',
-  noCam:'ไม่มีกล้อง', camNone:'ไม่มีกล้องสาธารณะ',
+  noCam:'ไม่มีกล้อง', camNone:'ไม่มีกล้องสาธารณะ', camPhoto:'ภาพนิ่ง', camVideo:'วิดีโอสด',
   tPeak:'สูงสุด', tTide:'น้ำขึ้นลง', tNow:'ตอนนี้',
   tideHigh:'สูงสุด', tideLow:'ต่ำสุด',
   rising:'สภาพกำลังดีขึ้น', falling:'สภาพกำลังแย่ลง', atPeak:'ตอนนี้ดีที่สุด', flat:'คงที่',
@@ -1599,12 +1602,20 @@ function mapLink(sp){
 function camBlock(sp){
   // original streams: autoplay, no redirect
   const view=(c,tag)=>{
+/* Live video for still-frame cams: the Patong Tower stream refuses to be framed
+   anywhere but phuket101.net, so the frame links there. */
+const CAM_VIDEO={'1613136596':'https://www.phuket101.net/phuket-webcams/#Patong_Beach_Live_Weather_Webcam'};
     // players are heavy on phones: markup first, src once the data is on screen
     const at=CAMS_ON?'src':'data-live';
-    if(c.type==='img') return `<div class="cam" data-src="img:${c.id}">
-      <img class="camimg" data-cam="${c.id}" alt="${tag}"
+    // a still frame: say so, and send a tap to the owner's live video,
+    // which only plays on their own site; the language is part of the key
+    // so a language switch redraws the labels
+    if(c.type==='img') return `<a class="cam" data-src="img:${c.id}:${LANG}" href="${CAM_VIDEO[c.id]}"
+      target="_blank" rel="noopener">
+      <img class="camimg" data-cam="${c.id}" alt="${t('camPhoto')} · ${c.by}"
         ${at}="https://imgproxy.windy.com/_/preview/plain/current/${c.id}/original.jpg?v=${Date.now()}">
-      <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
+      <div class="camtag">${t('camPhoto')} · ${c.by}</div>
+      <span class="camplay">▶ ${t('camVideo')} ↗</span></a>`;
     const src=c.type==='ipcam'
       ? `https://g3.ipcamlive.com/player/player.php?alias=${c.id}&autoplay=1&mute=1`
       : `https://rtsp.me/embed/${c.id}/`;
@@ -2776,6 +2787,8 @@ document.addEventListener('toggle',e=>{
   else if(k==='day') trackOnce('day_open',{beach:d.dataset.s,day_ahead:nth(d)},d.dataset.s+nth(d));
   else if(o==='src') trackOnce('sources_open',{where:'sunset'},'sunset');
   else if(o==='why'||o==='plrest') trackOnce('fold_open',{what:o},o);
+  const cv=el.closest('a.cam');
+  if(cv) track('cam_video_out',{beach:spotOf(cv)});
   else if(o.startsWith('od')) trackOnce('outlook_day',{day_ahead:nth(d)},o);
   else if(o.startsWith('ob')) trackOnce('outlook_beach',{beach:o.slice(2)},o);
   else if(o.startsWith('ws')) trackOnce('sources_open',{where:'weather'},'weather');
