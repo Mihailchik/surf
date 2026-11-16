@@ -2,6 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- What the page may load. A new data source, camera or image host must be
+     added here too, or the browser silently blocks it (it then shows up as
+     src_fail in analytics). Camera players also get sandbox: no pop-ups and no
+     leading the whole tab away. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self';
+  script-src 'self' 'unsafe-inline' https://*.googletagmanager.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https://imgproxy.windy.com https://tile.openstreetmap.org https://*.google-analytics.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com;
+  connect-src 'self' https://*.open-meteo.com https://api.met.no https://pae-paha.pacioos.hawaii.edu https://wttr.in https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com;
+  frame-src https://rtsp.me https://g3.ipcamlive.com;
+  object-src 'none'; base-uri 'none'; form-action 'none'">
 <!-- Google tag. Events wait in dataLayer; the library itself is fetched by
      loadGA(), which the page calls once the forecast is on screen. -->
 <script>
@@ -1624,6 +1635,7 @@ function camBlock(sp){
       : `https://rtsp.me/embed/${c.id}/`;
     return `<div class="cam" data-src="${src}">
       <iframe ${at}="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
+        sandbox="allow-scripts allow-same-origin"
         referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
   };
