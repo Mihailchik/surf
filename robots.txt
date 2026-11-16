@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+# sources and build tools: the built pages live under /ru/ and /en/
+Disallow: /articles/
+Disallow: /tools/
 
 Sitemap: https://surf.voidstudio.top/sitemap.xml

@@ -12,7 +12,9 @@
   gtag('js', new Date());
   // who is looking: interface language, theme, and whether the site is installed as an app
   var up={ui_lang:'en',ui_theme:'light',app_mode:'browser'};
-  try{ up.ui_lang=localStorage.getItem('lang')||'en'; up.ui_theme=localStorage.getItem('theme')||'light'; }catch(e){}
+  // no stored choice yet: the browser's language, if the page speaks it (same rule as LANG below)
+  try{ up.ui_lang=localStorage.getItem('lang')||(navigator.languages||[navigator.language||'']).map(function(l){return String(l).slice(0,2).toLowerCase()}).filter(function(l){return /^(en|ru|th)$/.test(l)})[0]||'en'; }catch(e){}
+  try{ up.ui_theme=localStorage.getItem('theme')||'light'; }catch(e){}
   try{ if(matchMedia('(display-mode: standalone)').matches||navigator.standalone) up.app_mode='app'; }catch(e){}
   gtag('set','user_properties',up);
   gtag('config', 'G-72CS4WJ571');
@@ -28,9 +30,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f9">
 <title>Phuket surf forecast today: waves, live cams, sunset · Surf</title>
-<link rel="icon" type="image/svg+xml" href="./surf-logo-icon-smooth.svg">
-<link rel="apple-touch-icon" href="./surf-logo-icon-smooth.svg">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Phuket%20surf%22%2C%22short_name%22%3A%22Surf%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f2f5f9%22%2C%22theme_color%22%3A%22%230b7fc7%22%2C%22start_url%22%3A%22.%22%7D">
+<link rel="icon" type="image/png" href="./favicon.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Surf">
 <meta name="description" content="Is it worth surfing in Phuket right now? Wave height, period, wind and tide for Kata, Karon, Patong, Nai Harn and 9 more beaches, scored 0 to 10, with live cams, a 10-day outlook and a sunset score.">
@@ -348,8 +349,7 @@ html[lang="ru"] [data-guide-lang="ru"]{display:block}
 .made{text-align:center;padding:16px 0 2px;font-size:12px;color:var(--dim2)}
 .made a{color:var(--acc);text-decoration:none;font-weight:650}
 .made a:hover{text-decoration:underline}
-.hits{display:flex;justify-content:center;padding:8px 0 4px;opacity:.65}
-.hits img{height:18px}
+
 .stale{margin:10px 0 0;padding:9px 12px;border-radius:11px;font-size:12.5px;line-height:1.45;
   background:color-mix(in srgb,var(--bad) 10%,var(--card));
   border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);color:var(--bad)}
@@ -507,8 +507,7 @@ html[lang="ru"] [data-guide-lang="ru"]{display:block}
   <div class="src" id="src"></div>
   <div class="made"><a id="howlink" href="how.html">How the score works</a> · <a id="histlink" href="history.html">History</a> · <a id="artlink" href="en/">Guides</a></div>
   <div class="made">made by <a href="https://voidstudio.top" target="_blank" rel="noopener">voidstudio.top</a></div>
-  <div class="hits"><img alt="" width="56" height="20"
-    data-src="https://hits.sh/surf.voidstudio.top.svg?style=flat-square&label=visits&color=0b7fc7&labelColor=e3e9f0"></div>
+
 
 </div>
 
@@ -1279,7 +1278,12 @@ const I18N={
 const LOCALE={en:'en-GB',ru:'ru-RU',th:'th-TH'};
 const nameOf=sp=>sp.nm[LANG]||sp.nm.en;
 let LANG=LS.get('lang');
-if(!I18N[LANG]) LANG='en';
+/* First visit: the browser's language, if the page speaks it. A found Russian
+   or Thai is stored, so how.html and history.html open in it too. */
+if(!I18N[LANG]){
+  LANG=(navigator.languages||[navigator.language||'']).map(l=>String(l).slice(0,2).toLowerCase()).find(l=>I18N[l])||'en';
+  if(LANG!=='en') LS.set('lang',LANG);
+}
 function t(k,...a){
   let s=I18N[LANG][k]; if(s===undefined) s=I18N.en[k]; if(s===undefined) return k;
   a.forEach((v,i)=>{s=s.split('{'+i+'}').join(v)});
@@ -1383,7 +1387,7 @@ const speedBucket=ms=>ms<1000?'under 1 s':ms<2000?'1-2 s':ms<4000?'2-4 s':ms<800
 const reportFail=src=>trackOnce('src_fail',{src},src);
 /* Nothing that is not the forecast is fetched before the forecast is on
    screen. The code of the weather and sunset tabs, the analytics library and
-   the visit counter come after the first paint, when the browser is idle. */
+   the install manifest come after the first paint, when the browser is idle. */
 const SKY_FILES=['sky.js?v=20261007d','horizon.js?v=20261007a'];
 let SKY_CODE=false, AFTER_DONE=false;
 function loadSkyCode(){
@@ -1395,8 +1399,7 @@ function afterPaint(){
   const idle=window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:2500}):f=>setTimeout(f,400);
   idle(()=>{
     loadSkyCode(); loadGA();
-    const h=document.querySelector('.hits img[data-src]');
-    if(h){ h.src=h.dataset.src; h.removeAttribute('data-src'); }
+    const m=document.createElement('link'); m.rel='manifest'; m.href='./manifest.webmanifest'; document.head.appendChild(m);
   });
 }
 // a page that never gets a forecast still loads them, later
@@ -2578,7 +2581,12 @@ async function boot(force){
   // rolling wave, so a slow answer does not look like a frozen page
   if(!DATA){
     document.getElementById('main').innerHTML=
-      `<div class="loader pen"><i class="wavepen" aria-hidden="true"></i>${t('loading')}</div>`+'<div class="skel"></div>'.repeat(3);
+      `<div class="loader"><span class="dots"><i></i><i></i><i></i></span>${t('loading')}</div>`+'<div class="skel"></div>'.repeat(3);
+    // the drawn wave weighs more than the page itself, so it is fetched only
+    // when the wait is long enough to need it; a quick answer never asks for it
+    setTimeout(()=>{ const l=document.querySelector('#main .loader');
+      if(l&&!DATA&&!l.classList.contains('pen')){ l.classList.add('pen');
+        l.innerHTML=`<i class="wavepen" aria-hidden="true"></i>${t('loading')}`; } },1500);
     // a long wait should not look like a frozen page
     setTimeout(()=>{ const l=document.querySelector('#main .loader');
       if(l&&!DATA) l.insertAdjacentHTML('afterend',`<p class="slow">${t('slowLoad')}</p>`); },5000);
