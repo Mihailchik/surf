@@ -2547,11 +2547,21 @@ let KEPT=false;
 /* How long the full forecast waits for the reserve and the extras, ms. */
 const JOIN_WAIT=1200;
 let WAVE_FALLBACK=null, LOADING=false, EXTRA_PENDING=false, CAMS_ON=false;
+/* Players are heavy: the forecast paints first, the cameras start CAM_DELAY
+   later and one at a time, top to bottom, so they do not fight the page or
+   each other for the connection. */
+const CAM_DELAY=2500, CAM_STEP=800;
+let CAMS_QUEUED=false;
 function startCams(){
-  CAMS_ON=true;
-  document.querySelectorAll('.cam [data-live]').forEach(el=>{
-    el.src=el.dataset.live; el.removeAttribute('data-live');
-  });
+  if(CAMS_QUEUED) return;
+  CAMS_QUEUED=true;
+  setTimeout(()=>{ CAMS_ON=true; nextCam(); },CAM_DELAY);
+}
+function nextCam(){
+  const el=document.querySelector('.cam [data-live]');
+  if(!el) return;
+  el.src=el.dataset.live; el.removeAttribute('data-live');
+  setTimeout(nextCam,CAM_STEP);
 }
 function cacheSave(d){
   try{
@@ -2615,7 +2625,7 @@ async function boot(force){
     if(moved()) return;
     if(!painted){
       DATA=build(first,null); DATA_FROM=first.fallback?'reserve':'net'; LAST_OK=Date.now(); STALE=false; render();
-      if(!CAMS_ON) setTimeout(startCams,1500);
+      startCams();
     }
     // then everything that arrived: Open-Meteo per-beach models plus NOAA in
     // one median; NOAA alone if Open-Meteo never answered
