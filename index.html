@@ -1620,9 +1620,7 @@ function camBlock(sp){
   // original streams: autoplay, no redirect
   const view=(c,tag)=>{
     // players are heavy on phones: markup first, src once the data is on screen
-    // Start RTSP only when its frame is visible. Loading the player below the
-    // fold can leave its mobile autoplay attempt waiting for a manual play.
-    const at=CAMS_ON&&c.type!=='rtsp'?'src':'data-live';
+    const at=CAMS_ON?'src':'data-live';
     // a still frame: say so, and send a tap to the owner's live video,
     // which only plays on their own site; the language is part of the key
     // so a language switch redraws the labels
@@ -1636,7 +1634,7 @@ function camBlock(sp){
       ? `https://g3.ipcamlive.com/player/player.php?alias=${c.id}&autoplay=1&mute=1`
       : `https://rtsp.me/embed/${c.id}/`;
     return `<div class="cam" data-src="${src}">
-      <iframe ${c.type==='rtsp'?'data-cam-viewport':''} ${at}="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
+      <iframe ${at}="${src}" loading="lazy" allow="autoplay; fullscreen; encrypted-media"
         sandbox="allow-scripts allow-same-origin"
         referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="camtag"><span class="dot"></span>${tag}</div></div>`;
@@ -2125,7 +2123,7 @@ function render(){
     new Date(LAST_OK||Date.now()).toLocaleTimeString(LOCALE[LANG],{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit'}));
   const cams=SPOTS.filter(x=>x.cam).map(x=>`${nameOf(x)} (${x.cam.by})`).join(', ');
   document.getElementById('src').innerHTML=t('licence')+(cams?' '+t('camsLine',cams):'')+' '+t('licTail');
-  firstPaint(); reportState(); startCams();
+  firstPaint(); reportState();
 }
 
 /* ===== Weather and sunset tabs =====
@@ -2565,40 +2563,17 @@ let WAVE_FALLBACK=null, LOADING=false, EXTRA_PENDING=false, CAMS_ON=false;
    later and one at a time, top to bottom, so they do not fight the page or
    each other for the connection. */
 const CAM_DELAY=2500, CAM_STEP=800;
-let CAMS_QUEUED=false, CAM_STARTING=false, CAM_VIEW=null;
-const CAM_WATCHED=new Set();
-function camVisible(el){
-  const r=el.getBoundingClientRect();
-  return r.width>0&&r.height>0&&r.right>0&&r.left<innerWidth&&
-    Math.min(r.bottom,innerHeight)-Math.max(r.top,0)>=Math.min(r.height,innerHeight)/2;
-}
-function watchCamViewport(){
-  if(!('IntersectionObserver' in window)) return;
-  if(!CAM_VIEW) CAM_VIEW=new IntersectionObserver(()=>nextCam(),{threshold:[0,.5,1]});
-  for(const el of CAM_WATCHED) if(!el.isConnected||!el.hasAttribute('data-live')){
-    CAM_VIEW.unobserve(el); CAM_WATCHED.delete(el);
-  }
-  document.querySelectorAll('.cam [data-cam-viewport][data-live]').forEach(el=>{
-    if(!CAM_WATCHED.has(el)){ CAM_WATCHED.add(el); CAM_VIEW.observe(el); }
-  });
-}
+let CAMS_QUEUED=false;
 function startCams(){
-  watchCamViewport();
-  if(CAMS_QUEUED){ if(CAMS_ON) nextCam(); return; }
+  if(CAMS_QUEUED) return;
   CAMS_QUEUED=true;
   setTimeout(()=>{ CAMS_ON=true; nextCam(); },CAM_DELAY);
 }
 function nextCam(){
-  if(!CAMS_ON||CAM_STARTING||document.hidden) return;
-  const el=[...document.querySelectorAll('.cam [data-live]')].find(el=>
-    !el.hasAttribute('data-cam-viewport')||!('IntersectionObserver' in window)||camVisible(el));
+  const el=document.querySelector('.cam [data-live]');
   if(!el) return;
-  // Visibility is handled above; browser lazy loading must not delay this
-  // second, now-visible start independently.
-  if(el.hasAttribute('data-cam-viewport')) el.loading='eager';
   el.src=el.dataset.live; el.removeAttribute('data-live');
-  CAM_STARTING=true;
-  setTimeout(()=>{ CAM_STARTING=false; nextCam(); },CAM_STEP);
+  setTimeout(nextCam,CAM_STEP);
 }
 function cacheSave(d){
   try{
@@ -2809,17 +2784,10 @@ const CAM_RESTART=9*60*1000;
 let camAt=Date.now();
 function restartCams(){
   camAt=Date.now();
-  document.querySelectorAll('.cam iframe[src*="rtsp.me"]').forEach(f=>{
-    if(camVisible(f)) f.src=f.src;
-    else { f.dataset.live=f.src; f.removeAttribute('src'); }
-  });
-  watchCamViewport();
+  document.querySelectorAll('.cam iframe[src*="rtsp.me"]').forEach(f=>{ f.src=f.src; });
 }
 setInterval(()=>{ if(!document.hidden&&Date.now()-camAt>=CAM_RESTART) restartCams(); },30000);
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden){
-  if(Date.now()-camAt>=CAM_RESTART) restartCams();
-  startCams();
-} });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&Date.now()-camAt>=CAM_RESTART) restartCams(); });
 document.addEventListener('click',()=>{const m=document.getElementById('regmenu'); if(m) m.hidden=true;});
 addEventListener('hashchange',()=>{
   const h=(location.hash||'').replace('#','').toLowerCase();
