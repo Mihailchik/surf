@@ -184,7 +184,7 @@ for (const lang of Object.keys(L)) {
     ] });
     if (a.faq?.length) data.push({ '@context': 'https://schema.org', '@type': 'FAQPage',
       mainEntity: a.faq.map(([q, ans]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: strip(ans) } })) });
-    const related = { waves: ['surf', 'flags', 'cams'], surf: ['waves', 'cams', 'flags'], sunset: ['cams', 'swim', 'waves'], cams: ['flags', 'surf', 'sunset'], flags: ['swim', 'cams', 'waves'], swim: ['flags', 'cams', 'waves'] };
+    const related = { waves: ['surf', 'flags', 'cams'], surf: ['waves', 'cams', 'flags'], sunset: ['cams', 'swim', 'waves'], cams: ['flags', 'surf', 'sunset'], flags: ['swim', 'cams', 'waves'], swim: ['flags', 'cams', 'waves'], glossary: ['surf', 'flags', 'waves'] };
     const priority = related[a.key] || [];
     const others = arts.filter(o => o !== a).sort((x, y) =>
       (priority.includes(x.key) ? priority.indexOf(x.key) : 99) - (priority.includes(y.key) ? priority.indexOf(y.key) : 99));

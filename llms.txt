@@ -25,5 +25,6 @@ Data: Open-Meteo, MET Norway, NOAA WaveWatch III through PacIOOS, Copernicus Atm
 - [Phuket webcams live](https://surf.voidstudio.top/en/phuket-webcams/): live cams of Kata, Karon and Patong on one page, how to read the picture
 - [Red flags on Phuket beaches](https://surf.voidstudio.top/en/phuket-red-flags/): beach flag meanings, months with dangerous sea, rip currents and what to do
 - [Is it safe to swim in Phuket](https://surf.voidstudio.top/en/is-it-safe-to-swim-in-phuket/): rip currents, jellyfish and bluebottles, stingrays, sea urchins, first aid
+- [Surf glossary](https://surf.voidstudio.top/en/surf-glossary/): surf terms explained, from swell, set and line-up to leash, drop-in and offshore wind
 
 Every guide has a Russian version under https://surf.voidstudio.top/ru/
