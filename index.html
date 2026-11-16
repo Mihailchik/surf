@@ -194,10 +194,10 @@ header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 9
 .cam{position:relative;background:#000;aspect-ratio:16/9;width:100%}
 .cam iframe{width:100%;height:100%;border:0;display:block}
 .cam img{width:100%;height:100%;object-fit:cover;display:block}
-.camtag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);
 a.cam{display:block;color:#fff;text-decoration:none}
 .camplay{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);
   font-size:12px;font-weight:650;padding:6px 11px;border-radius:16px;z-index:2}
+.camtag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);
   font-size:10px;padding:3px 7px;border-radius:6px;color:#fff;display:flex;align-items:center;
   gap:5px;pointer-events:none;z-index:2}
 .dot{width:6px;height:6px;border-radius:50%;background:#ff4444;animation:pulse 1.8s infinite}
@@ -1602,12 +1602,12 @@ function mapLink(sp){
     href="https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lon}"><svg viewBox="0 0 24 24"
     width="12" height="12" aria-hidden="true"><path fill="#EA4335" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></a>`;
 }
-function camBlock(sp){
-  // original streams: autoplay, no redirect
-  const view=(c,tag)=>{
 /* Live video for still-frame cams: the Patong Tower stream refuses to be framed
    anywhere but phuket101.net, so the frame links there. */
 const CAM_VIDEO={'1613136596':'https://www.phuket101.net/phuket-webcams/#Patong_Beach_Live_Weather_Webcam'};
+function camBlock(sp){
+  // original streams: autoplay, no redirect
+  const view=(c,tag)=>{
     // players are heavy on phones: markup first, src once the data is on screen
     const at=CAMS_ON?'src':'data-live';
     // a still frame: say so, and send a tap to the owner's live video,
@@ -2797,6 +2797,8 @@ document.addEventListener('click',e=>{
   if(m){ const pl=m.closest('details[data-o^="pl"]');
     track('map_open',pl?{place:pl.dataset.o.slice(2),kind:'sunset'}:{place:spotOf(m),kind:'beach'}); }
   if(el.closest('.retry')) track('retry_tap',{});
+  const cv=el.closest('a.cam');
+  if(cv) track('cam_video_out',{beach:spotOf(cv)});
 },true);
 document.addEventListener('toggle',e=>{
   const d=e.target; if(!d.open||!d.dataset) return;
@@ -2805,8 +2807,6 @@ document.addEventListener('toggle',e=>{
   else if(k==='day') trackOnce('day_open',{beach:d.dataset.s,day_ahead:nth(d)},d.dataset.s+nth(d));
   else if(o==='src') trackOnce('sources_open',{where:'sunset'},'sunset');
   else if(o==='why'||o==='plrest') trackOnce('fold_open',{what:o},o);
-  const cv=el.closest('a.cam');
-  if(cv) track('cam_video_out',{beach:spotOf(cv)});
   else if(o.startsWith('od')) trackOnce('outlook_day',{day_ahead:nth(d)},o);
   else if(o.startsWith('ob')) trackOnce('outlook_beach',{beach:o.slice(2)},o);
   else if(o.startsWith('ws')) trackOnce('sources_open',{where:'weather'},'weather');
