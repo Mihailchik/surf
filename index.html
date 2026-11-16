@@ -2737,6 +2737,16 @@ setInterval(()=>{ if(!document.hidden) boot(true); },1800000);
 setInterval(()=>document.querySelectorAll('.camimg').forEach(img=>{
   img.src=`https://imgproxy.windy.com/_/preview/plain/current/${img.dataset.cam}/original.jpg?v=${Date.now()}`;
 }),45000);
+// rtsp.me stops its player after 10 min of watching and waits for a tap;
+// reload it a minute earlier so the picture keeps running on its own
+const CAM_RESTART=9*60*1000;
+let camAt=Date.now();
+function restartCams(){
+  camAt=Date.now();
+  document.querySelectorAll('.cam iframe[src*="rtsp.me"]').forEach(f=>{ f.src=f.src; });
+}
+setInterval(()=>{ if(!document.hidden&&Date.now()-camAt>=CAM_RESTART) restartCams(); },30000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&Date.now()-camAt>=CAM_RESTART) restartCams(); });
 document.addEventListener('click',()=>{const m=document.getElementById('regmenu'); if(m) m.hidden=true;});
 addEventListener('hashchange',()=>{
   const h=(location.hash||'').replace('#','').toLowerCase();
